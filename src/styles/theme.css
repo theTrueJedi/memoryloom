@@ -1831,41 +1831,77 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: 8px 12px; /* Tighter gaps for clustered effect */
   text-align: center;
+  line-height: 1.2; /* Tighter line height for density */
 }
 
 /* Word Cloud Words */
 .mood-cloud-word,
 .tag-cloud-word {
   display: inline-block;
-  font-weight: 700;
-  padding: 4px 8px;
+  padding: 2px 6px; /* Reduced padding for tighter clustering */
   cursor: default;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
-  animation: wordFadeIn 0.6s ease-out forwards;
+  animation: wordFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   opacity: 0;
   transform-origin: center;
+  letter-spacing: -0.02em; /* Slight tightening for density */
+  user-select: none;
+  --rotation: 0deg; /* Default rotation, overridden by inline style */
 }
 
 .mood-cloud-word:hover,
 .tag-cloud-word:hover {
-  transform: scale(1.15) !important;
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  transform: scale(1.2) rotate(var(--rotation)) !important;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   z-index: 10;
+  filter: brightness(1.1);
+  cursor: pointer;
 }
 
 @keyframes wordFadeIn {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.5) translateY(20px);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
+}
+
+/* Packed Word Cloud Layout */
+.tag-cloud-container-packed,
+.mood-cloud-container-packed {
+  position: relative;
+  padding: var(--spacing-lg);
+  min-height: 400px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.tag-cloud-word-packed,
+.mood-cloud-word-packed {
+  display: inline-block;
+  padding: 4px 8px;
+  cursor: default;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  animation: wordFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  letter-spacing: 0;
+  user-select: none;
+  --rotation: 0deg;
+  line-height: 1;
+}
+
+.tag-cloud-word-packed:hover,
+.mood-cloud-word-packed:hover {
+  filter: brightness(1.2) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  z-index: 100 !important;
+  cursor: pointer;
 }
 
 /* Responsive adjustments for My Loom */
