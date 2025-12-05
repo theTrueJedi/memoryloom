@@ -1,6 +1,6 @@
 /* ========== CSS Variables ========== */
 :root {
-  /* Colors - ombre gradient */
+  /* Colors - ombre gradient (same for both themes) */
   --primary-purple: #6f2db1;
   --primary-blue: #5b8ac2;
   --primary-teal: #5bc1b3;
@@ -10,6 +10,7 @@
   --gradient-blue: #5b8ac2;
   --gradient-teal: #5bc1b3;
 
+  /* Light mode colors */
   --bg-primary: #F7F5FB;
   --bg-secondary: #FFFFFF;
   --bg-input: #FFFFFF;
@@ -52,6 +53,25 @@
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 350ms ease;
+}
+
+/* Dark mode colors */
+[data-theme="dark"] {
+  --bg-primary: #1a1625;
+  --bg-secondary: #241d30;
+  --bg-input: #2d2638;
+
+  --text-primary: #e8e4f0;
+  --text-secondary: #b8adc9;
+  --text-gradient: linear-gradient(90deg, #9B7FD9 0%, #7ba3d4 50%, #7dd4c7 100%);
+
+  --border-light: #3d3350;
+  --border-medium: #6f5a8f;
+  --border-dark: #9B7FD9;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* ========== Global Styles ========== */
@@ -106,6 +126,13 @@ body {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--gradient-purple) 0%, var(--gradient-blue) 50%, var(--gradient-teal) 100%);
   padding: var(--spacing-md);
+  position: relative;
+}
+
+.sign-in-theme-toggle {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
 }
 
 .sign-in-content {
@@ -283,6 +310,39 @@ body {
   background: var(--border-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
+}
+
+/* ========== Theme Toggle ========== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--transition-base);
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(15deg);
 }
 
 /* ========== Tab Navigation ========== */

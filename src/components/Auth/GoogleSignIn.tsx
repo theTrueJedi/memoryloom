@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
 
 const GoogleSignIn: React.FC = () => {
   const { user, signIn, signOut } = useAuth();
@@ -7,6 +8,7 @@ const GoogleSignIn: React.FC = () => {
   if (user) {
     return (
       <div className="auth-container">
+        <ThemeToggle />
         <div className="user-info">
           <img src={user.photoURL || ''} alt={user.displayName || 'User'} className="user-avatar" />
           <span className="user-name">{user.displayName}</span>
@@ -20,6 +22,9 @@ const GoogleSignIn: React.FC = () => {
 
   return (
     <div className="sign-in-container">
+      <div className="sign-in-theme-toggle">
+        <ThemeToggle />
+      </div>
       <div className="sign-in-content">
         <img src="/logo_thoughtloom_full.png" alt="ThoughtLoom" className="sign-in-logo" />
         <p className="app-subtitle">Capture your thoughts, explore your mind</p>
