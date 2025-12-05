@@ -34,13 +34,15 @@ export const analyzeSentiment = async (content: string): Promise<Sentiment> => {
 {
   "score": <number between -1 and 1>,
   "magnitude": <number from 0 to infinity>,
-  "label": "<emotion>"
+  "label": "<primary emotion>",
+  "secondaryLabel": "<secondary emotion or null>"
 }
 
 Guidelines:
 - score: -1 (very negative) to 1 (very positive) - overall emotional valence
 - magnitude: intensity of emotion (0 = no emotion, 1-2 = mild, 3-5 = moderate, 6+ = strong)
-- label: Pick the SINGLE most dominant emotion from this list:
+- label: Pick the PRIMARY most dominant emotion from this list
+- secondaryLabel: Pick the SECONDARY emotion (if present), or null if only one clear emotion exists
 
   Positive emotions:
   - joy: Happy, delighted, cheerful, upbeat
@@ -68,7 +70,7 @@ Guidelines:
   - neutral: Balanced, unremarkable, matter-of-fact
   - mixed: Multiple strong competing emotions
 
-Choose the emotion that best captures the PRIMARY emotional tone of the entry.
+Choose the PRIMARY emotion that best captures the dominant emotional tone, and a SECONDARY emotion if another significant emotion is present.
 
 Entry: "${content.replace(/"/g, '\\"')}"`;
 
@@ -88,6 +90,7 @@ Entry: "${content.replace(/"/g, '\\"')}"`;
       score: Number(sentiment.score),
       magnitude: Number(sentiment.magnitude),
       label: sentiment.label,
+      secondaryLabel: sentiment.secondaryLabel || undefined,
     };
   } catch (error) {
     console.error('Error analyzing sentiment:', error);

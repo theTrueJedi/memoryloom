@@ -75,8 +75,15 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
     const counts = new Map<EmotionLabel, number>();
 
     thoughts.forEach((thought) => {
-      const label = thought.sentiment.label;
-      counts.set(label, (counts.get(label) || 0) + 1);
+      // Primary sentiment gets full weight (1.0)
+      const primaryLabel = thought.sentiment.label;
+      counts.set(primaryLabel, (counts.get(primaryLabel) || 0) + 1);
+
+      // Secondary sentiment gets 60% weight (0.6)
+      if (thought.sentiment.secondaryLabel) {
+        const secondaryLabel = thought.sentiment.secondaryLabel;
+        counts.set(secondaryLabel, (counts.get(secondaryLabel) || 0) + 0.6);
+      }
     });
 
     const moodData: MoodCount[] = Array.from(counts.entries()).map(([label, count]) => ({

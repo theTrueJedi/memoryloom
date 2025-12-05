@@ -6,9 +6,10 @@ import CaptureTab from './components/Capture/CaptureTab';
 import ExploreTab from './components/Explore/ExploreTab';
 import MyLoomTab from './components/MyLoom/MyLoomTab';
 import TagManagerTab from './components/TagManager/TagManagerTab';
+import SentimentMigration from './components/Admin/SentimentMigration';
 import './styles/theme.css';
 
-type TabType = 'capture' | 'explore' | 'myloom' | 'tags';
+type TabType = 'capture' | 'explore' | 'myloom' | 'tags' | 'admin';
 
 const ACTIVE_TAB_KEY = 'thoughtloom-active-tab';
 
@@ -54,6 +55,7 @@ const App: React.FC = () => {
         {activeTab === 'explore' && <ExploreTab />}
         {activeTab === 'myloom' && <MyLoomTab />}
         {activeTab === 'tags' && <TagManagerTab />}
+        {activeTab === 'admin' && <SentimentMigration />}
       </main>
     </div>
   );

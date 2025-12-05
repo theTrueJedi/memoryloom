@@ -218,7 +218,7 @@ body {
 
 .app-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
   background: var(--bg-secondary);
@@ -228,16 +228,13 @@ body {
 }
 
 .header-logo-wrapper {
-  position: absolute;
-  left: var(--spacing-lg);
-  top: 50%;
-  transform: translateY(-50%);
   height: 60px;
   width: 45px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .header-logo {
@@ -259,14 +256,14 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0;
-  text-align: center;
+  text-align: left;
+  margin-left: var(--spacing-sm);
 }
 
 .auth-container-wrapper {
-  position: absolute;
-  right: var(--spacing-lg);
-  top: 50%;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .app-header .app-title {
@@ -1032,7 +1029,7 @@ body {
 }
 
 .thought-tags-section {
-  margin-top: 6px;
+  margin-top: 12px;
   display: flex;
   justify-content: flex-start;
   gap: 4px;
@@ -1050,12 +1047,12 @@ body {
 }
 
 .edit-tags-button {
-  padding: 4px 12px;
+  padding: 5px 14px;
   background: rgba(26, 122, 111, 0.08);
   color: var(--primary-teal-dark);
   border: 1px solid var(--primary-teal-dark);
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -1331,17 +1328,12 @@ body {
   }
 
   .header-logo-wrapper {
-    left: var(--spacing-sm);
     height: 40px;
     width: 30px;
   }
 
   .page-title {
     font-size: var(--font-size-lg);
-  }
-
-  .auth-container-wrapper {
-    right: var(--spacing-sm);
   }
 
   .auth-container {
@@ -1726,7 +1718,7 @@ body {
 }
 
 .stat-value {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--primary-purple);
   margin-bottom: 0.25rem;

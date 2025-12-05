@@ -26,6 +26,7 @@ export interface Sentiment {
   score: number;      // -1 to 1 (overall valence)
   magnitude: number;  // 0 to infinity (intensity)
   label: EmotionLabel;
+  secondaryLabel?: EmotionLabel;  // Optional secondary emotion
 }
 
 export interface Thought {
