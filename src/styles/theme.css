@@ -1562,13 +1562,13 @@ body {
 .myloom-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .stat-card {
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
   text-align: center;
@@ -1604,14 +1604,14 @@ body {
 }
 
 .stat-value {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--primary-purple);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 0.25rem;
 }
 
 .stat-label {
-  font-size: var(--font-size-sm);
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -1721,7 +1721,22 @@ body {
   }
 
   .myloom-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    padding: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .stat-label {
+    font-size: 0.625rem;
+    line-height: 1.2;
   }
 
   .mood-cloud,
