@@ -107,7 +107,8 @@ const CaptureTab: React.FC = () => {
     <div className="capture-tab">
       <div className="capture-header">
         <img src="/thoughtloom_icon.svg" alt="ThoughtLoom" className="capture-logo" />
-        <h2 className="gradient-text">Capture Your Thoughts</h2>
+        <h2 className="gradient-text">Weave Your Thoughts</h2>
+        <p className="subtitle">Add a new strand to your fabric</p>
       </div>
 
       {successMessage && (
