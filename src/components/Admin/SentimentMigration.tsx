@@ -104,24 +104,14 @@ const SentimentMigration: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="card">
-        <p>Please log in to access migration tools.</p>
-      </div>
+      <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+        Please log in to access migration tools.
+      </p>
     );
   }
 
   return (
-    <div className="card" style={{ maxWidth: '800px', margin: '2rem auto' }}>
-      <h2 className="gradient-text" style={{ marginBottom: '1rem' }}>Sentiment Migration Tool</h2>
-
-      <div style={{ marginBottom: '1.5rem' }}>
-        <p style={{ marginBottom: '0.5rem' }}>
-          This tool will re-analyze the emotional content of all your thoughts using the new expanded emotion categories.
-        </p>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          <strong>Note:</strong> This will use your Gemini API quota and may take several minutes depending on how many thoughts you have.
-        </p>
-      </div>
+    <div>
 
       {!isRunning && !isComplete && (
         <button

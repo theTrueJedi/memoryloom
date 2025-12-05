@@ -23,18 +23,19 @@ export const createThought = async (
   userId: string,
   content: string,
   tags: string[],
-  sentiment: Sentiment
+  sentiment: Sentiment,
+  customTimestamp?: Timestamp
 ): Promise<string> => {
   const thoughtsRef = collection(db, `users/${userId}/thoughts`);
-  const now = Timestamp.now();
+  const timestamp = customTimestamp || Timestamp.now();
 
   const docRef = await addDoc(thoughtsRef, {
     userId,
     content,
     tags,
     sentiment,
-    timestamp: now,
-    createdAt: now,
+    timestamp,
+    createdAt: timestamp,
   });
 
   // Update tag usage

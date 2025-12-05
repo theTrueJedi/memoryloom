@@ -2048,3 +2048,76 @@ body {
 .thought-content p:last-child {
   margin-bottom: 0;
 }
+
+/* ========== Admin Tab ========== */
+.admin-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.admin-section {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Bulk Import specific styles */
+.bulk-import-container {
+  /* Container for bulk import tool */
+}
+
+.sheet-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-sm) 0;
+  font-size: 0.875rem;
+}
+
+.sheet-preview-table th,
+.sheet-preview-table td {
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border-light);
+  text-align: left;
+}
+
+.sheet-preview-table th {
+  background: var(--bg-primary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sheet-preview-table td {
+  color: var(--text-secondary);
+}
+
+/* Mobile responsive for admin */
+@media (max-width: 768px) {
+  .admin-tab {
+    gap: var(--spacing-md);
+  }
+
+  .admin-section {
+    padding: var(--spacing-md);
+  }
+
+  .sheet-preview-table {
+    font-size: 0.75rem;
+  }
+
+  .sheet-preview-table th,
+  .sheet-preview-table td {
+    padding: 0.25rem;
+  }
+}

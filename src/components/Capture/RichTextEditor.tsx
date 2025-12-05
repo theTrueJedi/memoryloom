@@ -113,6 +113,63 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'list', 'bullet', 'indent', 'link'
   ];
 
+  // Handle markdown shortcuts
+  useEffect(() => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+
+      const handleTextChange = (_delta: any, _oldDelta: any, source: string) => {
+        if (source !== 'user') return;
+
+        const selection = editor.getSelection();
+        if (!selection) return;
+
+        const [line, offset] = editor.getLine(selection.index);
+        if (!line) return;
+
+        const text = line.domNode.textContent || '';
+        const beforeCursor = text.substring(0, offset);
+
+        // Check for markdown patterns followed by space
+        const boldPattern = /\*([^*\s]+)\*\s$/;
+        const italicPattern = /_([^_\s]+)_\s$/;
+
+        let match;
+        let format: 'bold' | 'italic' | null = null;
+        let matchLength = 0;
+
+        if ((match = beforeCursor.match(boldPattern))) {
+          format = 'bold';
+          matchLength = match[0].length;
+        } else if ((match = beforeCursor.match(italicPattern))) {
+          format = 'italic';
+          matchLength = match[0].length;
+        }
+
+        if (match && format) {
+          const matchText = match[1];
+          const startIndex = selection.index - matchLength;
+
+          // Remove the markdown syntax
+          editor.deleteText(startIndex, matchLength);
+
+          // Insert the formatted text
+          editor.insertText(startIndex, matchText, { [format]: true });
+          editor.insertText(startIndex + matchText.length, ' ');
+
+          // Move cursor to end
+          editor.setSelection(startIndex + matchText.length + 1, 0);
+        }
+      };
+
+      editor.on('text-change', handleTextChange);
+
+      return () => {
+        editor.off('text-change', handleTextChange);
+      };
+    }
+  }, []);
+
   return (
     <div className="rich-text-editor-wrapper">
       <ReactQuill
