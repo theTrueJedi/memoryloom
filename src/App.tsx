@@ -63,22 +63,24 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <div className="header-logo-wrapper">
-          <img src="/thoughtloom_icon.svg" alt="ThoughtLoom Icon" className="header-logo" />
-        </div>
-        <h1 className="page-title">ThoughtLoom</h1>
-        <div className="auth-container-wrapper">
-          <GoogleSignIn />
-        </div>
-      </header>
+      <div className="app-sticky-header">
+        <header className="app-header">
+          <div className="header-logo-wrapper">
+            <img src="/thoughtloom_icon.svg" alt="ThoughtLoom Icon" className="header-logo" />
+          </div>
+          <h1 className="page-title">ThoughtLoom</h1>
+          <div className="auth-container-wrapper">
+            <GoogleSignIn />
+          </div>
+        </header>
 
-      <TabNavigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        showAdminTab={showAdminTab}
-        onMenuBarClick={handleHeaderClick}
-      />
+        <TabNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          showAdminTab={showAdminTab}
+          onMenuBarClick={handleHeaderClick}
+        />
+      </div>
 
       <main className="app-main">
         {activeTab === 'capture' && <CaptureTab />}
