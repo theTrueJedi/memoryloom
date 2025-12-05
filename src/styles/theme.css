@@ -1217,7 +1217,7 @@ body {
   }
 
   .page-title {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-lg);
   }
 
   .auth-container-wrapper {
