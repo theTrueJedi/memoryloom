@@ -858,10 +858,11 @@ body {
 }
 
 .thought-content p {
-  margin: 0 0 1em 0;
+  margin: 0 0 0.75em 0;
 }
 
-.thought-content p:empty {
+.thought-content p:empty,
+.thought-content p:has(> br:only-child) {
   margin: 0;
 }
 
@@ -1035,7 +1036,13 @@ body {
 .thought-tags-section {
   margin-top: 12px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.thought-action-buttons-left {
+  display: flex;
   gap: 4px;
 }
 
@@ -1077,6 +1084,52 @@ body {
 [data-theme="dark"] .edit-tags-button:hover {
   background: var(--primary-teal);
   border-color: var(--primary-teal);
+}
+
+/* ========== Shared Delete Button Styles ========== */
+/* Used by: ThoughtCard delete, TagManager delete */
+.delete-button {
+  padding: 5px 10px;
+  background: rgba(229, 82, 82, 0.08);
+  color: #d64545;
+  border: 1px solid #d64545;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #d64545;
+  border-color: #d64545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] .delete-button {
+  background: rgba(244, 117, 117, 0.1);
+  color: #ef9a9a;
+  border-color: #ef9a9a;
+}
+
+[data-theme="dark"] .delete-button:hover:not(:disabled) {
+  background: #ef9a9a;
+  border-color: #ef9a9a;
+  color: #1a1625;
 }
 
 .tag-editor {
@@ -1479,22 +1532,6 @@ body {
   transform: translateY(-1px);
 }
 
-.tag-manager-delete-btn {
-  background: transparent;
-  color: #F44336;
-  border: 1px solid #F44336;
-}
-
-.tag-manager-delete-btn:hover:not(:disabled) {
-  background: #F44336;
-  color: white;
-  transform: translateY(-1px);
-}
-
-.tag-manager-delete-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .tag-manager-edit {
   display: flex;

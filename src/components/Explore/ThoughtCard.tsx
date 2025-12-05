@@ -10,17 +10,19 @@ import TimestampEditor from './TimestampEditor';
 
 // Normalize HTML content to use consistent paragraph structure
 const normalizeContent = (html: string): string => {
-  // If content already has proper <p> tags, just return it
+  // If content already has proper <p> tags (modern Quill format), return as-is
   if (html.includes('<p>')) {
     return html;
   }
 
-  // For legacy content with <br> tags, convert them to paragraphs
-  let normalized = html
-    // Convert double <br> to paragraph break
-    .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>')
-    // Convert single <br> to paragraph break
-    .replace(/<br\s*\/?>/gi, '</p><p>');
+  // For legacy content with <br> tags only, convert to paragraphs
+  let normalized = html;
+
+  // Convert double <br> to paragraph break
+  normalized = normalized.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>');
+
+  // Convert remaining single <br> to paragraph break (legacy format)
+  normalized = normalized.replace(/<br\s*\/?>/gi, '</p><p>');
 
   // Wrap in paragraph tags if not already wrapped
   if (!normalized.startsWith('<p>')) {
@@ -42,7 +44,7 @@ interface ThoughtCardProps {
 
 const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const { user } = useAuth();
-  const { editThought } = useThoughts(user?.uid);
+  const { editThought, removeThought } = useThoughts(user?.uid);
   const { tags: allTags, addTag } = useTags(user?.uid);
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
@@ -298,6 +300,20 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     setIsTimestampEditorOpen(false);
   };
 
+  // Delete handler
+  const handleDeleteThought = async () => {
+    if (!window.confirm('Are you sure you want to delete this thought? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await removeThought(thought.id);
+    } catch (error) {
+      console.error('Error deleting thought:', error);
+      alert('Failed to delete thought. Please try again.');
+    }
+  };
+
   return (
     <div className="thought-card" onClick={handleCardClick}>
       <div className="thought-card-top">
@@ -375,17 +391,39 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       <div className="thought-tags-section">
         {!isEditingTags && !isEditingContent ? (
           <>
+            <div className="thought-action-buttons-left">
+              <button
+                className="edit-tags-button"
+                onClick={() => setIsEditingContent(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="edit-tags-button"
+                onClick={() => setIsEditingTags(true)}
+              >
+                {selectedTags.length > 0 ? 'Change Tags' : 'Add Tags'}
+              </button>
+            </div>
             <button
-              className="edit-tags-button"
-              onClick={() => setIsEditingContent(true)}
+              className="delete-button"
+              onClick={handleDeleteThought}
+              title="Delete thought"
             >
-              Edit
-            </button>
-            <button
-              className="edit-tags-button"
-              onClick={() => setIsEditingTags(true)}
-            >
-              {selectedTags.length > 0 ? 'Change Tags' : 'Add Tags'}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
             </button>
           </>
         ) : isEditingTags ? (

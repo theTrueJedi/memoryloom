@@ -29,11 +29,23 @@ export const createThought = async (
   const thoughtsRef = collection(db, `users/${userId}/thoughts`);
   const timestamp = customTimestamp || Timestamp.now();
 
+  // Clean sentiment object - remove undefined values for Firestore
+  const cleanedSentiment: any = {
+    score: sentiment.score,
+    magnitude: sentiment.magnitude,
+    label: sentiment.label,
+  };
+
+  // Only add secondaryLabel if it's defined
+  if (sentiment.secondaryLabel !== undefined) {
+    cleanedSentiment.secondaryLabel = sentiment.secondaryLabel;
+  }
+
   const docRef = await addDoc(thoughtsRef, {
     userId,
     content,
     tags,
-    sentiment,
+    sentiment: cleanedSentiment,
     timestamp,
     createdAt: timestamp,
   });
