@@ -11,7 +11,7 @@ import { stripTags } from '../../services/tagExtraction';
 
 const CaptureTab: React.FC = () => {
   const { user } = useAuth();
-  const { addThought } = useThoughts(user?.uid);
+  const { addThought, thoughts } = useThoughts(user?.uid);
   const { tags } = useTags(user?.uid);
 
   const [thoughtText, setThoughtText] = useState('');
@@ -73,7 +73,16 @@ const CaptureTab: React.FC = () => {
     existingTagNames: string[]
   ) => {
     try {
-      const suggestions = await suggestTags(content, existingTagNames);
+      // Build historical context from recent thoughts
+      const context = {
+        thoughts: thoughts.map(t => ({
+          content: t.content,
+          tags: t.tags,
+          sentiment: t.sentiment,
+        }))
+      };
+
+      const suggestions = await suggestTags(content, existingTagNames, context);
 
       // Create suggestion for existing tags
       for (const tag of suggestions.existingTags) {

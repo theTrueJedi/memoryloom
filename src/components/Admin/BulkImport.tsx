@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
+import { useThoughts } from '../../hooks/useThoughts';
 import { createThought, createTagSuggestion } from '../../services/firestore';
 import { analyzeSentiment, suggestTags } from '../../services/gemini';
 import {
@@ -26,6 +27,7 @@ const SHEET_ID_STORAGE_KEY = 'thoughtloom-last-sheet-id';
 
 const BulkImport: React.FC = () => {
   const { user } = useAuth();
+  const { thoughts } = useThoughts(user?.uid);
   const [sheetId, setSheetId] = useState('');
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [detectedRows, setDetectedRows] = useState<SheetRow[]>([]);
@@ -87,7 +89,16 @@ const BulkImport: React.FC = () => {
     existingTagNames: string[]
   ) => {
     try {
-      const suggestions = await suggestTags(content, existingTagNames);
+      // Build historical context from existing thoughts
+      const context = {
+        thoughts: thoughts.map(t => ({
+          content: t.content,
+          tags: t.tags,
+          sentiment: t.sentiment,
+        }))
+      };
+
+      const suggestions = await suggestTags(content, existingTagNames, context);
 
       // Create suggestion for existing tags
       for (const tag of suggestions.existingTags) {
