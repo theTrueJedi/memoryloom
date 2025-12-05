@@ -53,21 +53,41 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Handle keyboard shortcuts
   useEffect(() => {
-    if (quillRef.current && onKeyDown) {
+    if (quillRef.current) {
       const editor = quillRef.current.getEditor();
       const editorElement = editor.root;
 
       const handleKeyDown = (e: KeyboardEvent) => {
-        // Convert KeyboardEvent to React.KeyboardEvent-like object
-        const reactEvent = {
-          key: e.key,
-          metaKey: e.metaKey,
-          ctrlKey: e.ctrlKey,
-          shiftKey: e.shiftKey,
-          altKey: e.altKey,
-          preventDefault: () => e.preventDefault(),
-        };
-        onKeyDown(reactEvent);
+        // Handle Cmd+K / Ctrl+K for link insertion
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          const range = editor.getSelection();
+          if (range) {
+            const format = editor.getFormat(range);
+            const currentLink = (format.link as string) || '';
+            const url = prompt('Enter URL:', currentLink || 'https://');
+            if (url !== null && url !== '') {
+              editor.format('link', url);
+            } else if (url === '') {
+              // Remove link if empty string
+              editor.format('link', false);
+            }
+          }
+          return;
+        }
+
+        // Convert KeyboardEvent to React.KeyboardEvent-like object for parent handler
+        if (onKeyDown) {
+          const reactEvent = {
+            key: e.key,
+            metaKey: e.metaKey,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey,
+            altKey: e.altKey,
+            preventDefault: () => e.preventDefault(),
+          };
+          onKeyDown(reactEvent);
+        }
       };
 
       editorElement.addEventListener('keydown', handleKeyDown);
@@ -83,13 +103,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       ['bold', 'italic', 'underline', 'strike'],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'indent': '-1'}, { 'indent': '+1' }],
+      ['link'],
       ['clean']
     ],
   };
 
   const formats = [
     'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'indent'
+    'list', 'bullet', 'indent', 'link'
   ];
 
   return (

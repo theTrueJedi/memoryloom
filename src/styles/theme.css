@@ -1837,6 +1837,17 @@ body {
   text-decoration: line-through;
 }
 
+.rich-text-editor-wrapper .ql-editor a {
+  color: var(--primary-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rich-text-editor-wrapper .ql-editor a:hover {
+  color: var(--primary-purple);
+  text-decoration: underline;
+}
+
 /* Adjust thought input container for rich text editor */
 .thought-input-container .rich-text-editor-wrapper {
   margin-bottom: 0;
@@ -1866,6 +1877,17 @@ body {
 
 .thought-content s {
   text-decoration: line-through;
+}
+
+.thought-content a {
+  color: var(--primary-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.thought-content a:hover {
+  color: var(--primary-purple);
+  text-decoration: underline;
 }
 
 .thought-content ul,
