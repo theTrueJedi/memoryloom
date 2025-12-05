@@ -62,7 +62,26 @@ export const updateThought = async (
   updates: Partial<Thought>
 ): Promise<void> => {
   const thoughtRef = doc(db, `users/${userId}/thoughts`, thoughtId);
-  await updateDoc(thoughtRef, updates);
+
+  // Clean updates to remove undefined values
+  const cleanedUpdates: any = { ...updates };
+
+  // If sentiment is being updated, clean it
+  if (cleanedUpdates.sentiment) {
+    const sentiment = cleanedUpdates.sentiment;
+    cleanedUpdates.sentiment = {
+      score: sentiment.score,
+      magnitude: sentiment.magnitude,
+      label: sentiment.label,
+    };
+
+    // Only add secondaryLabel if it's defined
+    if (sentiment.secondaryLabel !== undefined) {
+      cleanedUpdates.sentiment.secondaryLabel = sentiment.secondaryLabel;
+    }
+  }
+
+  await updateDoc(thoughtRef, cleanedUpdates);
 };
 
 export const deleteThought = async (userId: string, thoughtId: string): Promise<void> => {

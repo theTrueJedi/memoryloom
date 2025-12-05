@@ -135,9 +135,21 @@ const SentimentMigration: React.FC = () => {
           // Re-analyze sentiment
           const newSentiment = await analyzeSentiment(thought.content);
 
+          // Remove undefined fields to avoid Firestore errors
+          const sanitizedSentiment: any = {
+            score: newSentiment.score,
+            magnitude: newSentiment.magnitude,
+            label: newSentiment.label,
+          };
+
+          // Only add secondaryLabel if it's defined
+          if (newSentiment.secondaryLabel !== undefined) {
+            sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
+          }
+
           // Update the thought document
           await updateDoc(doc(db, `users/${user.uid}/thoughts`, thoughtId), {
-            sentiment: newSentiment,
+            sentiment: sanitizedSentiment,
           });
 
           processed++;
