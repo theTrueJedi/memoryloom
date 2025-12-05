@@ -815,16 +815,36 @@ body {
   white-space: nowrap;
 }
 
-.sentiment-indicator {
-  width: 28px;
+.sentiment-indicators {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
   height: 28px;
+  gap: 0;
+}
+
+.sentiment-indicator {
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
   flex-shrink: 0;
   text-shadow: 0.5px 0.87px 2px rgba(0, 0, 0, 0.35), 1px 1.73px 4px rgba(0, 0, 0, 0.25);
+}
+
+.sentiment-indicator.primary {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  z-index: 1;
+}
+
+.sentiment-indicator.secondary {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  margin-left: -4px;
+  z-index: 2;
 }
 
 .thought-content {

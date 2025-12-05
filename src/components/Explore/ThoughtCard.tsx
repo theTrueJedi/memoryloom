@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { Timestamp } from 'firebase/firestore';
 import { Thought } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useThoughts } from '../../hooks/useThoughts';
 import { useTags } from '../../hooks/useTags';
 import ThoughtTagSuggestions from './ThoughtTagSuggestions';
 import RichTextEditor from '../Capture/RichTextEditor';
+import TimestampEditor from './TimestampEditor';
 
 interface ThoughtCardProps {
   thought: Thought;
@@ -19,6 +21,11 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>(thought.tags);
   const [editedContent, setEditedContent] = useState(thought.content);
   const [newTagInput, setNewTagInput] = useState('');
+
+  // Secret timestamp editor state
+  const [isTimestampEditorOpen, setIsTimestampEditorOpen] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  const lastClickTime = useRef<number>(0);
 
   const getSentimentColor = (label: string): string => {
     switch (label) {
@@ -217,8 +224,54 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     }
   };
 
+  // Secret click detection for timestamp editor
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only count clicks on the card itself, not on interactive elements
+    const target = e.target as HTMLElement;
+    const isInteractiveElement =
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'INPUT' ||
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('.thought-tag') ||
+      target.closest('.rich-text-editor');
+
+    if (isInteractiveElement) {
+      return;
+    }
+
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTime.current;
+
+    // Reset counter if more than 500ms since last click
+    if (timeSinceLastClick > 500) {
+      setClickCount(1);
+    } else {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+
+      // Trigger timestamp editor on 7th click
+      if (newCount === 7) {
+        setIsTimestampEditorOpen(true);
+        setClickCount(0); // Reset counter
+      }
+    }
+
+    lastClickTime.current = now;
+  };
+
+  // Save handler for timestamp editor
+  const handleSaveTimestamp = async (newTimestamp: Timestamp) => {
+    // Update both timestamp and createdAt fields
+    await editThought(thought.id, {
+      timestamp: newTimestamp,
+      createdAt: newTimestamp,
+    });
+    setIsTimestampEditorOpen(false);
+  };
+
   return (
-    <div className="thought-card">
+    <div className="thought-card" onClick={handleCardClick}>
       <div className="thought-card-top">
         <div className="thought-card-tags">
           {selectedTags.length > 0 && !isEditingTags && (
@@ -238,12 +291,23 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
         </div>
         <div className="thought-card-meta">
           <span className="thought-date">{formatDate(thought.timestamp)}</span>
-          <div
-            className="sentiment-indicator"
-            style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
-            title={`Sentiment: ${thought.sentiment.label} (${thought.sentiment.score.toFixed(2)})`}
-          >
-            {getSentimentEmoji(thought.sentiment.label)}
+          <div className="sentiment-indicators">
+            <div
+              className="sentiment-indicator primary"
+              style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
+              title={`Primary: ${thought.sentiment.label} (${thought.sentiment.score.toFixed(2)})`}
+            >
+              {getSentimentEmoji(thought.sentiment.label)}
+            </div>
+            {thought.sentiment.secondaryLabel && (
+              <div
+                className="sentiment-indicator secondary"
+                style={{ backgroundColor: getSentimentColor(thought.sentiment.secondaryLabel) }}
+                title={`Secondary: ${thought.sentiment.secondaryLabel}`}
+              >
+                {getSentimentEmoji(thought.sentiment.secondaryLabel)}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -353,6 +417,13 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
           </div>
         ) : null}
       </div>
+
+      <TimestampEditor
+        thought={thought}
+        isOpen={isTimestampEditorOpen}
+        onClose={() => setIsTimestampEditorOpen(false)}
+        onSave={handleSaveTimestamp}
+      />
     </div>
   );
 };
