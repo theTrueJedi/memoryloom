@@ -28,7 +28,7 @@ const ThoughtList: React.FC<ThoughtListProps> = ({ thoughts, loading }) => {
   return (
     <div className="thought-list">
       <h3 className="section-title">
-        Thoughts <span className="thought-count">({thoughts.length})</span>
+        Past Thoughts <span className="thought-count">({thoughts.length})</span>
       </h3>
       <div className="thoughts-grid">
         {thoughts.map((thought) => (

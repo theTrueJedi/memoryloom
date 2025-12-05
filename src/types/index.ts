@@ -1,9 +1,31 @@
 import { Timestamp } from 'firebase/firestore';
 
+export type EmotionLabel =
+  | 'joy'           // Happy, delighted, cheerful
+  | 'gratitude'     // Thankful, appreciative
+  | 'pride'         // Accomplished, successful
+  | 'excitement'    // Eager, enthusiastic, energized
+  | 'love'          // Affectionate, caring, warm
+  | 'peace'         // Calm, serene, content
+  | 'hope'          // Optimistic, encouraged
+  | 'sadness'       // Unhappy, down, melancholic
+  | 'anxiety'       // Worried, nervous, stressed
+  | 'anger'         // Frustrated, irritated, upset
+  | 'fear'          // Scared, afraid, worried
+  | 'shame'         // Embarrassed, guilty, regretful
+  | 'loneliness'    // Isolated, disconnected
+  | 'disappointment' // Let down, discouraged
+  | 'confusion'     // Uncertain, unclear, puzzled
+  | 'boredom'       // Unengaged, restless
+  | 'surprise'      // Amazed, shocked, astonished
+  | 'curiosity'     // Interested, inquisitive
+  | 'neutral'       // Balanced, unremarkable
+  | 'mixed';        // Multiple competing emotions
+
 export interface Sentiment {
-  score: number;      // -1 to 1
-  magnitude: number;  // 0 to infinity
-  label: 'positive' | 'negative' | 'neutral' | 'mixed';
+  score: number;      // -1 to 1 (overall valence)
+  magnitude: number;  // 0 to infinity (intensity)
+  label: EmotionLabel;
 }
 
 export interface Thought {

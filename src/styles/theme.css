@@ -437,16 +437,16 @@ body {
 }
 
 .tag-toggle-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
 .tag-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
+  justify-content: center;
+  padding: 6px 12px;
   background: var(--primary-lavender-light);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
@@ -454,6 +454,7 @@ body {
   transition: all var(--transition-fast);
   font-size: var(--font-size-xs);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .tag-toggle:hover {
@@ -479,6 +480,7 @@ body {
   border-radius: var(--radius-full);
   font-size: 10px;
   font-weight: 700;
+  margin-left: 6px;
 }
 
 .tag-toggle.active .tag-count {
@@ -623,18 +625,19 @@ body {
 }
 
 .tag-filter {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
   background: var(--primary-lavender-light);
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .tag-filter:hover {
@@ -916,19 +919,22 @@ body {
 }
 
 .thought-tag {
-  padding: 3px 10px;
-  background: var(--primary-lavender);
-  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  background: var(--primary-lavender-light);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--primary-purple);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .thought-tag:hover {
-  background: var(--primary-purple);
-  color: white;
+  background: var(--primary-lavender);
+  border-color: var(--primary-lavender);
   transform: translateY(-1px);
 }
 
@@ -1025,29 +1031,30 @@ body {
 }
 
 .tag-editor-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: var(--spacing-sm);
 }
 
 .tag-editor-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
-  background: var(--bg-secondary);
+  padding: 6px 12px;
+  background: var(--primary-lavender-light);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-base);
   font-size: var(--font-size-xs);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .tag-editor-item:hover {
   background: var(--primary-lavender);
-  border-color: var(--primary-purple);
+  border-color: var(--primary-lavender);
   transform: translateY(-1px);
 }
 
@@ -1408,4 +1415,387 @@ body {
   background: var(--primary-lavender);
   border-color: var(--border-dark);
   color: var(--border-dark);
+}
+
+/* ========== My Loom Tab ========== */
+.myloom-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.myloom-header {
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.myloom-header h2 {
+  font-size: var(--font-size-lg);
+  margin-bottom: 0;
+}
+
+/* Date Range Selector */
+.date-range-selector {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.date-range-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: center;
+}
+
+.preset-button {
+  padding: 6px 16px;
+  background: var(--primary-lavender-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.preset-button:hover {
+  background: var(--primary-purple);
+  color: white;
+  border-color: var(--border-dark);
+  transform: translateY(-1px);
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.date-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.date-input-group label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.date-input-group input[type="date"] {
+  padding: 6px 12px;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-base);
+}
+
+.date-input-group input[type="date"]:focus {
+  border-color: var(--primary-purple);
+}
+
+/* Stats Cards */
+.myloom-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--primary-purple);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Visualizations */
+.myloom-visualizations {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.mood-visualization,
+.tag-cloud-visualization {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.mood-visualization.empty,
+.tag-cloud-visualization.empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+}
+
+.empty-message {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  font-style: italic;
+}
+
+.visualization-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Word Cloud Containers */
+.mood-cloud-container,
+.tag-cloud-container {
+  padding: var(--spacing-lg);
+  min-height: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+/* Word Cloud Words */
+.mood-cloud-word,
+.tag-cloud-word {
+  display: inline-block;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: default;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  animation: wordFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform-origin: center;
+}
+
+.mood-cloud-word:hover,
+.tag-cloud-word:hover {
+  transform: scale(1.15) !important;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+}
+
+@keyframes wordFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Responsive adjustments for My Loom */
+@media (max-width: 768px) {
+  .date-range-presets {
+    justify-content: center;
+  }
+
+  .date-range-inputs {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .date-input-group {
+    width: 100%;
+  }
+
+  .date-input-group input[type="date"] {
+    flex: 1;
+  }
+
+  .myloom-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .mood-cloud,
+  .tag-cloud {
+    gap: var(--spacing-sm);
+  }
+}
+
+/* ========== Rich Text Editor ========== */
+.rich-text-editor-wrapper {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Customize Quill toolbar */
+.rich-text-editor-wrapper .ql-toolbar {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light) !important;
+  border-bottom: none !important;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  padding: 8px;
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-stroke {
+  stroke: var(--primary-purple);
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-fill {
+  fill: var(--primary-purple);
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-picker-label {
+  color: var(--text-primary);
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover,
+.rich-text-editor-wrapper .ql-toolbar button:focus,
+.rich-text-editor-wrapper .ql-toolbar button.ql-active {
+  background: var(--primary-lavender-light);
+  border-radius: 4px;
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor-wrapper .ql-toolbar button:focus .ql-stroke,
+.rich-text-editor-wrapper .ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--primary-purple);
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover .ql-fill,
+.rich-text-editor-wrapper .ql-toolbar button:focus .ql-fill,
+.rich-text-editor-wrapper .ql-toolbar button.ql-active .ql-fill {
+  fill: var(--primary-purple);
+}
+
+/* Customize Quill editor container */
+.rich-text-editor-wrapper .ql-container {
+  border: 1px solid var(--border-light) !important;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+}
+
+.rich-text-editor-wrapper .ql-editor {
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.rich-text-editor-wrapper .ql-editor.ql-blank::before {
+  color: var(--text-secondary);
+  opacity: 0.6;
+  font-style: normal;
+}
+
+.rich-text-editor-wrapper .ql-editor:focus {
+  outline: none;
+}
+
+/* Style lists and formatting in editor */
+.rich-text-editor-wrapper .ql-editor ul,
+.rich-text-editor-wrapper .ql-editor ol {
+  padding-left: 1.5em;
+}
+
+.rich-text-editor-wrapper .ql-editor strong {
+  font-weight: 600;
+}
+
+.rich-text-editor-wrapper .ql-editor em {
+  font-style: italic;
+}
+
+.rich-text-editor-wrapper .ql-editor u {
+  text-decoration: underline;
+}
+
+.rich-text-editor-wrapper .ql-editor s {
+  text-decoration: line-through;
+}
+
+/* Adjust thought input container for rich text editor */
+.thought-input-container .rich-text-editor-wrapper {
+  margin-bottom: 0;
+}
+
+.thought-input-container .ql-toolbar {
+  background: transparent;
+}
+
+/* Adjust thought content editor */
+.thought-content-editor .rich-text-editor-wrapper {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Style rendered HTML content in thought cards */
+.thought-content strong {
+  font-weight: 600;
+}
+
+.thought-content em {
+  font-style: italic;
+}
+
+.thought-content u {
+  text-decoration: underline;
+}
+
+.thought-content s {
+  text-decoration: line-through;
+}
+
+.thought-content ul,
+.thought-content ol {
+  margin-left: 1.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.thought-content li {
+  margin-bottom: 0.25em;
+}
+
+.thought-content p {
+  margin-bottom: 0.5em;
+}
+
+.thought-content p:last-child {
+  margin-bottom: 0;
 }

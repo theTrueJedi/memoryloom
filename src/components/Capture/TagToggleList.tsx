@@ -52,7 +52,6 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
               onClick={() => handleTagToggle(tag.name)}
             >
               <span className="tag-name">#{tag.name}</span>
-              <span className="tag-count">{tag.usageCount}</span>
             </button>
           );
         })}

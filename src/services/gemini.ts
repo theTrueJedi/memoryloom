@@ -30,17 +30,45 @@ export const analyzeSentiment = async (content: string): Promise<Sentiment> => {
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
-    const prompt = `Analyze the sentiment of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks):
+    const prompt = `Analyze the emotional content of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks):
 {
   "score": <number between -1 and 1>,
   "magnitude": <number from 0 to infinity>,
-  "label": "positive|negative|neutral|mixed"
+  "label": "<emotion>"
 }
 
 Guidelines:
-- score: -1 (very negative) to 1 (very positive)
-- magnitude: intensity of emotion (0 = no emotion, higher = stronger emotion)
-- label: overall sentiment category
+- score: -1 (very negative) to 1 (very positive) - overall emotional valence
+- magnitude: intensity of emotion (0 = no emotion, 1-2 = mild, 3-5 = moderate, 6+ = strong)
+- label: Pick the SINGLE most dominant emotion from this list:
+
+  Positive emotions:
+  - joy: Happy, delighted, cheerful, upbeat
+  - gratitude: Thankful, appreciative, blessed
+  - pride: Accomplished, successful, validated
+  - excitement: Eager, enthusiastic, energized, pumped
+  - love: Affectionate, caring, warm, connected
+  - peace: Calm, serene, content, tranquil
+  - hope: Optimistic, encouraged, looking forward
+  - curiosity: Interested, inquisitive, engaged, wondering
+  - surprise: Amazed, shocked, astonished (in a positive way)
+
+  Negative emotions:
+  - sadness: Unhappy, down, melancholic, blue, grieving
+  - anxiety: Worried, nervous, stressed, overwhelmed, tense
+  - anger: Frustrated, irritated, upset, mad, annoyed
+  - fear: Scared, afraid, threatened, panicked
+  - shame: Embarrassed, guilty, regretful, self-critical
+  - loneliness: Isolated, disconnected, alone, abandoned
+  - disappointment: Let down, discouraged, defeated
+  - boredom: Unengaged, restless, unmotivated, stuck
+
+  Neutral/Other:
+  - confusion: Uncertain, unclear, puzzled, conflicted
+  - neutral: Balanced, unremarkable, matter-of-fact
+  - mixed: Multiple strong competing emotions
+
+Choose the emotion that best captures the PRIMARY emotional tone of the entry.
 
 Entry: "${content.replace(/"/g, '\\"')}"`;
 

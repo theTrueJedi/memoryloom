@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { extractTags } from '../../services/tagExtraction';
+import RichTextEditor from './RichTextEditor';
 
 interface ThoughtInputProps {
   value: string;
@@ -16,15 +17,17 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
   disabled = false,
   onTagsDetected,
 }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   useEffect(() => {
     // Extract and notify parent of tags whenever content changes
-    const tags = extractTags(value);
+    // Strip HTML tags before extracting hashtags
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = value;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    const tags = extractTags(plainText);
     onTagsDetected(tags);
   }, [value, onTagsDetected]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: any) => {
     // Submit on Cmd+Enter or Ctrl+Enter
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -32,21 +35,15 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
-
   return (
     <div className="thought-input-container">
-      <textarea
-        ref={textareaRef}
-        className="thought-input"
+      <RichTextEditor
         value={value}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
+        onChange={onChange}
         placeholder="What's on your mind? Use #tags to categorize your thoughts..."
         disabled={disabled}
-        rows={8}
+        minHeight="100px"
+        onKeyDown={handleKeyDown}
       />
       <div className="thought-input-footer">
         <span className="hint-text">

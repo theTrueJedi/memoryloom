@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface TabNavigationProps {
-  activeTab: 'capture' | 'explore' | 'tags';
-  onTabChange: (tab: 'capture' | 'explore' | 'tags') => void;
+  activeTab: 'capture' | 'explore' | 'myloom' | 'tags';
+  onTabChange: (tab: 'capture' | 'explore' | 'myloom' | 'tags') => void;
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
@@ -19,6 +19,12 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
         onClick={() => onTabChange('explore')}
       >
         Explore
+      </button>
+      <button
+        className={`tab-button ${activeTab === 'myloom' ? 'active' : ''}`}
+        onClick={() => onTabChange('myloom')}
+      >
+        My Loom
       </button>
       <button
         className={`tab-button ${activeTab === 'tags' ? 'active' : ''}`}

@@ -14,7 +14,7 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => 
 
   return (
     <div className="tag-list-section">
-      <h3 className="section-title">Tags</h3>
+      <h3 className="section-title">Reminisce by Tag</h3>
       <div className="tag-list">
         <button
           className={`tag-filter ${selectedTag === null ? 'active' : ''}`}

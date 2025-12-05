@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Thought } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useThoughts } from '../../hooks/useThoughts';
 import { useTags } from '../../hooks/useTags';
 import ThoughtTagSuggestions from './ThoughtTagSuggestions';
+import RichTextEditor from '../Capture/RichTextEditor';
 
 interface ThoughtCardProps {
   thought: Thought;
@@ -22,12 +22,52 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
 
   const getSentimentColor = (label: string): string => {
     switch (label) {
-      case 'positive':
+      // Positive emotions - greens and warm colors
+      case 'joy':
         return '#4CAF50';
-      case 'negative':
-        return '#F44336';
-      case 'mixed':
+      case 'gratitude':
+        return '#8BC34A';
+      case 'pride':
+        return '#FFC107';
+      case 'excitement':
         return '#FF9800';
+      case 'love':
+        return '#E91E63';
+      case 'peace':
+        return '#00BCD4';
+      case 'hope':
+        return '#03A9F4';
+      case 'curiosity':
+        return '#9C27B0';
+      case 'surprise':
+        return '#FF6F00';
+
+      // Negative emotions - reds, blues, and grays
+      case 'sadness':
+        return '#5C6BC0';
+      case 'anxiety':
+        return '#FF5722';
+      case 'anger':
+        return '#F44336';
+      case 'fear':
+        return '#9E9E9E';
+      case 'shame':
+        return '#795548';
+      case 'loneliness':
+        return '#607D8B';
+      case 'disappointment':
+        return '#757575';
+      case 'boredom':
+        return '#9E9E9E';
+
+      // Neutral/Other
+      case 'confusion':
+        return '#FF9800';
+      case 'neutral':
+        return '#9E9E9E';
+      case 'mixed':
+        return '#673AB7';
+
       default:
         return '#9E9E9E';
     }
@@ -35,12 +75,52 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
 
   const getSentimentEmoji = (label: string): string => {
     switch (label) {
-      case 'positive':
+      // Positive emotions
+      case 'joy':
         return '😊';
-      case 'negative':
+      case 'gratitude':
+        return '🙏';
+      case 'pride':
+        return '🌟';
+      case 'excitement':
+        return '🎉';
+      case 'love':
+        return '❤️';
+      case 'peace':
+        return '☮️';
+      case 'hope':
+        return '🌅';
+      case 'curiosity':
+        return '🤔';
+      case 'surprise':
+        return '😲';
+
+      // Negative emotions
+      case 'sadness':
+        return '😢';
+      case 'anxiety':
+        return '😰';
+      case 'anger':
+        return '😤';
+      case 'fear':
+        return '😨';
+      case 'shame':
+        return '😳';
+      case 'loneliness':
         return '😔';
+      case 'disappointment':
+        return '😞';
+      case 'boredom':
+        return '😑';
+
+      // Neutral/Other
+      case 'confusion':
+        return '😕';
+      case 'neutral':
+        return '😌';
       case 'mixed':
         return '😐';
+
       default:
         return '😌';
     }
@@ -169,22 +249,17 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       </div>
 
       {!isEditingContent ? (
-        <div className="thought-content">
-          <ReactMarkdown>
-            {thought.content
-              .replace(/\*\*([^*]+)\*\*/g, '___DOUBLE___$1___DOUBLE___')
-              .replace(/\*([^*]+)\*/g, '**$1**')
-              .replace(/___DOUBLE___([^_]+)___DOUBLE___/g, '_$1_')
-            }
-          </ReactMarkdown>
-        </div>
+        <div
+          className="thought-content"
+          dangerouslySetInnerHTML={{ __html: thought.content }}
+        />
       ) : (
         <div className="thought-content-editor">
-          <textarea
-            className="thought-content-textarea"
+          <RichTextEditor
             value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-            autoFocus
+            onChange={setEditedContent}
+            placeholder="Edit your thought..."
+            minHeight="100px"
             onKeyDown={(e) => {
               if (e.key === 'Escape') {
                 e.preventDefault();

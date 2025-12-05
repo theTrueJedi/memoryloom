@@ -11,7 +11,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
 } from 'firebase/firestore';
 
 interface ThoughtTagSuggestionsProps {
