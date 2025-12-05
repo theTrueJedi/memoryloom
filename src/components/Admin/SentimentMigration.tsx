@@ -191,15 +191,12 @@ const SentimentMigration: React.FC = () => {
 
       {isComplete && progress && (
         <div>
-          <div style={{
+          <div className="alert alert-success" style={{
             padding: '1.5rem',
-            backgroundColor: '#D4EDDA',
-            border: '1px solid #4CAF50',
-            borderRadius: '8px',
             textAlign: 'center'
           }}>
-            <h3 style={{ color: '#155724', marginBottom: '1rem' }}>✅ Migration Complete!</h3>
-            <div style={{ color: '#155724' }}>
+            <h3 style={{ marginBottom: '1rem' }}>✅ Migration Complete!</h3>
+            <div>
               <p>Successfully processed: {progress.processed} thoughts</p>
               {progress.failed > 0 && <p>Failed: {progress.failed} thoughts</p>}
             </div>

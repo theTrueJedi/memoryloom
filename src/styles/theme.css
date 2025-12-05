@@ -592,9 +592,15 @@ body {
 }
 
 .alert-success {
-  background: #D4EDDA;
-  color: #155724;
-  border: 1px solid #C3E6CB;
+  background: rgba(91, 193, 179, 0.15);
+  color: var(--primary-teal-dark);
+  border: 1px solid var(--primary-teal);
+}
+
+[data-theme="dark"] .alert-success {
+  background: rgba(91, 193, 179, 0.1);
+  color: var(--primary-teal);
+  border: 1px solid var(--primary-teal);
 }
 
 .alert-error {
