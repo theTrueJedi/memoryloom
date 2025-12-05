@@ -60,6 +60,11 @@ const BulkImport: React.FC = () => {
   const markdownToHtml = (text: string): string => {
     let html = text;
 
+    // FIRST: Escape HTML characters to prevent browser from interpreting <text> as tags
+    html = html.replace(/&/g, '&amp;');
+    html = html.replace(/</g, '&lt;');
+    html = html.replace(/>/g, '&gt;');
+
     // Convert *bold* to <strong> (custom standard)
     html = html.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
 

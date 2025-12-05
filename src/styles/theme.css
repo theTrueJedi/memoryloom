@@ -220,11 +220,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-lg);
   background: var(--bg-secondary);
   border-bottom: 2px solid var(--border-light);
   box-shadow: var(--shadow-sm);
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-logo-wrapper {
@@ -358,9 +360,13 @@ body {
   display: flex;
   justify-content: center;
   gap: 4px;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 0.75rem var(--spacing-md);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: calc(60px + var(--spacing-xs) * 2 + 1px);
+  z-index: 99;
+  margin-top: -1px;
 }
 
 .tab-button {
