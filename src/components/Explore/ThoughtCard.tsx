@@ -61,7 +61,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     switch (label) {
       // Positive emotions - greens and warm colors
       case 'joy':
-        return '#4CAF50';
+        return '#46a050';
       case 'amusement':
         return '#F28500';
       case 'gratitude':
@@ -71,44 +71,44 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       case 'excitement':
         return '#FF9800';
       case 'love':
-        return '#E91E63';
+        return '#df58b4';
       case 'peace':
-        return '#00BCD4';
+        return '#328cb3';
       case 'hope':
-        return '#03A9F4';
+        return '#54b9e8';
       case 'curiosity':
-        return '#9C27B0';
+        return '#9227b0';
       case 'surprise':
-        return '#FF6F00';
+        return '#ff8800';
 
       // Negative emotions - reds, blues, and grays
       case 'sadness':
-        return '#5C6BC0';
+        return '#4e61ca';
       case 'anxiety':
-        return '#FF5722';
+        return '#f44e4e';
       case 'anger':
-        return '#F44336';
+        return '#ba261c';
       case 'fear':
-        return '#9E9E9E';
+        return '#4b4949';
       case 'shame':
-        return '#795548';
+        return '#a16059';
       case 'loneliness':
-        return '#607D8B';
+        return '#557d91';
       case 'disappointment':
-        return '#757575';
+        return '#716496';
       case 'boredom':
-        return '#9E9E9E';
+        return '#819c77';
 
       // Neutral/Other
       case 'confusion':
         return '#FF9800';
       case 'neutral':
-        return '#9E9E9E';
+        return '#949494';
       case 'mixed':
         return '#673AB7';
 
       default:
-        return '#9E9E9E';
+        return '#949494';
     }
   };
 
@@ -116,7 +116,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     switch (label) {
       // Positive emotions
       case 'joy':
-        return '😊';
+        return '😄';
       case 'amusement':
         return '😂';
       case 'gratitude':
@@ -142,7 +142,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       case 'anxiety':
         return '😰';
       case 'anger':
-        return '😤';
+        return '😡';
       case 'fear':
         return '😨';
       case 'shame':
@@ -343,7 +343,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
             <div
               className="sentiment-indicator primary"
               style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
-              title={`Primary: ${thought.sentiment.label} (${thought.sentiment.score.toFixed(2)})`}
+              title={`Primary: ${thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1)} (${thought.sentiment.score.toFixed(2)})`}
             >
               {getSentimentEmoji(thought.sentiment.label)}
             </div>
@@ -351,7 +351,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
               <div
                 className="sentiment-indicator secondary"
                 style={{ backgroundColor: getSentimentColor(thought.sentiment.secondaryLabel) }}
-                title={`Secondary: ${thought.sentiment.secondaryLabel}`}
+                title={`Secondary: ${thought.sentiment.secondaryLabel.charAt(0).toUpperCase() + thought.sentiment.secondaryLabel.slice(1)}`}
               >
                 {getSentimentEmoji(thought.sentiment.secondaryLabel)}
               </div>

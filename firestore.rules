@@ -30,6 +30,11 @@ service cloud.firestore {
       match /tagSuggestions/{suggestionId} {
         allow read, write: if isOwner(userId);
       }
+
+      // Config subcollection
+      match /config/{configId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

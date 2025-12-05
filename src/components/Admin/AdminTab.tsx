@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import BulkImport from './BulkImport';
 import SentimentMigration from './SentimentMigration';
+import SentimentConfig from './SentimentConfig';
 
 const AdminTab: React.FC = () => {
   const { user } = useAuth();
@@ -37,6 +38,10 @@ const AdminTab: React.FC = () => {
 
       <div className="admin-section">
         <BulkImport />
+      </div>
+
+      <div className="admin-section">
+        <SentimentConfig />
       </div>
     </div>
   );

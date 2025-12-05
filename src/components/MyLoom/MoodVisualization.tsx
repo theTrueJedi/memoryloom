@@ -21,7 +21,7 @@ interface WordData {
 const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
   const getSentimentEmoji = (label: EmotionLabel): string => {
     const emojiMap: Record<EmotionLabel, string> = {
-      joy: '😊',
+      joy: '😄',
       amusement: '😂',
       gratitude: '🙏',
       pride: '🌟',
@@ -33,7 +33,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       surprise: '😲',
       sadness: '😢',
       anxiety: '😰',
-      anger: '😤',
+      anger: '😡',
       fear: '😨',
       shame: '😳',
       loneliness: '😔',
@@ -48,26 +48,26 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
 
   const getSentimentColor = (label: EmotionLabel): string => {
     const colorMap: Record<EmotionLabel, string> = {
-      joy: '#4CAF50',
+      joy: '#46a050',
       amusement: '#F28500',
       gratitude: '#8BC34A',
       pride: '#FFC107',
       excitement: '#FF9800',
-      love: '#E91E63',
-      peace: '#00BCD4',
-      hope: '#03A9F4',
-      curiosity: '#9C27B0',
-      surprise: '#FF6F00',
-      sadness: '#5C6BC0',
-      anxiety: '#FF5722',
-      anger: '#F44336',
-      fear: '#9E9E9E',
-      shame: '#795548',
-      loneliness: '#607D8B',
-      disappointment: '#757575',
-      boredom: '#9E9E9E',
+      love: '#df58b4',
+      peace: '#328cb3',
+      hope: '#54b9e8',
+      curiosity: '#9227b0',
+      surprise: '#ff8800',
+      sadness: '#4e61ca',
+      anxiety: '#f44e4e',
+      anger: '#ba261c',
+      fear: '#4b4949',
+      shame: '#a16059',
+      loneliness: '#557d91',
+      disappointment: '#716496',
+      boredom: '#819c77',
       confusion: '#FF9800',
-      neutral: '#9E9E9E',
+      neutral: '#949494',
       mixed: '#673AB7',
     };
     return colorMap[label];
@@ -102,7 +102,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
 
   const wordCloudData: WordData[] = useMemo(() => {
     return moodCounts.map((mood) => ({
-      text: `${mood.emoji} ${mood.label}`,
+      text: `${mood.emoji} ${mood.label.charAt(0).toUpperCase() + mood.label.slice(1)}`,
       value: mood.count,
       color: mood.color,
     }));
