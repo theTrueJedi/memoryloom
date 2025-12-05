@@ -53,6 +53,11 @@
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 350ms ease;
+
+  /* Tag chip colors */
+  --tag-chip-bg: var(--primary-lavender-light);
+  --tag-chip-text: #2D1B3D;
+  --tag-chip-border: var(--border-medium);
 }
 
 /* Dark mode colors */
@@ -72,6 +77,11 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* Tag chip colors for dark mode */
+  --tag-chip-bg: #4a3d5e;
+  --tag-chip-text: #e8e4f0;
+  --tag-chip-border: #6f5a8f;
 }
 
 /* ========== Global Styles ========== */
@@ -481,7 +491,39 @@ body {
   transform: none !important;
 }
 
-/* Tag Toggle List */
+/* ========== Common Tag Chip Styles ========== */
+/* Shared base styles for all tag chips/filter buttons across the app */
+.tag-toggle,
+.thought-tag,
+.tag-filter,
+.preset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: var(--tag-chip-bg);
+  color: var(--tag-chip-text);
+  border: 1px solid var(--tag-chip-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.tag-toggle:hover,
+.thought-tag:hover,
+.tag-filter:hover,
+.preset-button:hover {
+  background: var(--primary-lavender);
+  border-color: var(--primary-lavender);
+  color: #2D1B3D;
+  transform: translateY(-1px);
+}
+
+/* Tag Toggle List (Capture Tab specific) */
 .tag-toggle-list {
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
@@ -504,24 +546,7 @@ body {
 }
 
 .tag-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  background: var(--primary-lavender-light);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: var(--font-size-xs);
   font-weight: 500;
-  white-space: nowrap;
-}
-
-.tag-toggle:hover {
-  background: var(--primary-lavender);
-  border-color: var(--primary-lavender);
-  transform: translateY(-1px);
 }
 
 .tag-toggle.active {
@@ -690,26 +715,9 @@ body {
   gap: 6px;
 }
 
+/* .tag-filter base styles are defined in Common Tag Chip Styles section */
 .tag-filter {
-  display: inline-flex;
-  align-items: center;
   gap: 4px;
-  padding: 6px 12px;
-  background: var(--primary-lavender-light);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-}
-
-.tag-filter:hover {
-  background: var(--primary-lavender);
-  border-color: var(--primary-lavender);
-  transform: translateY(-1px);
 }
 
 .tag-filter.active {
@@ -1006,24 +1014,9 @@ body {
   gap: 4px;
 }
 
+/* .thought-tag styles are defined in Common Tag Chip Styles section */
 .thought-tag {
   padding: 4px 10px;
-  background: var(--primary-lavender-light);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.thought-tag:hover {
-  background: var(--primary-lavender);
-  border-color: var(--primary-lavender);
-  transform: translateY(-1px);
 }
 
 .edit-tags-button {
@@ -1563,23 +1556,17 @@ body {
   justify-content: center;
 }
 
+/* .preset-button base styles are defined in Common Tag Chip Styles section */
 .preset-button {
   padding: 6px 16px;
-  background: var(--primary-lavender-light);
-  color: var(--text-primary);
-  border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
 }
 
 .preset-button:hover {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   color: white;
   border-color: var(--primary-teal);
-  transform: translateY(-1px);
 }
 
 .date-range-inputs {
