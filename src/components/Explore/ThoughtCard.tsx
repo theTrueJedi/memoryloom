@@ -62,6 +62,8 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       // Positive emotions - greens and warm colors
       case 'joy':
         return '#4CAF50';
+      case 'amusement':
+        return '#F28500';
       case 'gratitude':
         return '#8BC34A';
       case 'pride':
@@ -115,6 +117,8 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       // Positive emotions
       case 'joy':
         return '😊';
+      case 'amusement':
+        return '😂';
       case 'gratitude':
         return '🙏';
       case 'pride':

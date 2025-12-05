@@ -46,6 +46,7 @@ Guidelines:
 
   Positive emotions:
   - joy: Happy, delighted, cheerful, upbeat
+  - amusement: Entertained, laughing, finding something funny, humored
   - gratitude: Thankful, appreciative, blessed
   - pride: Accomplished, successful, validated
   - excitement: Eager, enthusiastic, energized, pumped

@@ -2,6 +2,7 @@ import { Timestamp } from 'firebase/firestore';
 
 export type EmotionLabel =
   | 'joy'           // Happy, delighted, cheerful
+  | 'amusement'     // Entertained, laughing, finding something funny
   | 'gratitude'     // Thankful, appreciative
   | 'pride'         // Accomplished, successful
   | 'excitement'    // Eager, enthusiastic, energized

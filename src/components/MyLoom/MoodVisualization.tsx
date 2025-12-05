@@ -22,6 +22,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
   const getSentimentEmoji = (label: EmotionLabel): string => {
     const emojiMap: Record<EmotionLabel, string> = {
       joy: '😊',
+      amusement: '😂',
       gratitude: '🙏',
       pride: '🌟',
       excitement: '🎉',
@@ -48,6 +49,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
   const getSentimentColor = (label: EmotionLabel): string => {
     const colorMap: Record<EmotionLabel, string> = {
       joy: '#4CAF50',
+      amusement: '#F28500',
       gratitude: '#8BC34A',
       pride: '#FFC107',
       excitement: '#FF9800',
