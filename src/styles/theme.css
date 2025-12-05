@@ -1206,18 +1206,40 @@ body {
 /* ========== Responsive Design ========== */
 @media (max-width: 768px) {
   .app-header {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 50px;
+  }
+
+  .header-logo-wrapper {
+    left: var(--spacing-sm);
+    height: 40px;
+    width: 30px;
+  }
+
+  .page-title {
+    font-size: var(--font-size-base);
+  }
+
+  .auth-container-wrapper {
+    right: var(--spacing-sm);
   }
 
   .auth-container {
-    flex-direction: column;
-    width: 100%;
+    gap: var(--spacing-xs);
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
   }
 
   .sign-out-button {
-    width: 100%;
+    padding: 4px 10px;
+    font-size: 10px;
   }
 
   .tab-navigation {
