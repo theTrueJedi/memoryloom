@@ -858,7 +858,11 @@ body {
 }
 
 .thought-content p {
-  margin: 0 0 0.5em 0;
+  margin: 0 0 1em 0;
+}
+
+.thought-content p:empty {
+  margin: 0;
 }
 
 .thought-content p:last-child {

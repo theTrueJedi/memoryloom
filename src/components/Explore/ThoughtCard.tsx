@@ -8,6 +8,34 @@ import ThoughtTagSuggestions from './ThoughtTagSuggestions';
 import RichTextEditor from '../Capture/RichTextEditor';
 import TimestampEditor from './TimestampEditor';
 
+// Normalize HTML content to use consistent paragraph structure
+const normalizeContent = (html: string): string => {
+  // If content already has proper <p> tags, just return it
+  if (html.includes('<p>')) {
+    return html;
+  }
+
+  // For legacy content with <br> tags, convert them to paragraphs
+  let normalized = html
+    // Convert double <br> to paragraph break
+    .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>')
+    // Convert single <br> to paragraph break
+    .replace(/<br\s*\/?>/gi, '</p><p>');
+
+  // Wrap in paragraph tags if not already wrapped
+  if (!normalized.startsWith('<p>')) {
+    normalized = '<p>' + normalized;
+  }
+  if (!normalized.endsWith('</p>')) {
+    normalized = normalized + '</p>';
+  }
+
+  // Clean up any empty paragraphs
+  normalized = normalized.replace(/<p>\s*<\/p>/gi, '');
+
+  return normalized || '<p></p>';
+};
+
 interface ThoughtCardProps {
   thought: Thought;
 }
@@ -315,7 +343,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       {!isEditingContent ? (
         <div
           className="thought-content"
-          dangerouslySetInnerHTML={{ __html: thought.content }}
+          dangerouslySetInnerHTML={{ __html: normalizeContent(thought.content) }}
         />
       ) : (
         <div className="thought-content-editor">

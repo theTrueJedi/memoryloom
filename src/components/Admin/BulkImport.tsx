@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
 import { createThought, createTagSuggestion } from '../../services/firestore';
@@ -22,6 +22,8 @@ interface ImportProgress {
   errors: Array<{ row: number; thought: string; error: string }>;
 }
 
+const SHEET_ID_STORAGE_KEY = 'thoughtloom-last-sheet-id';
+
 const BulkImport: React.FC = () => {
   const { user } = useAuth();
   const [sheetId, setSheetId] = useState('');
@@ -29,6 +31,54 @@ const BulkImport: React.FC = () => {
   const [detectedRows, setDetectedRows] = useState<SheetRow[]>([]);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [progress, setProgress] = useState<ImportProgress | null>(null);
+
+  // Load last used sheet ID for this user on mount
+  useEffect(() => {
+    if (user?.uid) {
+      const storageKey = `${SHEET_ID_STORAGE_KEY}-${user.uid}`;
+      const savedSheetId = localStorage.getItem(storageKey);
+      if (savedSheetId) {
+        setSheetId(savedSheetId);
+      }
+    }
+  }, [user?.uid]);
+
+  // Save sheet ID to localStorage when it changes (and is valid)
+  useEffect(() => {
+    if (user?.uid && sheetId.trim()) {
+      const storageKey = `${SHEET_ID_STORAGE_KEY}-${user.uid}`;
+      localStorage.setItem(storageKey, sheetId.trim());
+    }
+  }, [sheetId, user?.uid]);
+
+  /**
+   * Converts markdown formatting and newlines to HTML
+   * Custom markdown standard: *bold*, _italic_, newlines
+   */
+  const markdownToHtml = (text: string): string => {
+    let html = text;
+
+    // Convert *bold* to <strong> (custom standard)
+    html = html.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+
+    // Convert _italic_ to <em> (custom standard)
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+    // Convert newlines to <br> tags or <p> tags
+    // Split by double newlines for paragraphs
+    const paragraphs = html.split(/\n\n+/);
+    if (paragraphs.length > 1) {
+      // Multiple paragraphs
+      html = paragraphs
+        .map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+        .join('');
+    } else {
+      // Single paragraph with line breaks
+      html = `<p>${html.replace(/\n/g, '<br>')}</p>`;
+    }
+
+    return html;
+  };
 
   const generateTagSuggestions = async (
     userId: string,
@@ -152,19 +202,22 @@ const BulkImport: React.FC = () => {
         // 2. Parse tags
         const tags = parseTags(row.tags);
 
-        // 3. Analyze sentiment
+        // 3. Convert markdown to HTML and preserve newlines
+        const formattedContent = markdownToHtml(row.thoughtText);
+
+        // 4. Analyze sentiment (use original text for better analysis)
         const sentiment = await analyzeSentiment(row.thoughtText);
 
-        // 4. Create thought with custom timestamp (backdating)
+        // 5. Create thought with custom timestamp (backdating)
         const thoughtRef = await createThought(
           user.uid,
-          row.thoughtText,
+          formattedContent,
           tags,
           sentiment,
           timestamp // Custom timestamp for backdating
         );
 
-        // 5. Generate tag suggestions (async, don't await)
+        // 6. Generate tag suggestions (async, don't await)
         if (tags.length > 0) {
           generateTagSuggestions(user.uid, thoughtRef, row.thoughtText, tags).catch((err: Error) => {
             console.warn(`Tag suggestion failed for thought ${thoughtRef}:`, err);
