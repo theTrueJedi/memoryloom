@@ -19,10 +19,35 @@ const App: React.FC = () => {
     const savedTab = localStorage.getItem(ACTIVE_TAB_KEY);
     return (savedTab as TabType) || 'capture';
   });
+  const [showAdminTab, setShowAdminTab] = useState(false);
+  const [headerTapCount, setHeaderTapCount] = useState(0);
 
   useEffect(() => {
     localStorage.setItem(ACTIVE_TAB_KEY, activeTab);
   }, [activeTab]);
+
+  // If admin tab is hidden and user is on it, switch to capture
+  useEffect(() => {
+    if (!showAdminTab && activeTab === 'admin') {
+      setActiveTab('capture');
+    }
+  }, [showAdminTab, activeTab]);
+
+  // Handle secret admin tab activation
+  const handleHeaderClick = () => {
+    const newCount = headerTapCount + 1;
+    setHeaderTapCount(newCount);
+
+    if (newCount === 7) {
+      setShowAdminTab(true);
+      setHeaderTapCount(0); // Reset counter
+    }
+
+    // Reset counter after 2 seconds of no taps
+    setTimeout(() => {
+      setHeaderTapCount(0);
+    }, 2000);
+  };
 
   if (loading) {
     return (
@@ -48,7 +73,12 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <TabNavigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        showAdminTab={showAdminTab}
+        onMenuBarClick={handleHeaderClick}
+      />
 
       <main className="app-main">
         {activeTab === 'capture' && <CaptureTab />}

@@ -23,10 +23,6 @@ const AdminTab: React.FC = () => {
       </h2>
 
       <div className="admin-section">
-        <BulkImport />
-      </div>
-
-      <div className="admin-section">
         <h3 className="admin-section-title">Sentiment Migration Tool</h3>
         <div style={{ marginBottom: '1rem' }}>
           <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
@@ -37,6 +33,10 @@ const AdminTab: React.FC = () => {
           </p>
         </div>
         <SentimentMigration />
+      </div>
+
+      <div className="admin-section">
+        <BulkImport />
       </div>
     </div>
   );

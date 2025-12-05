@@ -3,11 +3,13 @@ import React from 'react';
 interface TabNavigationProps {
   activeTab: 'capture' | 'explore' | 'myloom' | 'tags' | 'admin';
   onTabChange: (tab: 'capture' | 'explore' | 'myloom' | 'tags' | 'admin') => void;
+  showAdminTab?: boolean;
+  onMenuBarClick?: () => void;
 }
 
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
+const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, showAdminTab = false, onMenuBarClick }) => {
   return (
-    <nav className="tab-navigation">
+    <nav className="tab-navigation" onClick={onMenuBarClick} style={{ cursor: onMenuBarClick ? 'pointer' : 'default' }}>
       <button
         className={`tab-button ${activeTab === 'capture' ? 'active' : ''}`}
         onClick={() => onTabChange('capture')}
@@ -32,12 +34,14 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
       >
         Tags
       </button>
-      <button
-        className={`tab-button ${activeTab === 'admin' ? 'active' : ''}`}
-        onClick={() => onTabChange('admin')}
-      >
-        Admin
-      </button>
+      {showAdminTab && (
+        <button
+          className={`tab-button ${activeTab === 'admin' ? 'active' : ''}`}
+          onClick={() => onTabChange('admin')}
+        >
+          Admin
+        </button>
+      )}
     </nav>
   );
 };

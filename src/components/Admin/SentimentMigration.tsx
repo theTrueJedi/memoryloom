@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { analyzeSentiment } from '../../services/gemini';
 
@@ -12,11 +12,43 @@ interface MigrationProgress {
   errors: Array<{ id: string; error: string }>;
 }
 
+type DateRangePreset = 'all' | 'today' | 'custom';
+
 const SentimentMigration: React.FC = () => {
   const { user } = useAuth();
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState<MigrationProgress | null>(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRangePreset>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+
+  // Helper to format date as YYYY-MM-DD for input
+  const formatDateForInput = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
+  // Handle preset selection
+  const handlePresetChange = (preset: DateRangePreset) => {
+    setDateRange(preset);
+
+    if (preset === 'all') {
+      setStartDate('');
+      setEndDate('');
+    } else if (preset === 'today') {
+      const today = formatDateForInput(new Date());
+      setStartDate(today);
+      setEndDate(today);
+    }
+    // For 'custom', don't change the dates - let user set them manually
+  };
+
+  // When user manually changes dates, switch to custom mode
+  const handleDateChange = (start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+    setDateRange('custom');
+  };
 
   const runMigration = async () => {
     if (!user) {
@@ -24,7 +56,19 @@ const SentimentMigration: React.FC = () => {
       return;
     }
 
-    if (!confirm('This will re-analyze sentiment for ALL your thoughts. This may take several minutes and use API credits. Continue?')) {
+    // Build confirmation message based on date range
+    let rangeLabel = 'ALL your thoughts';
+    if (dateRange === 'today') {
+      rangeLabel = "today's thoughts";
+    } else if (dateRange === 'custom' && startDate && endDate) {
+      rangeLabel = `thoughts from ${startDate} to ${endDate}`;
+    } else if (dateRange === 'custom' && startDate) {
+      rangeLabel = `thoughts from ${startDate} onwards`;
+    } else if (dateRange === 'custom' && endDate) {
+      rangeLabel = `thoughts up to ${endDate}`;
+    }
+
+    if (!confirm(`This will re-analyze sentiment for ${rangeLabel}. This may take several minutes and use API credits. Continue?`)) {
       return;
     }
 
@@ -32,9 +76,35 @@ const SentimentMigration: React.FC = () => {
     setIsComplete(false);
 
     try {
-      // Get all thoughts for current user
+      // Build query based on selected date range
       const thoughtsRef = collection(db, `users/${user.uid}/thoughts`);
-      const snapshot = await getDocs(thoughtsRef);
+      let thoughtsQuery;
+
+      if (dateRange === 'all') {
+        // All thoughts - no filter
+        thoughtsQuery = thoughtsRef;
+      } else {
+        // Build date filters
+        const filters = [];
+
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0);
+          filters.push(where('timestamp', '>=', Timestamp.fromDate(start)));
+        }
+
+        if (endDate) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          filters.push(where('timestamp', '<=', Timestamp.fromDate(end)));
+        }
+
+        thoughtsQuery = filters.length > 0
+          ? query(thoughtsRef, ...filters)
+          : thoughtsRef;
+      }
+
+      const snapshot = await getDocs(thoughtsQuery);
 
       // All thoughts in this collection belong to the user
       const userThoughts = snapshot.docs;
@@ -114,13 +184,122 @@ const SentimentMigration: React.FC = () => {
     <div>
 
       {!isRunning && !isComplete && (
-        <button
-          className="button-primary"
-          onClick={runMigration}
-          style={{ width: '100%' }}
-        >
-          Start Migration
-        </button>
+        <div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: '0.5rem'
+            }}>
+              Date Range
+            </label>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              <button
+                className={`preset-button ${dateRange === 'all' ? 'active' : ''}`}
+                onClick={() => handlePresetChange('all')}
+                style={{
+                  background: dateRange === 'all' ? 'var(--primary-teal)' : 'var(--tag-chip-bg)',
+                  color: dateRange === 'all' ? 'white' : 'var(--tag-chip-text)',
+                  borderColor: dateRange === 'all' ? 'var(--primary-teal)' : 'var(--tag-chip-border)',
+                }}
+              >
+                All Time
+              </button>
+              <button
+                className={`preset-button ${dateRange === 'today' ? 'active' : ''}`}
+                onClick={() => handlePresetChange('today')}
+                style={{
+                  background: dateRange === 'today' ? 'var(--primary-teal)' : 'var(--tag-chip-bg)',
+                  color: dateRange === 'today' ? 'white' : 'var(--tag-chip-text)',
+                  borderColor: dateRange === 'today' ? 'var(--primary-teal)' : 'var(--tag-chip-border)',
+                }}
+              >
+                Today
+              </button>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ flex: '1', minWidth: '150px' }}>
+                <label
+                  htmlFor="start-date"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '0.25rem'
+                  }}
+                >
+                  Start Date
+                </label>
+                <input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => handleDateChange(e.target.value, endDate)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-primary)',
+                    background: 'var(--bg-input)',
+                    border: '1px solid var(--border-medium)',
+                    borderRadius: 'var(--radius-sm)',
+                    outline: 'none',
+                    transition: 'border-color var(--transition-base)',
+                  }}
+                />
+              </div>
+
+              <div style={{ flex: '1', minWidth: '150px' }}>
+                <label
+                  htmlFor="end-date"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '0.25rem'
+                  }}
+                >
+                  End Date
+                </label>
+                <input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => handleDateChange(startDate, e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-primary)',
+                    background: 'var(--bg-input)',
+                    border: '1px solid var(--border-medium)',
+                    borderRadius: 'var(--radius-sm)',
+                    outline: 'none',
+                    transition: 'border-color var(--transition-base)',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="button-primary"
+            onClick={runMigration}
+            style={{ width: '100%' }}
+          >
+            Start Migration
+          </button>
+        </div>
       )}
 
       {isRunning && progress && (
