@@ -2392,6 +2392,7 @@ body {
 
   .mood-selector-columns {
     gap: 4px;
+    grid-template-columns: auto auto;
   }
 }
 
