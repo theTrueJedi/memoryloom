@@ -110,7 +110,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const formats = [
     'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'indent', 'link'
+    'list', 'indent', 'link'
   ];
 
   // Handle markdown shortcuts
@@ -129,6 +129,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         const text = line.domNode.textContent || '';
         const beforeCursor = text.substring(0, offset);
+
+        // Check for bullet list pattern at start of line
+        const bulletPattern = /^-\s$/;
+        if (bulletPattern.test(beforeCursor)) {
+          const startIndex = selection.index - 2; // Length of "- "
+
+          // Remove the "- " text
+          editor.deleteText(startIndex, 2);
+
+          // Format the line as a bullet list
+          editor.formatLine(startIndex, 1, 'list', 'bullet');
+
+          return;
+        }
 
         // Check for markdown patterns followed by space
         const boldPattern = /\*([^*\s]+)\*\s$/;

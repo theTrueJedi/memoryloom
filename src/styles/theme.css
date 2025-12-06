@@ -2102,7 +2102,21 @@ body {
 /* Style lists and formatting in editor */
 .rich-text-editor-wrapper .ql-editor ul,
 .rich-text-editor-wrapper .ql-editor ol {
-  padding-left: 1.5em;
+  padding-left: 0.25em !important;
+  list-style-position: inside;
+}
+
+.rich-text-editor-wrapper .ql-editor ul {
+  list-style-type: disc !important;
+}
+
+.rich-text-editor-wrapper .ql-editor ol {
+  list-style-type: decimal !important;
+}
+
+.rich-text-editor-wrapper .ql-editor li {
+  display: list-item !important;
+  list-style: inherit !important;
 }
 
 .rich-text-editor-wrapper .ql-editor strong {
