@@ -2384,8 +2384,12 @@ body {
   margin-bottom: var(--spacing-sm);
 }
 
-/* Mobile: reduce gap to fit columns side-by-side */
+/* Mobile: reduce gap and padding to fit columns side-by-side */
 @media (max-width: 768px) {
+  .mood-selector {
+    padding: var(--spacing-xs);
+  }
+
   .mood-selector-columns {
     gap: var(--spacing-xs);
   }
