@@ -2473,6 +2473,14 @@ body {
   border-width: 2px;
 }
 
+/* Mobile: reduce padding and gap to make buttons narrower */
+@media (max-width: 768px) {
+  .mood-option {
+    gap: 4px;
+    padding: 4px;
+  }
+}
+
 .mood-option-indicator {
   width: 20px;
   height: 20px;
