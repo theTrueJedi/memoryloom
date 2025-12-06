@@ -2017,6 +2017,18 @@ body {
   padding: 8px;
 }
 
+/* Mobile: adjust button sizing and spacing */
+@media (max-width: 768px) {
+  .rich-text-editor-wrapper .ql-toolbar button {
+    height: 26px !important;
+    padding: 3px !important;
+  }
+
+  .rich-text-editor-wrapper .ql-toolbar .ql-formats {
+    margin-right: 6px !important;
+  }
+}
+
 .rich-text-editor-wrapper .ql-toolbar .ql-stroke {
   stroke: var(--primary-teal-dark);
 }
