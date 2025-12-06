@@ -2529,10 +2529,6 @@ body {
 
 /* Mobile responsive for mood selector */
 @media (max-width: 768px) {
-  .mood-selector-columns {
-    grid-template-columns: 1fr;
-  }
-
   .mood-options {
     max-height: 200px;
   }
