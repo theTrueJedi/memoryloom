@@ -2481,7 +2481,11 @@ body {
 @media (max-width: 768px) {
   .mood-option {
     gap: 4px;
-    padding: 4px;
+    padding: 3px;
+  }
+
+  .mood-option-label {
+    font-size: 0.75rem;
   }
 }
 
