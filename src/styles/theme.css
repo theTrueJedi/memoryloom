@@ -2482,6 +2482,8 @@ body {
   .mood-option {
     gap: 2px;
     padding: 4px;
+    align-self: flex-start;
+    width: auto;
   }
 
   .mood-option-label {
