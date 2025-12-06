@@ -1,12 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { Timestamp } from 'firebase/firestore';
-import { Thought } from '../../types';
+import { Thought, EmotionLabel } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useThoughts } from '../../hooks/useThoughts';
 import { useTags } from '../../hooks/useTags';
 import ThoughtTagSuggestions from './ThoughtTagSuggestions';
 import RichTextEditor from '../Capture/RichTextEditor';
 import TimestampEditor from './TimestampEditor';
+import MoodSelector from './MoodSelector';
+import {
+  getSentimentColor,
+  getSentimentEmoji,
+} from '../../utils/sentimentUtils';
 
 // Normalize HTML content to use consistent paragraph structure
 const normalizeContent = (html: string): string => {
@@ -48,6 +53,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const { tags: allTags, addTag } = useTags(user?.uid);
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
+  const [isEditingMood, setIsEditingMood] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>(thought.tags);
   const [editedContent, setEditedContent] = useState(thought.content);
   const [newTagInput, setNewTagInput] = useState('');
@@ -56,116 +62,6 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const [isTimestampEditorOpen, setIsTimestampEditorOpen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const lastClickTime = useRef<number>(0);
-
-  const getSentimentColor = (label: string): string => {
-    switch (label) {
-      // Positive emotions - greens and warm colors
-      case 'joy':
-        return '#46a050';
-      case 'amusement':
-        return '#F28500';
-      case 'gratitude':
-        return '#8BC34A';
-      case 'pride':
-        return '#FFC107';
-      case 'excitement':
-        return '#FF9800';
-      case 'love':
-        return '#df58b4';
-      case 'peace':
-        return '#328cb3';
-      case 'hope':
-        return '#54b9e8';
-      case 'curiosity':
-        return '#9227b0';
-      case 'surprise':
-        return '#ff8800';
-
-      // Negative emotions - reds, blues, and grays
-      case 'sadness':
-        return '#4e61ca';
-      case 'anxiety':
-        return '#f44e4e';
-      case 'anger':
-        return '#ba261c';
-      case 'fear':
-        return '#4b4949';
-      case 'shame':
-        return '#a16059';
-      case 'loneliness':
-        return '#557d91';
-      case 'disappointment':
-        return '#716496';
-      case 'boredom':
-        return '#819c77';
-
-      // Neutral/Other
-      case 'confusion':
-        return '#FF9800';
-      case 'neutral':
-        return '#949494';
-      case 'mixed':
-        return '#673AB7';
-
-      default:
-        return '#949494';
-    }
-  };
-
-  const getSentimentEmoji = (label: string): string => {
-    switch (label) {
-      // Positive emotions
-      case 'joy':
-        return '😄';
-      case 'amusement':
-        return '😂';
-      case 'gratitude':
-        return '🙏';
-      case 'pride':
-        return '🌟';
-      case 'excitement':
-        return '🎉';
-      case 'love':
-        return '❤️';
-      case 'peace':
-        return '☮️';
-      case 'hope':
-        return '🌅';
-      case 'curiosity':
-        return '🤔';
-      case 'surprise':
-        return '😲';
-
-      // Negative emotions
-      case 'sadness':
-        return '😢';
-      case 'anxiety':
-        return '😰';
-      case 'anger':
-        return '😡';
-      case 'fear':
-        return '😨';
-      case 'shame':
-        return '😳';
-      case 'loneliness':
-        return '😔';
-      case 'disappointment':
-        return '😞';
-      case 'boredom':
-        return '😑';
-
-      // Neutral/Other
-      case 'confusion':
-        return '😕';
-      case 'neutral':
-        return '😌';
-      case 'mixed':
-        return '😐';
-
-      default:
-        return '😌';
-    }
-  };
 
   const formatDate = (timestamp: any): string => {
     const date = timestamp.toDate();
@@ -318,6 +214,21 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     }
   };
 
+  // Mood change handlers
+  const handleSaveMood = async (primary: EmotionLabel, secondary?: EmotionLabel) => {
+    const updatedSentiment = {
+      ...thought.sentiment,
+      label: primary,
+      secondaryLabel: secondary,
+    };
+    await editThought(thought.id, { sentiment: updatedSentiment });
+    setIsEditingMood(false);
+  };
+
+  const handleCancelMoodEdit = () => {
+    setIsEditingMood(false);
+  };
+
   return (
     <div className="thought-card" onClick={handleCardClick}>
       <div className="thought-card-top">
@@ -393,7 +304,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
       <ThoughtTagSuggestions thoughtId={thought.id} />
 
       <div className="thought-tags-section">
-        {!isEditingTags && !isEditingContent ? (
+        {!isEditingTags && !isEditingContent && !isEditingMood ? (
           <>
             <div className="thought-action-buttons-left">
               <button
@@ -407,6 +318,12 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
                 onClick={() => setIsEditingTags(true)}
               >
                 {selectedTags.length > 0 ? 'Change Tags' : 'Add Tags'}
+              </button>
+              <button
+                className="edit-tags-button"
+                onClick={() => setIsEditingMood(true)}
+              >
+                Change Moods
               </button>
             </div>
             <button
@@ -485,6 +402,13 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
               </button>
             </div>
           </div>
+        ) : isEditingMood ? (
+          <MoodSelector
+            currentPrimary={thought.sentiment.label}
+            currentSecondary={thought.sentiment.secondaryLabel}
+            onSave={handleSaveMood}
+            onCancel={handleCancelMoodEdit}
+          />
         ) : null}
       </div>
 
