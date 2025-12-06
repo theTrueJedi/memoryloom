@@ -386,7 +386,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
 
   return (
     <div className="mood-visualization">
-      <h3 className="visualization-title">Mood Overview</h3>
+      <h3 className="visualization-title">Your Mood Fabric</h3>
       <div className="mood-cloud-container-packed" ref={containerRef}>
         {positionedWords.map((word, index) => {
           const percentage = ((word.value / totalCount) * 100).toFixed(1);

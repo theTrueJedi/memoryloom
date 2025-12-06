@@ -1800,14 +1800,20 @@ body {
 .tag-cloud-visualization {
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: 0;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-light);
+  overflow: hidden;
 }
 
 .mood-visualization.empty,
 .tag-cloud-visualization.empty {
   text-align: center;
+  padding: 0;
+}
+
+.mood-visualization.empty .empty-message,
+.tag-cloud-visualization.empty .empty-message {
   padding: var(--spacing-xl);
 }
 
@@ -1820,13 +1826,55 @@ body {
 .visualization-title {
   font-size: var(--font-size-lg);
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-md);
+  margin: 0;
+  padding: 10px var(--spacing-lg);
   text-align: center;
-  background: var(--text-gradient);
-  -webkit-background-clip: text;
+  background: linear-gradient(135deg,
+    rgba(111, 45, 177, 0.08) 0%,
+    rgba(91, 138, 194, 0.08) 50%,
+    rgba(91, 193, 179, 0.08) 100%);
+  border-bottom: 2px solid var(--border-light);
+  position: relative;
+  color: transparent;
+  background-image:
+    linear-gradient(135deg,
+      rgba(111, 45, 177, 0.08) 0%,
+      rgba(91, 138, 194, 0.08) 50%,
+      rgba(91, 193, 179, 0.08) 100%),
+    linear-gradient(90deg, #6f2db1 0%, #5b8ac2 50%, #5bc1b3 100%);
+  background-clip: padding-box, text;
+  -webkit-background-clip: padding-box, text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background-size: 100%, 200px 100%;
+  background-position: 0 0, center;
+  background-repeat: repeat, no-repeat;
+}
+
+.visualization-title::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--gradient-purple) 0%,
+    var(--gradient-blue) 50%,
+    var(--gradient-teal) 100%);
+}
+
+[data-theme="dark"] .visualization-title {
+  background-image:
+    linear-gradient(135deg,
+      rgba(155, 127, 217, 0.12) 0%,
+      rgba(123, 163, 212, 0.12) 50%,
+      rgba(125, 212, 199, 0.12) 100%),
+    linear-gradient(90deg, #9B7FD9 0%, #7ba3d4 50%, #7dd4c7 100%);
+  background-clip: padding-box, text;
+  -webkit-background-clip: padding-box, text;
+  background-size: 100%, 200px 100%;
+  background-position: 0 0, center;
+  background-repeat: repeat, no-repeat;
 }
 
 /* Word Cloud Containers */
@@ -1882,7 +1930,7 @@ body {
 .tag-cloud-container-packed,
 .mood-cloud-container-packed {
   position: relative;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
   min-height: 400px;
   width: 100%;
   overflow: hidden;

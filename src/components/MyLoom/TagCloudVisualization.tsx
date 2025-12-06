@@ -340,7 +340,7 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
 
   return (
     <div className="tag-cloud-visualization">
-      <h3 className="visualization-title">Tag Cloud</h3>
+      <h3 className="visualization-title">Your Tag Fabric</h3>
       <div className="tag-cloud-container-packed" ref={containerRef}>
         {positionedWords.map((word, index) => {
           const percentage = ((word.value / totalTags) * 100).toFixed(1);
