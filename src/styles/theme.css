@@ -2392,7 +2392,7 @@ body {
 
   .mood-selector-columns {
     gap: 4px;
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2478,16 +2478,11 @@ body {
   border-width: 2px;
 }
 
-/* Mobile: reduce padding and gap to make buttons narrower */
+/* Mobile: reduce padding and gap for tighter layout */
 @media (max-width: 768px) {
-  .mood-options {
-    align-items: flex-start;
-  }
-
   .mood-option {
     gap: 2px;
     padding: 4px;
-    width: fit-content;
   }
 
   .mood-option-label {

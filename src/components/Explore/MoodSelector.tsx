@@ -114,6 +114,21 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({
             )}
           </div>
           <div className="mood-options">
+            <button
+              className={`mood-option ${!selectedSecondary ? 'selected' : ''}`}
+              onClick={() => setSelectedSecondary(undefined)}
+              style={{
+                borderColor: !selectedSecondary ? 'var(--border-medium)' : 'transparent',
+              }}
+            >
+              <div
+                className="mood-option-indicator"
+                style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-light)' }}
+              >
+                ✕
+              </div>
+              <span className="mood-option-label">None</span>
+            </button>
             {allEmotions
               .filter((emotion) => emotion !== selectedPrimary)
               .map((emotion) => (
