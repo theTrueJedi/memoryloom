@@ -1514,6 +1514,10 @@ body {
   color: var(--primary-purple);
 }
 
+[data-theme="dark"] .tag-manager-name {
+  color: var(--primary-lavender);
+}
+
 .tag-manager-count {
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
