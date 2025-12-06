@@ -2480,12 +2480,18 @@ body {
 /* Mobile: reduce padding and gap to make buttons narrower */
 @media (max-width: 768px) {
   .mood-option {
-    gap: 4px;
-    padding: 3px;
+    gap: 2px;
+    padding: 4px;
   }
 
   .mood-option-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .mood-option-indicator {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
   }
 }
 
