@@ -2480,11 +2480,14 @@ body {
 
 /* Mobile: reduce padding and gap to make buttons narrower */
 @media (max-width: 768px) {
+  .mood-options {
+    align-items: flex-start;
+  }
+
   .mood-option {
     gap: 2px;
     padding: 4px;
-    align-self: flex-start;
-    width: auto;
+    width: fit-content;
   }
 
   .mood-option-label {
