@@ -2384,6 +2384,13 @@ body {
   margin-bottom: var(--spacing-sm);
 }
 
+/* Mobile: reduce gap to fit columns side-by-side */
+@media (max-width: 768px) {
+  .mood-selector-columns {
+    gap: var(--spacing-xs);
+  }
+}
+
 .mood-column {
   display: flex;
   flex-direction: column;
