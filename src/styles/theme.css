@@ -2387,11 +2387,11 @@ body {
 /* Mobile: reduce gap and padding to fit columns side-by-side */
 @media (max-width: 768px) {
   .mood-selector {
-    padding: var(--spacing-xs);
+    padding: 4px;
   }
 
   .mood-selector-columns {
-    gap: var(--spacing-xs);
+    gap: 4px;
   }
 }
 
