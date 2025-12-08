@@ -11,7 +11,7 @@ import './styles/theme.css';
 
 type TabType = 'capture' | 'explore' | 'myloom' | 'tags' | 'admin';
 
-const ACTIVE_TAB_KEY = 'thoughtloom-active-tab';
+const ACTIVE_TAB_KEY = 'memoryloom-active-tab';
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -66,9 +66,9 @@ const App: React.FC = () => {
       <div className="app-sticky-header">
         <header className="app-header">
           <div className="header-logo-wrapper">
-            <img src="/thoughtloom_icon.svg" alt="ThoughtLoom Icon" className="header-logo" />
+            <img src="/memoryloom_icon.svg" alt="MemoryLoom Icon" className="header-logo" />
           </div>
-          <h1 className="page-title">ThoughtLoom</h1>
+          <h1 className="page-title">MemoryLoom</h1>
           <div className="auth-container-wrapper">
             <GoogleSignIn />
           </div>

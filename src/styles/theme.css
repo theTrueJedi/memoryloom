@@ -157,20 +157,30 @@ body {
 }
 
 .sign-in-logo {
-  max-width: 280px;
+  max-width: 100px;
   width: 100%;
   height: auto;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
-.app-title {
+.sign-in-title {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-2xl);
-  font-weight: 700;
+  font-weight: 300;
   background: var(--text-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: var(--spacing-sm);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.sign-in-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xl);
+  white-space: nowrap;
 }
 
 .app-subtitle {
@@ -432,8 +442,10 @@ body {
 }
 
 .subtitle {
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-secondary);
   font-size: var(--font-size-base);
+  font-weight: 500;
 }
 
 /* Thought Input */

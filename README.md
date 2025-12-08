@@ -1,4 +1,4 @@
-# ThoughtLoom
+# MemoryLoom
 
 A beautiful, AI-powered journal app for capturing and exploring your thoughts with intelligent tagging and sentiment analysis.
 
@@ -31,7 +31,7 @@ A beautiful, AI-powered journal app for capturing and exploring your thoughts wi
 
 1. **Clone and install dependencies**:
    ```bash
-   cd thoughtloom
+   cd memoryloom
    npm install
    ```
 
@@ -44,7 +44,7 @@ A beautiful, AI-powered journal app for capturing and exploring your thoughts wi
 
 3. **Set up Firebase Authentication**:
    - Go to the [Firebase Console](https://console.firebase.google.com/)
-   - Select the "thoughtloom-918bd" project
+   - Select the "memoryloom" project
    - Navigate to Authentication → Sign-in method
    - Enable Google as a sign-in provider
    - Add your development domain (e.g., `localhost`) to authorized domains
@@ -81,7 +81,7 @@ service cloud.firestore {
 ## Project Structure
 
 ```
-thoughtloom/
+memoryloom/
 ├── src/
 │   ├── components/
 │   │   ├── Capture/          # Thought input and tag management

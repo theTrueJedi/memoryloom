@@ -23,7 +23,7 @@ interface ImportProgress {
   errors: Array<{ row: number; thought: string; error: string }>;
 }
 
-const SHEET_ID_STORAGE_KEY = 'thoughtloom-last-sheet-id';
+const SHEET_ID_STORAGE_KEY = 'memoryloom-last-sheet-id';
 
 const BulkImport: React.FC = () => {
   const { user } = useAuth();

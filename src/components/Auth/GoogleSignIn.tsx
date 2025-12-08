@@ -26,8 +26,9 @@ const GoogleSignIn: React.FC = () => {
         <ThemeToggle />
       </div>
       <div className="sign-in-content">
-        <img src="/logo_thoughtloom_full.png" alt="ThoughtLoom" className="sign-in-logo" />
-        <p className="app-subtitle">Capture your thoughts, explore your mind</p>
+        <img src="/memoryloom_icon.svg" alt="MemoryLoom" className="sign-in-logo" />
+        <h1 className="sign-in-title">MemoryLoom</h1>
+        <p className="sign-in-subtitle">Weave your thoughts, explore your tapestry.</p>
         <button onClick={signIn} className="google-sign-in-button">
           <svg className="google-icon" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

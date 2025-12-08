@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get ThoughtLoom running in 5 minutes!
+Get MemoryLoom running in 5 minutes!
 
 ## Step 1: Install Dependencies
 ```bash
@@ -22,7 +22,7 @@ VITE_GEMINI_API_KEY=paste_your_actual_key_here
 
 ### Enable Google Authentication:
 1. Go to https://console.firebase.google.com/
-2. Select project: **thoughtloom-918bd**
+2. Select project: **memoryloom**
 3. Navigate to **Authentication** → **Sign-in method**
 4. Click **Google** → Enable → Save
 5. Add `localhost` to authorized domains
