@@ -1847,6 +1847,7 @@ h2 {
     rgba(91, 193, 179, 0.08) 100%);
   border-bottom: 2px solid var(--border-light);
   position: relative;
+  z-index: 10;
   color: transparent;
   background-image:
     linear-gradient(135deg,
