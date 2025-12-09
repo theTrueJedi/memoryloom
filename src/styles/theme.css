@@ -1942,7 +1942,7 @@ h2 {
 .tag-cloud-container-packed,
 .mood-cloud-container-packed {
   position: relative;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
   min-height: 400px;
   width: 100%;
   overflow: hidden;
