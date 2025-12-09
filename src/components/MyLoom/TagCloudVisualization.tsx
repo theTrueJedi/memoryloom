@@ -74,6 +74,7 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
   }, [tagCounts]);
 
   const maxCount = Math.max(...tagCounts.map((t) => t.count), 1);
+  const minCount = Math.min(...tagCounts.map((t) => t.count), 1);
   const totalTags = tagCounts.reduce((sum, t) => sum + t.count, 0);
 
   if (tagCounts.length === 0) {
@@ -88,13 +89,17 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
     const isSmallScreen = containerWidth < 500;
     const minSize = isSmallScreen ? 10 : 14;
     const maxSize = isSmallScreen ? 32 : 48;
-    const ratio = count / maxCount;
+    // Use relative scaling: smallest count maps to 0, largest to 1
+    const range = maxCount - minCount;
+    const ratio = range > 0 ? (count - minCount) / range : 1;
     // Use power scaling for more dramatic size differences
     return minSize + (maxSize - minSize) * Math.pow(ratio, 0.7);
   };
 
   const getFontWeight = (count: number): number => {
-    const ratio = count / maxCount;
+    // Use relative scaling: smallest count maps to 0, largest to 1
+    const range = maxCount - minCount;
+    const ratio = range > 0 ? (count - minCount) / range : 1;
     // More granular font weight distribution for better visual hierarchy
     if (ratio >= 0.9) return 900;
     if (ratio >= 0.75) return 800;

@@ -41,7 +41,7 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
 
   return (
     <div className="tag-toggle-list">
-      <h3 className="tag-toggle-title">Your Tags</h3>
+      <h3 className="tag-toggle-title">Add Past Tags</h3>
       <div className="tag-toggle-grid">
         {tags.map((tag) => {
           const isActive = activeTags.includes(tag.name);
