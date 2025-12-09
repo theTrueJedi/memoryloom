@@ -106,6 +106,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
 }
 
+h2 {
+  font-size: var(--font-size-xl);
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -438,7 +442,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .capture-header h2 {
-  font-size: var(--font-size-lg);
   margin-bottom: 0;
 }
 
@@ -641,7 +644,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .explore-header h2 {
-  font-size: var(--font-size-lg);
   margin-bottom: 0;
 }
 
@@ -1482,7 +1484,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tag-manager-header h2 {
-  font-size: var(--font-size-lg);
   margin-bottom: 0;
 }
 
@@ -1673,7 +1674,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .myloom-header h2 {
-  font-size: var(--font-size-lg);
   margin-bottom: 0;
 }
 
