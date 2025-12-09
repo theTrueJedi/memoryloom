@@ -58,6 +58,11 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const [editedContent, setEditedContent] = useState(thought.content);
   const [newTagInput, setNewTagInput] = useState('');
 
+  // Sync local state when thought.tags changes (e.g., from accepted suggestions)
+  React.useEffect(() => {
+    setSelectedTags(thought.tags);
+  }, [thought.tags]);
+
   // Secret timestamp editor state
   const [isTimestampEditorOpen, setIsTimestampEditorOpen] = useState(false);
   const [clickCount, setClickCount] = useState(0);

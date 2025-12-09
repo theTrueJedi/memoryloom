@@ -437,7 +437,9 @@ body {
 }
 
 .capture-header h2 {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
+  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -640,7 +642,9 @@ body {
 }
 
 .explore-header h2 {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
+  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -1481,7 +1485,9 @@ body {
 }
 
 .tag-manager-header h2 {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
+  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -1672,7 +1678,9 @@ body {
 }
 
 .myloom-header h2 {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
+  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -2012,6 +2020,12 @@ body {
   .mood-cloud,
   .tag-cloud {
     gap: var(--spacing-sm);
+  }
+
+  .tag-cloud-container-packed,
+  .mood-cloud-container-packed {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
