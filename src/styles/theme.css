@@ -101,6 +101,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 300;
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -164,9 +169,7 @@ body {
 }
 
 .sign-in-title {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-2xl);
-  font-weight: 300;
   background: var(--text-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -264,8 +267,6 @@ body {
 }
 
 .page-title {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-weight: 300;
   font-size: var(--font-size-2xl);
   background: var(--text-gradient);
   -webkit-background-clip: text;
@@ -437,9 +438,7 @@ body {
 }
 
 .capture-header h2 {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
-  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -642,9 +641,7 @@ body {
 }
 
 .explore-header h2 {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
-  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -1485,9 +1482,7 @@ body {
 }
 
 .tag-manager-header h2 {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
-  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -1678,9 +1673,7 @@ body {
 }
 
 .myloom-header h2 {
-  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-lg);
-  font-weight: 300;
   margin-bottom: 0;
 }
 
@@ -1845,7 +1838,6 @@ body {
 
 .visualization-title {
   font-size: var(--font-size-lg);
-  font-weight: 700;
   margin: 0;
   padding: 10px var(--spacing-lg);
   text-align: center;
