@@ -84,9 +84,10 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
     );
   }
 
-  const getFontSize = (count: number): number => {
-    const minSize = 14;
-    const maxSize = 48;
+  const getFontSize = (count: number, containerWidth: number): number => {
+    const isSmallScreen = containerWidth < 500;
+    const minSize = isSmallScreen ? 10 : 14;
+    const maxSize = isSmallScreen ? 32 : 48;
     const ratio = count / maxCount;
     // Use power scaling for more dramatic size differences
     return minSize + (maxSize - minSize) * Math.pow(ratio, 0.7);
@@ -214,7 +215,7 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
     // Process words in order of prominence (already sorted by count, largest first)
     // This ensures big, important words are placed in the center first
     wordCloudData.forEach((word, index) => {
-      const fontSize = getFontSize(word.value);
+      const fontSize = getFontSize(word.value, width);
       const fontWeight = getFontWeight(word.value);
 
       // Randomize rotation order for better interspersion
