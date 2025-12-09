@@ -29,7 +29,7 @@ interface PositionedWord extends WordData {
 const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [positionedWords, setPositionedWords] = useState<PositionedWord[]>([]);
-  const [containerSize, setContainerSize] = useState({ width: 800, height: 400 });
+  const [containerSize, setContainerSize] = useState({ width: 800, height: 400, offsetX: 0, offsetY: 0 });
 
   const tagCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -330,8 +330,13 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
 
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setContainerSize({ width: width || 800, height: height || 400 });
+        const { width, height, x, y } = entry.contentRect;
+        setContainerSize({
+          width: width || 800,
+          height: height || 400,
+          offsetX: x || 0,
+          offsetY: y || 0
+        });
       }
     });
 
@@ -347,9 +352,9 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
           const percentage = ((word.value / totalTags) * 100).toFixed(1);
 
           // For vertical text, we need to adjust positioning since rotation happens around center
-          const isVertical = Math.abs(word.rotation) === 90;
-          const adjustedLeft = isVertical ? word.x + word.width / 2 : word.x + word.width / 2;
-          const adjustedTop = isVertical ? word.y + word.height / 2 : word.y + word.height / 2;
+          // Add container padding offsets to position within content area
+          const adjustedLeft = word.x + word.width / 2 + containerSize.offsetX;
+          const adjustedTop = word.y + word.height / 2 + containerSize.offsetY;
 
           return (
             <span

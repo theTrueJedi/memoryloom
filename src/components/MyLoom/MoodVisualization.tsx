@@ -31,7 +31,7 @@ interface PositionedWord extends WordData {
 const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [positionedWords, setPositionedWords] = useState<PositionedWord[]>([]);
-  const [containerSize, setContainerSize] = useState({ width: 800, height: 400 });
+  const [containerSize, setContainerSize] = useState({ width: 800, height: 400, offsetX: 0, offsetY: 0 });
 
   const getSentimentEmoji = (label: EmotionLabel): string => {
     const emojiMap: Record<EmotionLabel, string> = {
@@ -376,8 +376,13 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
 
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setContainerSize({ width: width || 800, height: height || 400 });
+        const { width, height, x, y } = entry.contentRect;
+        setContainerSize({
+          width: width || 800,
+          height: height || 400,
+          offsetX: x || 0,
+          offsetY: y || 0
+        });
       }
     });
 
@@ -392,8 +397,9 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
         {positionedWords.map((word, index) => {
           const percentage = ((word.value / totalCount) * 100).toFixed(1);
 
-          const adjustedLeft = word.x + word.width / 2;
-          const adjustedTop = word.y + word.height / 2;
+          // Add container padding offsets to position within content area
+          const adjustedLeft = word.x + word.width / 2 + containerSize.offsetX;
+          const adjustedTop = word.y + word.height / 2 + containerSize.offsetY;
 
           return (
             <span
