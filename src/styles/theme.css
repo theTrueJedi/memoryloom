@@ -1943,7 +1943,7 @@ h2 {
 .tag-cloud-container-packed,
 .mood-cloud-container-packed {
   position: relative;
-  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+  padding: var(--spacing-md);
   min-height: 400px;
   width: 100%;
   overflow: hidden;
@@ -2015,11 +2015,6 @@ h2 {
     gap: var(--spacing-sm);
   }
 
-  .tag-cloud-container-packed,
-  .mood-cloud-container-packed {
-    padding-left: 0;
-    padding-right: 0;
-  }
 }
 
 /* ========== Rich Text Editor ========== */
