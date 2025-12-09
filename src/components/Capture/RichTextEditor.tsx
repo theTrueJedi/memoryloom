@@ -169,10 +169,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
           // Insert the formatted text
           editor.insertText(startIndex, matchText, { [format]: true });
-          editor.insertText(startIndex + matchText.length, ' ');
 
-          // Move cursor to end
-          editor.setSelection(startIndex + matchText.length + 1, 0);
+          // Insert space WITHOUT formatting to break the format continuation
+          editor.insertText(startIndex + matchText.length, ' ', { [format]: false });
+
+          // Move cursor to end and explicitly clear the format
+          const newCursorPos = startIndex + matchText.length + 1;
+          editor.setSelection(newCursorPos, 0);
+          editor.format(format, false);
         }
       };
 
