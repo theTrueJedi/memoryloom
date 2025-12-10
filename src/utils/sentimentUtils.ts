@@ -32,6 +32,8 @@ export const getSentimentColor = (label: string): string => {
       return '#4e61ca';
     case 'anxiety':
       return '#f44e4e';
+    case 'frustration':
+      return '#e07040';
     case 'anger':
       return '#ba261c';
     case 'fear':
@@ -87,6 +89,8 @@ export const getSentimentEmoji = (label: string): string => {
       return '😢';
     case 'anxiety':
       return '😰';
+    case 'frustration':
+      return '😤';
     case 'anger':
       return '😡';
     case 'fear':
@@ -127,6 +131,7 @@ export const getAllEmotionLabels = (): EmotionLabel[] => {
     'surprise',
     'sadness',
     'anxiety',
+    'frustration',
     'anger',
     'fear',
     'shame',

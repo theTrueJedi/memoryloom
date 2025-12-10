@@ -144,9 +144,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           return;
         }
 
-        // Check for markdown patterns followed by space
-        const boldPattern = /\*([^*\s]+)\*\s$/;
-        const italicPattern = /_([^_\s]+)_\s$/;
+        // Check for markdown patterns followed by space or punctuation
+        const boldPattern = /\*([^*]+)\*(\s|[,.:;!?])$/;
+        const italicPattern = /_([^_]+)_(\s|[,.:;!?])$/;
 
         let match;
         let format: 'bold' | 'italic' | null = null;
@@ -162,6 +162,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         if (match && format) {
           const matchText = match[1];
+          const trailingChar = match[2]; // The space or punctuation that triggered it
           const startIndex = selection.index - matchLength;
 
           // Remove the markdown syntax
@@ -170,8 +171,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           // Insert the formatted text
           editor.insertText(startIndex, matchText, { [format]: true });
 
-          // Insert space WITHOUT formatting to break the format continuation
-          editor.insertText(startIndex + matchText.length, ' ', { [format]: false });
+          // Insert trailing character WITHOUT formatting to break the format continuation
+          editor.insertText(startIndex + matchText.length, trailingChar, { [format]: false });
 
           // Move cursor to end and explicitly clear the format
           const newCursorPos = startIndex + matchText.length + 1;

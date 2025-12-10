@@ -11,7 +11,8 @@ export type EmotionLabel =
   | 'hope'          // Optimistic, encouraged
   | 'sadness'       // Unhappy, down, melancholic
   | 'anxiety'       // Worried, nervous, stressed
-  | 'anger'         // Frustrated, irritated, upset
+  | 'frustration'   // Annoyed, irritated, exasperated
+  | 'anger'         // Furious, enraged, hostile, mad
   | 'fear'          // Scared, afraid, worried
   | 'shame'         // Embarrassed, guilty, regretful
   | 'loneliness'    // Isolated, disconnected

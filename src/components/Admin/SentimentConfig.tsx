@@ -26,6 +26,7 @@ const DEFAULT_SENTIMENT_CONFIG: Record<EmotionLabel, { emoji: string; color: str
   surprise: { emoji: '😲', color: '#ff8800' },
   sadness: { emoji: '😢', color: '#4e61ca' },
   anxiety: { emoji: '😰', color: '#f44e4e' },
+  frustration: { emoji: '😤', color: '#e07040' },
   anger: { emoji: '😡', color: '#ba261c' },
   fear: { emoji: '😨', color: '#4b4949' },
   shame: { emoji: '😳', color: '#a16059' },
@@ -55,8 +56,11 @@ const SentimentConfig: React.FC = () => {
         if (configSnap.exists()) {
           const savedConfig = configSnap.data().config as Record<EmotionLabel, { emoji: string; color: string }>;
 
+          // Merge saved config with defaults to include any new emotions
+          const mergedConfig = { ...DEFAULT_SENTIMENT_CONFIG, ...savedConfig };
+
           // Convert to array format for rendering
-          const configArray: SentimentConfigItem[] = Object.entries(savedConfig).map(([label, data]) => ({
+          const configArray: SentimentConfigItem[] = Object.entries(mergedConfig).map(([label, data]) => ({
             label: label as EmotionLabel,
             emoji: data.emoji,
             color: data.color,

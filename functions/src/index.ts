@@ -72,7 +72,8 @@ Guidelines:
   Negative emotions:
   - sadness: Unhappy, down, melancholic, blue, grieving
   - anxiety: Worried, nervous, stressed, overwhelmed, tense
-  - anger: Frustrated, irritated, upset, mad, annoyed
+  - frustration: Annoyed, irritated, exasperated, bothered
+  - anger: Furious, enraged, hostile, mad, livid
   - fear: Scared, afraid, threatened, panicked
   - shame: Embarrassed, guilty, regretful, self-critical
   - loneliness: Isolated, disconnected, alone, abandoned
