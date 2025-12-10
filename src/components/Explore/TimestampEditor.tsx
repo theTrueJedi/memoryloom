@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Timestamp } from 'firebase/firestore';
 import { Thought } from '../../types';
+import { analyzeSentiment, suggestTags } from '../../services/gemini';
+import { createTagSuggestion, getAllTags, updateThought } from '../../services/firestore';
+import { useAuth } from '../../contexts/AuthContext';
 import './TimestampEditor.css';
 
 interface TimestampEditorProps {
@@ -9,6 +12,7 @@ interface TimestampEditorProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newTimestamp: Timestamp) => Promise<void>;
+  onThoughtUpdated?: () => void;
 }
 
 const TimestampEditor: React.FC<TimestampEditorProps> = ({
@@ -16,11 +20,16 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
   isOpen,
   onClose,
   onSave,
+  onThoughtUpdated,
 }) => {
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isReprocessingSentiment, setIsReprocessingSentiment] = useState(false);
+  const [isReprocessingTags, setIsReprocessingTags] = useState(false);
+  const [reprocessMessage, setReprocessMessage] = useState<string | null>(null);
 
   // Initialize date/time from thought's current timestamp
   useEffect(() => {
@@ -86,6 +95,90 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
     }
   };
 
+  const handleReprocessSentiment = async () => {
+    if (!user) return;
+
+    try {
+      setIsReprocessingSentiment(true);
+      setReprocessMessage(null);
+      setError(null);
+
+      const newSentiment = await analyzeSentiment(thought.content);
+
+      const sanitizedSentiment: any = {
+        score: newSentiment.score,
+        magnitude: newSentiment.magnitude,
+        label: newSentiment.label,
+      };
+
+      if (newSentiment.secondaryLabel !== undefined) {
+        sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
+      }
+
+      await updateThought(user.uid, thought.id, { sentiment: sanitizedSentiment });
+      setReprocessMessage(`Sentiment updated to: ${newSentiment.label}`);
+      onThoughtUpdated?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reprocess sentiment');
+    } finally {
+      setIsReprocessingSentiment(false);
+    }
+  };
+
+  const handleReprocessTags = async () => {
+    if (!user) return;
+
+    try {
+      setIsReprocessingTags(true);
+      setReprocessMessage(null);
+      setError(null);
+
+      const existingTags = await getAllTags(user.uid);
+      const tagNames = existingTags.map(t => t.name);
+
+      const suggestions = await suggestTags(thought.content, tagNames);
+
+      let suggestionsCreated = 0;
+
+      // Create suggestions for existing tags
+      for (const tag of suggestions.existingTags) {
+        if (!thought.tags?.includes(tag)) {
+          await createTagSuggestion(
+            user.uid,
+            thought.id,
+            tag,
+            false,
+            `AI suggested existing tag: ${suggestions.reasoning}`
+          );
+          suggestionsCreated++;
+        }
+      }
+
+      // Create suggestion for new tag
+      if (suggestions.newTag && !thought.tags?.includes(suggestions.newTag)) {
+        await createTagSuggestion(
+          user.uid,
+          thought.id,
+          suggestions.newTag,
+          true,
+          `AI suggested new tag: ${suggestions.reasoning}`
+        );
+        suggestionsCreated++;
+      }
+
+      setReprocessMessage(
+        suggestionsCreated > 0
+          ? `Created ${suggestionsCreated} tag suggestion(s)`
+          : 'No new tag suggestions'
+      );
+      onThoughtUpdated?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reprocess tags');
+    } finally {
+      setIsReprocessingTags(false);
+    }
+  };
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -96,66 +189,94 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
 
   const currentDate = thought.timestamp.toDate();
 
+  const isProcessing = isSaving || isReprocessingSentiment || isReprocessingTags;
+
   const modalContent = (
     <div className="timestamp-editor-backdrop" onClick={handleBackdropClick}>
       <div className="timestamp-editor-modal">
-        <h2 className="timestamp-editor-title">Update Thought Timestamp</h2>
+        <h2 className="timestamp-editor-title">Thought Options</h2>
 
-        <div className="timestamp-editor-current">
-          <strong>Current:</strong> {currentDate.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-          })}
-        </div>
-
-        <div className="timestamp-editor-inputs">
-          <div className="timestamp-editor-field">
-            <label htmlFor="date-input">Date</label>
-            <input
-              id="date-input"
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              disabled={isSaving}
-            />
+        <div className="timestamp-editor-section">
+          <h3 className="timestamp-editor-section-title">Timestamp</h3>
+          <div className="timestamp-editor-current">
+            <strong>Current:</strong> {currentDate.toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            })}
           </div>
 
-          <div className="timestamp-editor-field">
-            <label htmlFor="time-input">Time</label>
-            <input
-              id="time-input"
-              type="time"
-              value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-              disabled={isSaving}
-            />
+          <div className="timestamp-editor-inputs">
+            <div className="timestamp-editor-field">
+              <label htmlFor="date-input">Date</label>
+              <input
+                id="date-input"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                disabled={isProcessing}
+              />
+            </div>
+
+            <div className="timestamp-editor-field">
+              <label htmlFor="time-input">Time</label>
+              <input
+                id="time-input"
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                disabled={isProcessing}
+              />
+            </div>
+          </div>
+
+          <div className="timestamp-editor-warning">
+            This will change when this thought appears in your timeline
+          </div>
+
+          <button
+            className="timestamp-editor-save"
+            onClick={handleSave}
+            disabled={isProcessing}
+            style={{ marginTop: '0.5rem' }}
+          >
+            {isSaving ? 'Saving...' : 'Update Timestamp'}
+          </button>
+        </div>
+
+        <div className="timestamp-editor-section">
+          <h3 className="timestamp-editor-section-title">Reprocess</h3>
+          <div className="timestamp-editor-reprocess-buttons">
+            <button
+              className="timestamp-editor-reprocess"
+              onClick={handleReprocessSentiment}
+              disabled={isProcessing}
+            >
+              {isReprocessingSentiment ? 'Processing...' : 'Reprocess Sentiment'}
+            </button>
+            <button
+              className="timestamp-editor-reprocess"
+              onClick={handleReprocessTags}
+              disabled={isProcessing}
+            >
+              {isReprocessingTags ? 'Processing...' : 'Reprocess Tags'}
+            </button>
           </div>
         </div>
 
         {error && <div className="timestamp-editor-error">{error}</div>}
-
-        <div className="timestamp-editor-warning">
-          This will change when this thought appears in your timeline
-        </div>
+        {reprocessMessage && <div className="timestamp-editor-success">{reprocessMessage}</div>}
 
         <div className="timestamp-editor-actions">
           <button
             className="timestamp-editor-cancel"
             onClick={onClose}
-            disabled={isSaving}
+            disabled={isProcessing}
           >
-            Cancel
-          </button>
-          <button
-            className="timestamp-editor-save"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
+            Close
           </button>
         </div>
       </div>
