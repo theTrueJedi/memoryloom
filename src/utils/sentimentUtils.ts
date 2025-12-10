@@ -33,7 +33,7 @@ export const getSentimentColor = (label: string): string => {
     case 'anxiety':
       return '#f44e4e';
     case 'frustration':
-      return '#e07040';
+      return '#c86aaf';
     case 'anger':
       return '#ba261c';
     case 'fear':
