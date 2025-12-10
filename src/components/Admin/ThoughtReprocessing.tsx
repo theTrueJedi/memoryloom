@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, getDocs, updateDoc, doc, query, where, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../services/firebase';
-import { analyzeSentiment } from '../../services/gemini';
+import { analyzeSentiment, suggestTags } from '../../services/gemini';
+import { createTagSuggestion, getAllTags, updateThought } from '../../services/firestore';
+import { Tag } from '../../types';
 
-interface MigrationProgress {
+interface ReprocessingProgress {
   total: number;
   processed: number;
   failed: number;
@@ -14,14 +16,23 @@ interface MigrationProgress {
 
 type DateRangePreset = 'all' | 'today' | 'custom';
 
-const SentimentMigration: React.FC = () => {
+interface ReprocessingOptions {
+  sentiment: boolean;
+  tags: boolean;
+}
+
+const ThoughtReprocessing: React.FC = () => {
   const { user } = useAuth();
   const [isRunning, setIsRunning] = useState(false);
-  const [progress, setProgress] = useState<MigrationProgress | null>(null);
+  const [progress, setProgress] = useState<ReprocessingProgress | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [dateRange, setDateRange] = useState<DateRangePreset>('all');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [options, setOptions] = useState<ReprocessingOptions>({
+    sentiment: true,
+    tags: false,
+  });
 
   // Helper to format date as YYYY-MM-DD for input
   const formatDateForInput = (date: Date): string => {
@@ -50,9 +61,18 @@ const SentimentMigration: React.FC = () => {
     setDateRange('custom');
   };
 
-  const runMigration = async () => {
+  const handleOptionChange = (option: keyof ReprocessingOptions) => {
+    setOptions(prev => ({ ...prev, [option]: !prev[option] }));
+  };
+
+  const runReprocessing = async () => {
     if (!user) {
-      alert('You must be logged in to run migration');
+      alert('You must be logged in to run reprocessing');
+      return;
+    }
+
+    if (!options.sentiment && !options.tags) {
+      alert('Please select at least one option to reprocess');
       return;
     }
 
@@ -68,7 +88,11 @@ const SentimentMigration: React.FC = () => {
       rangeLabel = `thoughts up to ${endDate}`;
     }
 
-    if (!confirm(`This will re-analyze sentiment for ${rangeLabel}. This may take several minutes and use API credits. Continue?`)) {
+    const processingTypes = [];
+    if (options.sentiment) processingTypes.push('sentiment');
+    if (options.tags) processingTypes.push('tag suggestions');
+
+    if (!confirm(`This will reprocess ${processingTypes.join(' and ')} for ${rangeLabel}. This may take several minutes and use API credits. Continue?`)) {
       return;
     }
 
@@ -105,9 +129,28 @@ const SentimentMigration: React.FC = () => {
       }
 
       const snapshot = await getDocs(thoughtsQuery);
-
-      // All thoughts in this collection belong to the user
       const userThoughts = snapshot.docs;
+
+      // Get existing tags for tag suggestions
+      let existingTags: string[] = [];
+      if (options.tags) {
+        const tagsData: Tag[] = await getAllTags(user.uid);
+        existingTags = tagsData.map((t: Tag) => t.name);
+      }
+
+      // Build context for tag suggestions (all thoughts for pattern matching)
+      let allThoughtsContext: Array<{ content: string; tags: string[]; sentiment: any }> = [];
+      if (options.tags) {
+        const allThoughtsSnapshot = await getDocs(thoughtsRef);
+        allThoughtsContext = allThoughtsSnapshot.docs.map(d => {
+          const data = d.data();
+          return {
+            content: data.content,
+            tags: data.tags || [],
+            sentiment: data.sentiment || { score: 0, magnitude: 0.5, label: 'neutral' },
+          };
+        });
+      }
 
       setProgress({
         total: userThoughts.length,
@@ -132,25 +175,57 @@ const SentimentMigration: React.FC = () => {
             currentThought: `${thought.content.substring(0, 100)}...`,
           } : null);
 
-          // Re-analyze sentiment
-          const newSentiment = await analyzeSentiment(thought.content);
+          // Reprocess sentiment if selected
+          if (options.sentiment) {
+            const newSentiment = await analyzeSentiment(thought.content);
 
-          // Remove undefined fields to avoid Firestore errors
-          const sanitizedSentiment: any = {
-            score: newSentiment.score,
-            magnitude: newSentiment.magnitude,
-            label: newSentiment.label,
-          };
+            // Remove undefined fields to avoid Firestore errors
+            const sanitizedSentiment: any = {
+              score: newSentiment.score,
+              magnitude: newSentiment.magnitude,
+              label: newSentiment.label,
+            };
 
-          // Only add secondaryLabel if it's defined
-          if (newSentiment.secondaryLabel !== undefined) {
-            sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
+            // Only add secondaryLabel if it's defined
+            if (newSentiment.secondaryLabel !== undefined) {
+              sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
+            }
+
+            await updateThought(user.uid, thoughtId, { sentiment: sanitizedSentiment });
           }
 
-          // Update the thought document
-          await updateDoc(doc(db, `users/${user.uid}/thoughts`, thoughtId), {
-            sentiment: sanitizedSentiment,
-          });
+          // Reprocess tags if selected
+          if (options.tags) {
+            const suggestions = await suggestTags(
+              thought.content,
+              existingTags,
+              { thoughts: allThoughtsContext }
+            );
+
+            // Create suggestions for existing tags
+            for (const tag of suggestions.existingTags) {
+              if (!thought.tags?.includes(tag)) {
+                await createTagSuggestion(
+                  user.uid,
+                  thoughtId,
+                  tag,
+                  false,
+                  `AI suggested existing tag: ${suggestions.reasoning}`
+                );
+              }
+            }
+
+            // Create suggestion for new tag
+            if (suggestions.newTag && !thought.tags?.includes(suggestions.newTag)) {
+              await createTagSuggestion(
+                user.uid,
+                thoughtId,
+                suggestions.newTag,
+                true,
+                `AI suggested new tag: ${suggestions.reasoning}`
+              );
+            }
+          }
 
           processed++;
           setProgress(prev => prev ? {
@@ -178,8 +253,8 @@ const SentimentMigration: React.FC = () => {
       setIsRunning(false);
 
     } catch (error) {
-      console.error('Migration error:', error);
-      alert('Migration failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('Reprocessing error:', error);
+      alert('Reprocessing failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
       setIsRunning(false);
     }
   };
@@ -187,7 +262,7 @@ const SentimentMigration: React.FC = () => {
   if (!user) {
     return (
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-        Please log in to access migration tools.
+        Please log in to access reprocessing tools.
       </p>
     );
   }
@@ -304,12 +379,73 @@ const SentimentMigration: React.FC = () => {
             </div>
           </div>
 
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: '0.5rem'
+            }}>
+              Reprocess Options
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={options.sentiment}
+                  onChange={() => handleOptionChange('sentiment')}
+                  style={{
+                    width: '1rem',
+                    height: '1rem',
+                    accentColor: 'var(--primary-teal)',
+                  }}
+                />
+                Sentiment Analysis
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                  (re-analyze emotional content)
+                </span>
+              </label>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={options.tags}
+                  onChange={() => handleOptionChange('tags')}
+                  style={{
+                    width: '1rem',
+                    height: '1rem',
+                    accentColor: 'var(--primary-teal)',
+                  }}
+                />
+                Tag Suggestions
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                  (generate new tag recommendations)
+                </span>
+              </label>
+            </div>
+          </div>
+
           <button
             className="button-primary"
-            onClick={runMigration}
+            onClick={runReprocessing}
+            disabled={!options.sentiment && !options.tags}
             style={{ width: '100%' }}
           >
-            Start Migration
+            Start Reprocessing
           </button>
         </div>
       )}
@@ -325,7 +461,7 @@ const SentimentMigration: React.FC = () => {
               color: 'var(--text-secondary)'
             }}>
               <span>Progress: {progress.processed} / {progress.total}</span>
-              <span>{Math.round((progress.processed / progress.total) * 100)}%</span>
+              <span>{progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0}%</span>
             </div>
             <div style={{
               width: '100%',
@@ -335,7 +471,7 @@ const SentimentMigration: React.FC = () => {
               overflow: 'hidden'
             }}>
               <div style={{
-                width: `${(progress.processed / progress.total) * 100}%`,
+                width: `${progress.total > 0 ? (progress.processed / progress.total) * 100 : 0}%`,
                 height: '100%',
                 backgroundColor: 'var(--primary-purple)',
                 transition: 'width 0.3s ease'
@@ -386,7 +522,7 @@ const SentimentMigration: React.FC = () => {
             padding: '1.5rem',
             textAlign: 'center'
           }}>
-            <h3 style={{ marginBottom: '1rem' }}>✅ Migration Complete!</h3>
+            <h3 style={{ marginBottom: '1rem' }}>Reprocessing Complete!</h3>
             <div>
               <p>Successfully processed: {progress.processed} thoughts</p>
               {progress.failed > 0 && <p>Failed: {progress.failed} thoughts</p>}
@@ -406,4 +542,4 @@ const SentimentMigration: React.FC = () => {
   );
 };
 
-export default SentimentMigration;
+export default ThoughtReprocessing;

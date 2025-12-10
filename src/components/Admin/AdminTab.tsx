@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import BulkImport from './BulkImport';
-import SentimentMigration from './SentimentMigration';
+import ThoughtReprocessing from './ThoughtReprocessing';
 import SentimentConfig from './SentimentConfig';
 
 const AdminTab: React.FC = () => {
@@ -24,16 +24,16 @@ const AdminTab: React.FC = () => {
       </h2>
 
       <div className="admin-section">
-        <h3 className="admin-section-title">Sentiment Migration Tool</h3>
+        <h3 className="admin-section-title">Past Thought Reprocessing</h3>
         <div style={{ marginBottom: '1rem' }}>
           <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
-            This tool will re-analyze the emotional content of all your thoughts using the expanded emotion categories.
+            Re-analyze sentiment and generate tag suggestions for your existing thoughts.
           </p>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            <strong>Note:</strong> This will use your Gemini API quota and may take several minutes depending on how many thoughts you have.
+            <strong>Note:</strong> This will use API credits and may take several minutes depending on how many thoughts you have.
           </p>
         </div>
-        <SentimentMigration />
+        <ThoughtReprocessing />
       </div>
 
       <div className="admin-section">
