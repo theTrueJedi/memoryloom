@@ -7,7 +7,7 @@ export const getSentimentColor = (label: string): string => {
   switch (label) {
     // Positive emotions - greens and warm colors
     case 'joy':
-      return '#46a050';
+      return '#3f9749';
     case 'amusement':
       return '#F28500';
     case 'gratitude':
