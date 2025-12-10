@@ -68,6 +68,7 @@ Guidelines:
   - love: Affectionate, caring, warm, connected
   - peace: Calm, serene, content, tranquil
   - hope: Optimistic, encouraged, looking forward
+  - creative: Inspired, imaginative, inventive, artistic, innovative
   - curiosity: Interested, inquisitive, engaged, wondering
   - surprise: Amazed, shocked, astonished (in a positive way)
 

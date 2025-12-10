@@ -43,6 +43,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       love: '❤️',
       peace: '☮️',
       hope: '🌅',
+      creative: '🎨',
       curiosity: '🤔',
       surprise: '😲',
       sadness: '😢',
@@ -63,7 +64,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
 
   const getSentimentColor = (label: EmotionLabel): string => {
     const colorMap: Record<EmotionLabel, string> = {
-      joy: '#46a050',
+      joy: '#3f9749',
       amusement: '#F28500',
       gratitude: '#8BC34A',
       pride: '#FFC107',
@@ -71,11 +72,12 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       love: '#df58b4',
       peace: '#328cb3',
       hope: '#54b9e8',
+      creative: '#60e698',
       curiosity: '#9227b0',
       surprise: '#ff8800',
       sadness: '#4e61ca',
       anxiety: '#f44e4e',
-      frustration: '#e07040',
+      frustration: '#c86aaf',
       anger: '#ba261c',
       fear: '#4b4949',
       shame: '#a16059',

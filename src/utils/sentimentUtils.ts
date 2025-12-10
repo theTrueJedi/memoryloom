@@ -22,6 +22,8 @@ export const getSentimentColor = (label: string): string => {
       return '#328cb3';
     case 'hope':
       return '#54b9e8';
+    case 'creative':
+      return '#60e698';
     case 'curiosity':
       return '#9227b0';
     case 'surprise':
@@ -79,6 +81,8 @@ export const getSentimentEmoji = (label: string): string => {
       return '☮️';
     case 'hope':
       return '🌅';
+    case 'creative':
+      return '🎨';
     case 'curiosity':
       return '🤔';
     case 'surprise':
@@ -127,6 +131,7 @@ export const getAllEmotionLabels = (): EmotionLabel[] => {
     'love',
     'peace',
     'hope',
+    'creative',
     'curiosity',
     'surprise',
     'sadness',
