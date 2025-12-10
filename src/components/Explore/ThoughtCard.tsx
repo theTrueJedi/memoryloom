@@ -140,7 +140,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   };
 
   const handleSaveContent = async () => {
-    await editThought(thought.id, { content: editedContent.trim() });
+    // Trim only leading/trailing newlines, preserve internal whitespace for indentation
+    const trimmedContent = editedContent.replace(/^[\r\n]+|[\r\n]+$/g, '');
+    await editThought(thought.id, { content: trimmedContent });
     setIsEditingContent(false);
   };
 

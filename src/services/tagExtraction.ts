@@ -43,17 +43,19 @@ export const insertTag = (text: string, cursorPosition: number, tag: string): { 
 };
 
 /**
- * Remove a tag from text
+ * Remove a tag from text while preserving whitespace/indentation
  */
 export const removeTag = (text: string, tag: string): string => {
   const tagPattern = new RegExp(`#${tag}\\b`, 'gi');
-  return text.replace(tagPattern, '').replace(/\s+/g, ' ').trim();
+  // Only clean up multiple spaces on the same line (not newlines or indentation)
+  return text.replace(tagPattern, '').replace(/ +/g, ' ').trim();
 };
 
 /**
- * Remove all hashtags from text content
+ * Remove all hashtags from text content while preserving whitespace/indentation
  */
 export const stripTags = (text: string): string => {
   const tagRegex = /#[a-zA-Z0-9_-]+/g;
-  return text.replace(tagRegex, '').replace(/\s+/g, ' ').trim();
+  // Only clean up multiple spaces on the same line (not newlines or indentation)
+  return text.replace(tagRegex, '').replace(/ +/g, ' ').trim();
 };

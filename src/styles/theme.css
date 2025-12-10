@@ -915,6 +915,16 @@ h2 {
   margin: 0.25em 0;
 }
 
+/* Quill indentation - minimal padding for economy */
+.thought-content li.ql-indent-1 { margin-left: 1.5em; }
+.thought-content li.ql-indent-2 { margin-left: 3em; }
+.thought-content li.ql-indent-3 { margin-left: 3.75em; }
+.thought-content li.ql-indent-4 { margin-left: 5em; }
+.thought-content li.ql-indent-5 { margin-left: 6.25em; }
+.thought-content li.ql-indent-6 { margin-left: 7.5em; }
+.thought-content li.ql-indent-7 { margin-left: 8.75em; }
+.thought-content li.ql-indent-8 { margin-left: 10em; }
+
 .thought-content-editor {
   margin-bottom: 6px;
 }
@@ -2232,10 +2242,6 @@ h2 {
   margin-left: 1.5em;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
-}
-
-.thought-content li {
-  margin-bottom: 0.25em;
 }
 
 .thought-content p {
