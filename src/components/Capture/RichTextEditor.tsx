@@ -58,6 +58,26 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const editorElement = editor.root;
 
       const handleKeyDown = (e: KeyboardEvent) => {
+        // Handle Cmd+] / Ctrl+] for indent
+        if ((e.metaKey || e.ctrlKey) && e.key === ']') {
+          e.preventDefault();
+          const range = editor.getSelection();
+          if (range) {
+            editor.format('indent', '+1');
+          }
+          return;
+        }
+
+        // Handle Cmd+[ / Ctrl+[ for outdent
+        if ((e.metaKey || e.ctrlKey) && e.key === '[') {
+          e.preventDefault();
+          const range = editor.getSelection();
+          if (range) {
+            editor.format('indent', '-1');
+          }
+          return;
+        }
+
         // Handle Cmd+K / Ctrl+K for link insertion
         if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
           e.preventDefault();

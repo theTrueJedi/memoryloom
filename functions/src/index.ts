@@ -8,7 +8,7 @@ const vertexAI = new VertexAI({
 });
 
 const model = vertexAI.getGenerativeModel({
-  model: "gemini-2.0-flash-exp",
+  model: "gemini-2.5-flash-001",
 });
 
 interface Sentiment {
@@ -43,7 +43,9 @@ export const analyzeSentiment = onCall<{ content: string }>(
     }
 
     try {
-      const prompt = `Analyze the emotional content of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks):
+      const prompt = `Analyze the emotional content of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks).
+The entry may be written in any language (English, Chinese, Spanish, etc.) - analyze the emotions regardless of language.
+
 {
   "score": <number between -1 and 1>,
   "magnitude": <number from 0 to infinity>,
@@ -223,6 +225,9 @@ Use this context to:
     const prompt = `Given this journal entry and the user's existing tags, suggest:
 1. Which existing tags are relevant (if any)
 2. If a new tag should be created (and what it should be)
+
+The entry may be written in any language (English, Chinese, Spanish, etc.).
+Tags can be in any language or a mix of languages - match the language the user tends to use for their tags, or use the language of the entry if no clear pattern exists.
 
 Existing tags: ${existingTagsList}
 Entry: "${content.replace(/"/g, '\\"')}"

@@ -1,12 +1,13 @@
 /**
  * Extract #tags from text content
- * Tags can contain letters, numbers, hyphens, and underscores
- * Examples: #work, #self-care, #idea_2024
+ * Tags can contain letters (any language), numbers, hyphens, and underscores
+ * Examples: #work, #self-care, #idea_2024, #工作, #日记
  */
 export const extractTags = (text: string): string[] => {
-  const tagRegex = /#([a-zA-Z0-9_-]+)/g;
+  // \p{L} matches any letter from any language (Unicode)
+  const tagRegex = /#([\p{L}\p{N}_-]+)/gu;
   const matches = text.matchAll(tagRegex);
-  const tags = Array.from(matches, (match) => match[1]); // Preserve original capitalization
+  const tags = Array.from(matches, (match) => match[1]); // Preserve original
 
   // Remove duplicates while preserving case (first occurrence wins)
   const uniqueTags = new Map<string, string>();
@@ -46,7 +47,10 @@ export const insertTag = (text: string, cursorPosition: number, tag: string): { 
  * Remove a tag from text while preserving whitespace/indentation
  */
 export const removeTag = (text: string, tag: string): string => {
-  const tagPattern = new RegExp(`#${tag}\\b`, 'gi');
+  // Escape special regex characters in the tag
+  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Use Unicode-aware boundary matching
+  const tagPattern = new RegExp(`#${escapedTag}(?![\\p{L}\\p{N}_-])`, 'giu');
   // Only clean up multiple spaces on the same line (not newlines or indentation)
   return text.replace(tagPattern, '').replace(/ +/g, ' ').trim();
 };
@@ -55,7 +59,8 @@ export const removeTag = (text: string, tag: string): string => {
  * Remove all hashtags from text content while preserving whitespace/indentation
  */
 export const stripTags = (text: string): string => {
-  const tagRegex = /#[a-zA-Z0-9_-]+/g;
+  // \p{L} matches any letter from any language (Unicode)
+  const tagRegex = /#[\p{L}\p{N}_-]+/gu;
   // Only clean up multiple spaces on the same line (not newlines or indentation)
   return text.replace(tagRegex, '').replace(/ +/g, ' ').trim();
 };
