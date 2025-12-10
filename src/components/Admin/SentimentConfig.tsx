@@ -3,6 +3,7 @@ import { EmotionLabel } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { getSentimentColor, getSentimentEmoji, getAllEmotionLabels } from '../../utils/sentimentUtils';
 
 interface SentimentConfigItem {
   label: EmotionLabel;
@@ -10,32 +11,22 @@ interface SentimentConfigItem {
   color: string;
 }
 
-// Default sentiment configuration
-// Exported: 2025-12-05T22:40:27.758Z
-// By: evantidd@gmail.com
-const DEFAULT_SENTIMENT_CONFIG: Record<EmotionLabel, { emoji: string; color: string }> = {
-  joy: { emoji: '😄', color: '#46a050' },
-  amusement: { emoji: '😂', color: '#F28500' },
-  gratitude: { emoji: '🙏', color: '#8BC34A' },
-  pride: { emoji: '🌟', color: '#FFC107' },
-  excitement: { emoji: '🎉', color: '#FF9800' },
-  love: { emoji: '❤️', color: '#df58b4' },
-  peace: { emoji: '☮️', color: '#328cb3' },
-  hope: { emoji: '🌅', color: '#54b9e8' },
-  curiosity: { emoji: '🤔', color: '#9227b0' },
-  surprise: { emoji: '😲', color: '#ff8800' },
-  sadness: { emoji: '😢', color: '#4e61ca' },
-  anxiety: { emoji: '😰', color: '#f44e4e' },
-  frustration: { emoji: '😤', color: '#e07040' },
-  anger: { emoji: '😡', color: '#ba261c' },
-  fear: { emoji: '😨', color: '#4b4949' },
-  shame: { emoji: '😳', color: '#a16059' },
-  loneliness: { emoji: '😔', color: '#557d91' },
-  disappointment: { emoji: '😞', color: '#716496' },
-  boredom: { emoji: '😑', color: '#819c77' },
-  confusion: { emoji: '😕', color: '#FF9800' },
-  neutral: { emoji: '😌', color: '#949494' },
-  mixed: { emoji: '😐', color: '#673AB7' },
+interface ConfigDiff {
+  label: EmotionLabel;
+  current: { emoji: string; color: string };
+  default: { emoji: string; color: string };
+}
+
+// Get latest defaults from sentimentUtils
+const getLatestDefaults = (): Record<EmotionLabel, { emoji: string; color: string }> => {
+  const labels = getAllEmotionLabels();
+  return labels.reduce((acc, label) => {
+    acc[label] = {
+      emoji: getSentimentEmoji(label),
+      color: getSentimentColor(label),
+    };
+    return acc;
+  }, {} as Record<EmotionLabel, { emoji: string; color: string }>);
 };
 
 const SentimentConfig: React.FC = () => {
@@ -43,11 +34,15 @@ const SentimentConfig: React.FC = () => {
   const [config, setConfig] = useState<SentimentConfigItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showDefaultsPreview, setShowDefaultsPreview] = useState(false);
+  const [configDiffs, setConfigDiffs] = useState<ConfigDiff[]>([]);
 
   // Load user's sentiment config from Firestore on mount
   useEffect(() => {
     const loadConfig = async () => {
       if (!user?.uid) return;
+
+      const defaults = getLatestDefaults();
 
       try {
         const configRef = doc(db, `users/${user.uid}/config`, 'sentimentConfig');
@@ -57,7 +52,7 @@ const SentimentConfig: React.FC = () => {
           const savedConfig = configSnap.data().config as Record<EmotionLabel, { emoji: string; color: string }>;
 
           // Merge saved config with defaults to include any new emotions
-          const mergedConfig = { ...DEFAULT_SENTIMENT_CONFIG, ...savedConfig };
+          const mergedConfig = { ...defaults, ...savedConfig };
 
           // Convert to array format for rendering
           const configArray: SentimentConfigItem[] = Object.entries(mergedConfig).map(([label, data]) => ({
@@ -69,7 +64,7 @@ const SentimentConfig: React.FC = () => {
           setConfig(configArray);
         } else {
           // Use defaults if no saved config
-          const defaultArray: SentimentConfigItem[] = Object.entries(DEFAULT_SENTIMENT_CONFIG).map(([label, data]) => ({
+          const defaultArray: SentimentConfigItem[] = Object.entries(defaults).map(([label, data]) => ({
             label: label as EmotionLabel,
             emoji: data.emoji,
             color: data.color,
@@ -79,7 +74,7 @@ const SentimentConfig: React.FC = () => {
       } catch (error) {
         console.error('Error loading sentiment config:', error);
         // Fall back to defaults on error
-        const defaultArray: SentimentConfigItem[] = Object.entries(DEFAULT_SENTIMENT_CONFIG).map(([label, data]) => ({
+        const defaultArray: SentimentConfigItem[] = Object.entries(defaults).map(([label, data]) => ({
           label: label as EmotionLabel,
           emoji: data.emoji,
           color: data.color,
@@ -90,6 +85,44 @@ const SentimentConfig: React.FC = () => {
 
     loadConfig();
   }, [user?.uid]);
+
+  // Calculate differences between current config and defaults
+  const calculateDiffs = () => {
+    const defaults = getLatestDefaults();
+    const diffs: ConfigDiff[] = [];
+
+    config.forEach(item => {
+      const defaultItem = defaults[item.label];
+      if (defaultItem && (item.emoji !== defaultItem.emoji || item.color.toLowerCase() !== defaultItem.color.toLowerCase())) {
+        diffs.push({
+          label: item.label,
+          current: { emoji: item.emoji, color: item.color },
+          default: defaultItem,
+        });
+      }
+    });
+
+    return diffs;
+  };
+
+  const handleShowDefaultsPreview = () => {
+    const diffs = calculateDiffs();
+    setConfigDiffs(diffs);
+    setShowDefaultsPreview(true);
+  };
+
+  const handleApplyDefaults = () => {
+    const defaults = getLatestDefaults();
+    const defaultArray: SentimentConfigItem[] = Object.entries(defaults).map(([label, data]) => ({
+      label: label as EmotionLabel,
+      emoji: data.emoji,
+      color: data.color,
+    }));
+    setConfig(defaultArray);
+    setShowDefaultsPreview(false);
+    setSaveMessage({ type: 'success', text: 'Defaults applied. Remember to save!' });
+    setTimeout(() => setSaveMessage(null), 3000);
+  };
 
   const handleEmojiChange = (label: EmotionLabel, newEmoji: string) => {
     setConfig(prev =>
@@ -176,6 +209,123 @@ const SENTIMENT_CONFIG: Record<EmotionLabel, { emoji: string; color: string }> =
       <p style={{ marginBottom: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
         Customize the emoji and color for each sentiment. Changes will be saved to your profile.
       </p>
+
+      <button
+        onClick={handleShowDefaultsPreview}
+        style={{
+          marginBottom: '1rem',
+          padding: '0.5rem 1rem',
+          backgroundColor: 'var(--bg-input)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontSize: '0.875rem',
+        }}
+      >
+        Pull Latest Defaults
+      </button>
+
+      {showDefaultsPreview && (
+        <div style={{
+          marginBottom: '1rem',
+          padding: '1rem',
+          backgroundColor: 'var(--bg-input)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: '8px',
+        }}>
+          <h4 style={{ marginBottom: '0.75rem', fontSize: '0.875rem' }}>
+            {configDiffs.length === 0 ? 'No differences found' : `${configDiffs.length} setting(s) will be overwritten:`}
+          </h4>
+          {configDiffs.length > 0 && (
+            <div style={{ marginBottom: '1rem' }}>
+              {configDiffs.map(diff => (
+                <div key={diff.label} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.5rem',
+                  marginBottom: '0.5rem',
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderRadius: '4px',
+                  fontSize: '0.875rem',
+                }}>
+                  <strong style={{ minWidth: '100px' }}>
+                    {diff.label.charAt(0).toUpperCase() + diff.label.slice(1)}
+                  </strong>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: diff.current.color,
+                        fontSize: '14px',
+                      }}
+                    >
+                      {diff.current.emoji}
+                    </span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{diff.current.color}</span>
+                  </div>
+                  <span style={{ color: 'var(--text-secondary)' }}>→</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: diff.default.color,
+                        fontSize: '14px',
+                      }}
+                    >
+                      {diff.default.emoji}
+                    </span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{diff.default.color}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {configDiffs.length > 0 && (
+              <button
+                onClick={handleApplyDefaults}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: 'var(--primary-teal)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                }}
+              >
+                Apply Defaults
+              </button>
+            )}
+            <button
+              onClick={() => setShowDefaultsPreview(false)}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-medium)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="sentiment-config-list">
         {config.map((item) => (
