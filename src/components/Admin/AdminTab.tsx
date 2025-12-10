@@ -24,6 +24,13 @@ const AdminTab: React.FC = () => {
       </h2>
 
       <div className="admin-section">
+        <h3 className="admin-section-title">Advanced Editing for Individual Thoughts</h3>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+          You can 7-tap an individual past thought to manually change datetime, reprocess sentiment, or reprocess tags.
+        </p>
+      </div>
+
+      <div className="admin-section">
         <h3 className="admin-section-title">Past Thought Reprocessing</h3>
         <div style={{ marginBottom: '1rem' }}>
           <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
