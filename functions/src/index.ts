@@ -8,7 +8,7 @@ const vertexAI = new VertexAI({
 });
 
 const model = vertexAI.getGenerativeModel({
-  model: "gemini-2.5-flash-001",
+  model: "gemini-2.5-flash",
 });
 
 interface Sentiment {
@@ -68,7 +68,7 @@ Guidelines:
   - love: Affectionate, caring, warm, connected
   - peace: Calm, serene, content, tranquil
   - hope: Optimistic, encouraged, looking forward
-  - creative: Inspired, imaginative, inventive, artistic, innovative
+  - creative: Inspired, imaginative, inventive, artistic, innovative; also use when describing creative projects, making/building things, crafting, designing, DIY projects, or artistic endeavors
   - curiosity: Interested, inquisitive, engaged, wondering
   - surprise: Amazed, shocked, astonished (in a positive way)
 
@@ -85,10 +85,16 @@ Guidelines:
 
   Neutral/Other:
   - confusion: Uncertain, unclear, puzzled, conflicted
-  - neutral: Balanced, unremarkable, matter-of-fact
+  - neutral: Balanced, unremarkable, matter-of-fact (use sparingly - only when no other emotion fits)
   - mixed: Multiple strong competing emotions
 
 Choose the PRIMARY emotion that best captures the dominant emotional tone, and a SECONDARY emotion if another significant emotion is present.
+
+IMPORTANT: Content matters as much as tone. If the entry describes:
+- Making, building, designing, crafting, 3D printing, DIY projects, or artistic work → use "creative"
+- Planning or looking forward to something → use "hope" or "excitement"
+- Learning or exploring ideas → use "curiosity"
+Do NOT default to "neutral" just because the writing style is matter-of-fact. Consider what the person is DOING or thinking about.
 
 Entry: "${content.replace(/"/g, '\\"')}"`;
 
