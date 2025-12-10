@@ -963,6 +963,11 @@ h2 {
   border: 1px solid var(--border-light);
 }
 
+[data-theme="dark"] .thought-suggestions {
+  background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
+  border-color: var(--border-medium);
+}
+
 .thought-suggestions-header {
   margin-bottom: var(--spacing-xs);
 }
@@ -1399,6 +1404,14 @@ h2 {
 [data-theme="dark"] .button-reject:hover:not(:disabled) {
   background: rgba(91, 193, 179, 0.1);
   border-color: var(--primary-teal);
+}
+
+[data-theme="dark"] .suggestion-tag {
+  color: var(--primary-lavender);
+}
+
+[data-theme="dark"] .thought-suggestion-tag {
+  color: var(--primary-lavender);
 }
 
 .button-accept:disabled,
