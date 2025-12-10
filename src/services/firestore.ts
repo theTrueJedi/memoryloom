@@ -15,7 +15,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Thought, Tag, TagSuggestion, Sentiment } from '../types';
+import { Thought, Tag, TagSuggestion, SentimentSuggestion, Sentiment } from '../types';
 
 // ========== Thought Operations ==========
 
@@ -326,4 +326,127 @@ export const applyTagSuggestion = async (
 
   // Mark suggestion as accepted
   await updateTagSuggestionStatus(userId, suggestionId, 'accepted');
+};
+
+// ========== Sentiment Suggestion Operations ==========
+
+export const createSentimentSuggestion = async (
+  userId: string,
+  thoughtId: string,
+  thoughtContent: string,
+  previousSentiment: Sentiment,
+  suggestedSentiment: Sentiment
+): Promise<string> => {
+  const suggestionsRef = collection(db, `users/${userId}/sentimentSuggestions`);
+
+  // Clean sentiment objects for Firestore
+  const cleanPrevious: any = {
+    score: previousSentiment.score,
+    magnitude: previousSentiment.magnitude,
+    label: previousSentiment.label,
+  };
+  if (previousSentiment.secondaryLabel !== undefined) {
+    cleanPrevious.secondaryLabel = previousSentiment.secondaryLabel;
+  }
+
+  const cleanSuggested: any = {
+    score: suggestedSentiment.score,
+    magnitude: suggestedSentiment.magnitude,
+    label: suggestedSentiment.label,
+  };
+  if (suggestedSentiment.secondaryLabel !== undefined) {
+    cleanSuggested.secondaryLabel = suggestedSentiment.secondaryLabel;
+  }
+
+  const docRef = await addDoc(suggestionsRef, {
+    userId,
+    thoughtId,
+    thoughtContent,
+    previousSentiment: cleanPrevious,
+    suggestedSentiment: cleanSuggested,
+    status: 'pending',
+    createdAt: Timestamp.now(),
+  });
+
+  return docRef.id;
+};
+
+export const updateSentimentSuggestionStatus = async (
+  userId: string,
+  suggestionId: string,
+  status: 'accepted' | 'rejected'
+): Promise<void> => {
+  const suggestionRef = doc(db, `users/${userId}/sentimentSuggestions`, suggestionId);
+  await updateDoc(suggestionRef, { status });
+};
+
+export const subscribeToSentimentSuggestions = (
+  userId: string,
+  callback: (suggestions: SentimentSuggestion[]) => void
+): (() => void) => {
+  const suggestionsRef = collection(db, `users/${userId}/sentimentSuggestions`);
+  const q = query(
+    suggestionsRef,
+    where('status', '==', 'pending'),
+    orderBy('createdAt', 'desc')
+  );
+
+  return onSnapshot(q, (querySnapshot) => {
+    const suggestions = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as SentimentSuggestion[];
+    callback(suggestions);
+  });
+};
+
+export const applySentimentSuggestion = async (
+  userId: string,
+  suggestionId: string,
+  thoughtId: string,
+  sentiment: Sentiment
+): Promise<void> => {
+  // Update the thought's sentiment
+  await updateThought(userId, thoughtId, { sentiment });
+
+  // Mark suggestion as accepted
+  await updateSentimentSuggestionStatus(userId, suggestionId, 'accepted');
+};
+
+export const bulkUpdateSentimentSuggestions = async (
+  userId: string,
+  suggestionIds: string[],
+  status: 'accepted' | 'rejected',
+  suggestions?: SentimentSuggestion[]
+): Promise<void> => {
+  const batch = writeBatch(db);
+
+  for (const suggestionId of suggestionIds) {
+    const suggestionRef = doc(db, `users/${userId}/sentimentSuggestions`, suggestionId);
+
+    if (status === 'accepted' && suggestions) {
+      // Find the suggestion to get thoughtId and sentiment
+      const suggestion = suggestions.find(s => s.id === suggestionId);
+      if (suggestion) {
+        // Update the thought's sentiment
+        const thoughtRef = doc(db, `users/${userId}/thoughts`, suggestion.thoughtId);
+
+        // Clean sentiment for Firestore
+        const cleanSentiment: any = {
+          score: suggestion.suggestedSentiment.score,
+          magnitude: suggestion.suggestedSentiment.magnitude,
+          label: suggestion.suggestedSentiment.label,
+        };
+        if (suggestion.suggestedSentiment.secondaryLabel !== undefined) {
+          cleanSentiment.secondaryLabel = suggestion.suggestedSentiment.secondaryLabel;
+        }
+
+        batch.update(thoughtRef, { sentiment: cleanSentiment });
+      }
+    }
+
+    batch.update(suggestionRef, { status });
+  }
+
+  await batch.commit();
 };

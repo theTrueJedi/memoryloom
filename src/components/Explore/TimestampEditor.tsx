@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Timestamp } from 'firebase/firestore';
-import { Thought } from '../../types';
+import { Thought, Sentiment } from '../../types';
 import { analyzeSentiment, suggestTags } from '../../services/gemini';
 import { createTagSuggestion, getAllTags, updateThought } from '../../services/firestore';
 import { useAuth } from '../../contexts/AuthContext';
+import { getSentimentColor, getSentimentEmoji, formatEmotionLabel } from '../../utils/sentimentUtils';
 import './TimestampEditor.css';
 
 interface TimestampEditorProps {
@@ -30,6 +31,8 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
   const [isReprocessingSentiment, setIsReprocessingSentiment] = useState(false);
   const [isReprocessingTags, setIsReprocessingTags] = useState(false);
   const [reprocessMessage, setReprocessMessage] = useState<string | null>(null);
+  const [sentimentPreview, setSentimentPreview] = useState<Sentiment | null>(null);
+  const [isApplyingSentiment, setIsApplyingSentiment] = useState(false);
 
   // Initialize date/time from thought's current timestamp
   useEffect(() => {
@@ -102,27 +105,48 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
       setIsReprocessingSentiment(true);
       setReprocessMessage(null);
       setError(null);
+      setSentimentPreview(null);
 
       const newSentiment = await analyzeSentiment(thought.content);
-
-      const sanitizedSentiment: any = {
-        score: newSentiment.score,
-        magnitude: newSentiment.magnitude,
-        label: newSentiment.label,
-      };
-
-      if (newSentiment.secondaryLabel !== undefined) {
-        sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
-      }
-
-      await updateThought(user.uid, thought.id, { sentiment: sanitizedSentiment });
-      setReprocessMessage(`Sentiment updated to: ${newSentiment.label}`);
-      onThoughtUpdated?.();
+      setSentimentPreview(newSentiment);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reprocess sentiment');
     } finally {
       setIsReprocessingSentiment(false);
     }
+  };
+
+  const handleAcceptSentiment = async () => {
+    if (!user || !sentimentPreview) return;
+
+    try {
+      setIsApplyingSentiment(true);
+      setError(null);
+
+      const sanitizedSentiment: any = {
+        score: sentimentPreview.score,
+        magnitude: sentimentPreview.magnitude,
+        label: sentimentPreview.label,
+      };
+
+      if (sentimentPreview.secondaryLabel !== undefined) {
+        sanitizedSentiment.secondaryLabel = sentimentPreview.secondaryLabel;
+      }
+
+      await updateThought(user.uid, thought.id, { sentiment: sanitizedSentiment });
+      setReprocessMessage(`Sentiment updated to: ${sentimentPreview.label}`);
+      setSentimentPreview(null);
+      onThoughtUpdated?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to apply sentiment');
+    } finally {
+      setIsApplyingSentiment(false);
+    }
+  };
+
+  const handleRejectSentiment = () => {
+    setSentimentPreview(null);
+    setReprocessMessage('Sentiment change rejected');
   };
 
   const handleReprocessTags = async () => {
@@ -189,7 +213,7 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
 
   const currentDate = thought.timestamp.toDate();
 
-  const isProcessing = isSaving || isReprocessingSentiment || isReprocessingTags;
+  const isProcessing = isSaving || isReprocessingSentiment || isReprocessingTags || isApplyingSentiment;
 
   const modalContent = (
     <div className="timestamp-editor-backdrop" onClick={handleBackdropClick}>
@@ -249,22 +273,71 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
 
         <div className="timestamp-editor-section">
           <h3 className="timestamp-editor-section-title">Reprocess</h3>
-          <div className="timestamp-editor-reprocess-buttons">
-            <button
-              className="timestamp-editor-reprocess"
-              onClick={handleReprocessSentiment}
-              disabled={isProcessing}
-            >
-              {isReprocessingSentiment ? 'Processing...' : 'Reprocess Sentiment'}
-            </button>
-            <button
-              className="timestamp-editor-reprocess"
-              onClick={handleReprocessTags}
-              disabled={isProcessing}
-            >
-              {isReprocessingTags ? 'Processing...' : 'Reprocess Tags'}
-            </button>
-          </div>
+
+          {sentimentPreview ? (
+            <div className="sentiment-preview">
+              <div className="sentiment-preview-comparison">
+                <div className="sentiment-preview-item">
+                  <span className="sentiment-preview-label">Current:</span>
+                  <span
+                    className="sentiment-preview-indicator"
+                    style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
+                  >
+                    {getSentimentEmoji(thought.sentiment.label)}
+                  </span>
+                  <span className="sentiment-preview-text">
+                    {formatEmotionLabel(thought.sentiment.label)}
+                  </span>
+                </div>
+                <span className="sentiment-preview-arrow">→</span>
+                <div className="sentiment-preview-item">
+                  <span className="sentiment-preview-label">Proposed:</span>
+                  <span
+                    className="sentiment-preview-indicator"
+                    style={{ backgroundColor: getSentimentColor(sentimentPreview.label) }}
+                  >
+                    {getSentimentEmoji(sentimentPreview.label)}
+                  </span>
+                  <span className="sentiment-preview-text">
+                    {formatEmotionLabel(sentimentPreview.label)}
+                  </span>
+                </div>
+              </div>
+              <div className="sentiment-preview-actions">
+                <button
+                  className="sentiment-preview-accept"
+                  onClick={handleAcceptSentiment}
+                  disabled={isApplyingSentiment}
+                >
+                  {isApplyingSentiment ? 'Applying...' : '✓ Accept'}
+                </button>
+                <button
+                  className="sentiment-preview-reject"
+                  onClick={handleRejectSentiment}
+                  disabled={isApplyingSentiment}
+                >
+                  ✕ Reject
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="timestamp-editor-reprocess-buttons">
+              <button
+                className="timestamp-editor-reprocess"
+                onClick={handleReprocessSentiment}
+                disabled={isProcessing}
+              >
+                {isReprocessingSentiment ? 'Processing...' : 'Reprocess Sentiment'}
+              </button>
+              <button
+                className="timestamp-editor-reprocess"
+                onClick={handleReprocessTags}
+                disabled={isProcessing}
+              >
+                {isReprocessingTags ? 'Processing...' : 'Reprocess Tags'}
+              </button>
+            </div>
+          )}
         </div>
 
         {error && <div className="timestamp-editor-error">{error}</div>}

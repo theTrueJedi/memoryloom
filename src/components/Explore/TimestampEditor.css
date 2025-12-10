@@ -218,6 +218,102 @@
   margin-bottom: 1rem;
 }
 
+/* Sentiment Preview */
+.sentiment-preview {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.sentiment-preview-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.sentiment-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sentiment-preview-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.sentiment-preview-indicator {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sentiment-preview-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sentiment-preview-arrow {
+  font-size: 1.25rem;
+  color: var(--text-tertiary);
+}
+
+.sentiment-preview-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.sentiment-preview-accept,
+.sentiment-preview-reject {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: inherit;
+}
+
+.sentiment-preview-accept {
+  background-color: #22c55e;
+  color: white;
+}
+
+.sentiment-preview-accept:hover:not(:disabled) {
+  background-color: #16a34a;
+}
+
+.sentiment-preview-reject {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-medium);
+}
+
+.sentiment-preview-reject:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.sentiment-preview-accept:disabled,
+.sentiment-preview-reject:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Mobile responsive */
 @media (max-width: 640px) {
   .timestamp-editor-modal {
@@ -239,5 +335,23 @@
 
   .timestamp-editor-reprocess-buttons {
     flex-direction: column;
+  }
+
+  .sentiment-preview-comparison {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sentiment-preview-arrow {
+    transform: rotate(90deg);
+  }
+
+  .sentiment-preview-actions {
+    flex-direction: column;
+  }
+
+  .sentiment-preview-accept,
+  .sentiment-preview-reject {
+    width: 100%;
   }
 }

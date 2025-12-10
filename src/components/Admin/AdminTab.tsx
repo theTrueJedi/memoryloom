@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import BulkImport from './BulkImport';
 import ThoughtReprocessing from './ThoughtReprocessing';
 import SentimentConfig from './SentimentConfig';
+import SentimentSuggestionReview from './SentimentSuggestionReview';
 
 const AdminTab: React.FC = () => {
   const { user } = useAuth();
@@ -26,8 +27,16 @@ const AdminTab: React.FC = () => {
       <div className="admin-section">
         <h3 className="admin-section-title">Advanced Editing for Individual Thoughts</h3>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-          You can 7-tap an individual past thought to manually change datetime, reprocess sentiment, or reprocess tags.
+          You can 7-tap an individual past thought on the Explore Tab to manually change datetime, reprocess sentiment, or reprocess tags.
         </p>
+      </div>
+
+      <div className="admin-section">
+        <h3 className="admin-section-title">Pending Sentiment Changes</h3>
+        <p style={{ marginBottom: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+          Review and approve sentiment changes from reprocessing.
+        </p>
+        <SentimentSuggestionReview />
       </div>
 
       <div className="admin-section">

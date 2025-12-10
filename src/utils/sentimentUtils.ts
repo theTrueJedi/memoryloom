@@ -23,7 +23,7 @@ export const getSentimentColor = (label: string): string => {
     case 'hope':
       return '#54b9e8';
     case 'creative':
-      return '#60e698';
+      return '#79d29e';
     case 'curiosity':
       return '#9227b0';
     case 'surprise':

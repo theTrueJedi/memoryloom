@@ -72,7 +72,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       love: '#df58b4',
       peace: '#328cb3',
       hope: '#54b9e8',
-      creative: '#60e698',
+      creative: '#79d29e',
       curiosity: '#9227b0',
       surprise: '#ff8800',
       sadness: '#4e61ca',

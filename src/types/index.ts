@@ -61,3 +61,14 @@ export interface TagSuggestion {
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: Timestamp;
 }
+
+export interface SentimentSuggestion {
+  id: string;
+  userId: string;
+  thoughtId: string;
+  thoughtContent: string;
+  previousSentiment: Sentiment;
+  suggestedSentiment: Sentiment;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: Timestamp;
+}

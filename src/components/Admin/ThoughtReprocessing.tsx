@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { analyzeSentiment, suggestTags } from '../../services/gemini';
-import { createTagSuggestion, getAllTags, updateThought } from '../../services/firestore';
+import { createTagSuggestion, createSentimentSuggestion, getAllTags } from '../../services/firestore';
 import { Tag } from '../../types';
 
 interface ReprocessingProgress {
@@ -179,19 +179,16 @@ const ThoughtReprocessing: React.FC = () => {
           if (options.sentiment) {
             const newSentiment = await analyzeSentiment(thought.content);
 
-            // Remove undefined fields to avoid Firestore errors
-            const sanitizedSentiment: any = {
-              score: newSentiment.score,
-              magnitude: newSentiment.magnitude,
-              label: newSentiment.label,
-            };
-
-            // Only add secondaryLabel if it's defined
-            if (newSentiment.secondaryLabel !== undefined) {
-              sanitizedSentiment.secondaryLabel = newSentiment.secondaryLabel;
+            // Only create suggestion if sentiment actually changed
+            if (newSentiment.label !== thought.sentiment?.label) {
+              await createSentimentSuggestion(
+                user.uid,
+                thoughtId,
+                thought.content,
+                thought.sentiment,
+                newSentiment
+              );
             }
-
-            await updateThought(user.uid, thoughtId, { sentiment: sanitizedSentiment });
           }
 
           // Reprocess tags if selected
