@@ -59,6 +59,11 @@
   --tag-chip-bg: var(--primary-lavender-light);
   --tag-chip-text: #2D1B3D;
   --tag-chip-border: var(--border-medium);
+
+  /* Chip highlight colors (default: purple) */
+  --chip-highlight-bg: var(--primary-purple);
+  --chip-highlight-border: var(--border-dark);
+  --chip-highlight-text: white;
 }
 
 /* Dark mode colors */
@@ -557,10 +562,30 @@ h2 {
 .thought-tag:hover,
 .tag-filter:hover,
 .preset-button:hover {
-  background: var(--primary-lavender);
-  border-color: var(--primary-lavender);
-  color: #2D1B3D;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+  border-color: var(--primary-teal);
+  color: white;
   transform: translateY(-1px);
+}
+
+/* Chip highlight state (reusable across all chip types) */
+.chip-highlight,
+.tag-toggle.active,
+.tag-filter.active,
+.tag-editor-item.active,
+.preset-button.active {
+  background: var(--chip-highlight-bg);
+  border-color: var(--chip-highlight-border);
+  color: var(--chip-highlight-text);
+}
+
+.chip-highlight:hover,
+.tag-toggle.active:hover,
+.tag-filter.active:hover,
+.tag-editor-item.active:hover,
+.preset-button.active:hover {
+  background: var(--chip-highlight-bg);
+  border-color: var(--chip-highlight-border);
 }
 
 /* Tag Toggle List (Capture Tab specific) */
@@ -587,12 +612,6 @@ h2 {
 
 .tag-toggle {
   font-weight: 500;
-}
-
-.tag-toggle.active {
-  background: var(--primary-purple);
-  border-color: var(--border-dark);
-  color: white;
 }
 
 .tag-name {
@@ -774,12 +793,6 @@ h2 {
 /* .tag-filter base styles are defined in Common Tag Chip Styles section */
 .tag-filter {
   gap: 4px;
-}
-
-.tag-filter.active {
-  background: var(--primary-purple);
-  border-color: var(--border-dark);
-  color: white;
 }
 
 .tag-badge {
@@ -1315,15 +1328,10 @@ h2 {
 }
 
 .tag-editor-item:hover {
-  background: var(--primary-lavender);
-  border-color: var(--primary-lavender);
-  transform: translateY(-1px);
-}
-
-.tag-editor-item.active {
-  background: var(--primary-purple);
-  border-color: var(--border-dark);
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+  border-color: var(--primary-teal);
   color: white;
+  transform: translateY(-1px);
 }
 
 .tag-checkmark {
@@ -1752,12 +1760,6 @@ h2 {
   padding: 6px 16px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
-}
-
-.preset-button:hover {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
-  color: white;
-  border-color: var(--primary-teal);
 }
 
 .date-range-inputs {
