@@ -47,7 +47,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
       <RichTextEditor
         value={value}
         onChange={onChange}
-        placeholder={"What's on your mind? Use #tags to categorize...\nAdd *bold* or _italics_, or start a bullet list with Hyphen-Space (\"- \")"}
+        placeholder={"What's on your mind? Use #tags to categorize...\n\nAdd *bold* or _italics_, or start bullets with \"- \""}
         disabled={disabled}
         minHeight="100px"
         onKeyDown={handleKeyDown}
