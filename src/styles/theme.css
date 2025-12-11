@@ -2373,6 +2373,7 @@ h2 {
   color: var(--text-secondary);
   opacity: 0.6;
   font-style: normal;
+  white-space: pre-line;
 }
 
 .rich-text-editor-wrapper .ql-editor:focus {
