@@ -1652,6 +1652,16 @@ h2 {
   .button-reject {
     width: 100%;
   }
+
+  /* Reduce padding on thought card action buttons to fit all 5 on one line */
+  .edit-tags-button {
+    padding: 5px 8px;
+  }
+
+  .copy-button,
+  .delete-button {
+    padding: 5px 6px;
+  }
 }
 
 /* ========== Tag Manager Tab ========== */
