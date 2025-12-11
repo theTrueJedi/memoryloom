@@ -275,35 +275,65 @@ const TimestampEditor: React.FC<TimestampEditorProps> = ({
           <h3 className="timestamp-editor-section-title">Reprocess</h3>
 
           {sentimentPreview ? (
-            <div className="sentiment-preview">
-              <div className="sentiment-preview-comparison">
-                <div className="sentiment-preview-item">
+            <div className="timestamp-sentiment-preview">
+              <div className="timestamp-sentiment-comparison">
+                <div className="sentiment-preview-row">
                   <span className="sentiment-preview-label">Current:</span>
-                  <span
-                    className="sentiment-preview-indicator"
-                    style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
-                  >
-                    {getSentimentEmoji(thought.sentiment.label)}
-                  </span>
+                  <div className="sentiment-preview-indicators">
+                    <span
+                      className="sentiment-preview-indicator primary"
+                      style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
+                    >
+                      {getSentimentEmoji(thought.sentiment.label)}
+                    </span>
+                    {thought.sentiment.secondaryLabel && (
+                      <span
+                        className="sentiment-preview-indicator secondary"
+                        style={{ backgroundColor: getSentimentColor(thought.sentiment.secondaryLabel) }}
+                      >
+                        {getSentimentEmoji(thought.sentiment.secondaryLabel)}
+                      </span>
+                    )}
+                  </div>
                   <span className="sentiment-preview-text">
                     {formatEmotionLabel(thought.sentiment.label)}
+                    {thought.sentiment.secondaryLabel && (
+                      <span className="sentiment-preview-secondary">
+                        {' + '}{formatEmotionLabel(thought.sentiment.secondaryLabel)}
+                      </span>
+                    )}
                   </span>
                 </div>
-                <span className="sentiment-preview-arrow">→</span>
-                <div className="sentiment-preview-item">
+                <span className="sentiment-preview-arrow">↓</span>
+                <div className="sentiment-preview-row">
                   <span className="sentiment-preview-label">Proposed:</span>
-                  <span
-                    className="sentiment-preview-indicator"
-                    style={{ backgroundColor: getSentimentColor(sentimentPreview.label) }}
-                  >
-                    {getSentimentEmoji(sentimentPreview.label)}
-                  </span>
+                  <div className="sentiment-preview-indicators">
+                    <span
+                      className="sentiment-preview-indicator primary"
+                      style={{ backgroundColor: getSentimentColor(sentimentPreview.label) }}
+                    >
+                      {getSentimentEmoji(sentimentPreview.label)}
+                    </span>
+                    {sentimentPreview.secondaryLabel && (
+                      <span
+                        className="sentiment-preview-indicator secondary"
+                        style={{ backgroundColor: getSentimentColor(sentimentPreview.secondaryLabel) }}
+                      >
+                        {getSentimentEmoji(sentimentPreview.secondaryLabel)}
+                      </span>
+                    )}
+                  </div>
                   <span className="sentiment-preview-text">
                     {formatEmotionLabel(sentimentPreview.label)}
+                    {sentimentPreview.secondaryLabel && (
+                      <span className="sentiment-preview-secondary">
+                        {' + '}{formatEmotionLabel(sentimentPreview.secondaryLabel)}
+                      </span>
+                    )}
                   </span>
                 </div>
               </div>
-              <div className="sentiment-preview-actions">
+              <div className="timestamp-sentiment-actions">
                 <button
                   className="sentiment-preview-accept"
                   onClick={handleAcceptSentiment}

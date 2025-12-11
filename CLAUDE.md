@@ -1,3 +1,4 @@
 - don't ask me to commit every time - wait until I ask you
 - do not build and deploy every time, wait for me to ask
 - we use a slightly custom markdown standard for this project: *bold* and _italic_
+- do not automatically push until I tell you to, I want to be able to test things locally before pushing

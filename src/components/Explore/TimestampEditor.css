@@ -218,24 +218,22 @@
   margin-bottom: 1rem;
 }
 
-/* Sentiment Preview */
-.sentiment-preview {
+/* Sentiment Preview for TimestampEditor */
+.timestamp-sentiment-preview {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 1rem;
 }
 
-.sentiment-preview-comparison {
+.timestamp-sentiment-comparison {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
 }
 
-.sentiment-preview-item {
+.sentiment-preview-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -245,17 +243,37 @@
   font-size: 0.75rem;
   color: var(--text-tertiary);
   text-transform: uppercase;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.sentiment-preview-indicators {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .sentiment-preview-indicator {
-  width: 28px;
-  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sentiment-preview-indicator.primary {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  z-index: 1;
+}
+
+.sentiment-preview-indicator.secondary {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  margin-left: -4px;
+  z-index: 0;
 }
 
 .sentiment-preview-text {
@@ -264,12 +282,18 @@
   color: var(--text-primary);
 }
 
-.sentiment-preview-arrow {
-  font-size: 1.25rem;
-  color: var(--text-tertiary);
+.sentiment-preview-secondary {
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
-.sentiment-preview-actions {
+.sentiment-preview-arrow {
+  font-size: 1rem;
+  color: var(--text-tertiary);
+  margin-left: 70px;
+}
+
+.timestamp-sentiment-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: center;
@@ -335,15 +359,6 @@
 
   .timestamp-editor-reprocess-buttons {
     flex-direction: column;
-  }
-
-  .sentiment-preview-comparison {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .sentiment-preview-arrow {
-    transform: rotate(90deg);
   }
 
   .sentiment-preview-actions {
