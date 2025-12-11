@@ -377,23 +377,24 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
         {!isEditingTags && !isEditingContent && !isEditingMood ? (
           <>
             <div className="thought-action-buttons-left">
+              <span className="edit-label">Edit:</span>
               <button
                 className="edit-tags-button"
                 onClick={() => setIsEditingContent(true)}
               >
-                Edit
+                Content
               </button>
               <button
                 className="edit-tags-button"
                 onClick={() => setIsEditingTags(true)}
               >
-                {selectedTags.length > 0 ? 'Change Tags' : 'Add Tags'}
+                Tags
               </button>
               <button
                 className="edit-tags-button"
                 onClick={() => setIsEditingMood(true)}
               >
-                Change Moods
+                Moods
               </button>
             </div>
             <div className="thought-action-buttons-right">

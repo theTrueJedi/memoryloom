@@ -1117,16 +1117,38 @@ h2 {
 }
 
 .thought-tags-section {
-  margin-top: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 4px;
+  margin: var(--spacing-sm) calc(-1 * var(--spacing-sm)) calc(-1 * var(--spacing-sm));
+  padding: 8px var(--spacing-sm);
+  background: linear-gradient(135deg,
+    rgba(111, 45, 177, 0.04) 0%,
+    rgba(91, 138, 194, 0.04) 50%,
+    rgba(91, 193, 179, 0.04) 100%);
+  border-top: 1px solid var(--border-light);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+[data-theme="dark"] .thought-tags-section {
+  background: linear-gradient(135deg,
+    rgba(155, 127, 217, 0.06) 0%,
+    rgba(123, 163, 212, 0.06) 50%,
+    rgba(125, 212, 199, 0.06) 100%);
 }
 
 .thought-action-buttons-left {
   display: flex;
   gap: 4px;
+  align-items: center;
+}
+
+.edit-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-right: 2px;
 }
 
 .thought-tags {
