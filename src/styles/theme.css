@@ -2046,8 +2046,9 @@ h2 {
 }
 
 .stat-value {
+  font-family: 'Zalando Sans SemiExpanded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-weight: 300;
   color: var(--primary-purple);
   margin-bottom: 0.25rem;
 }
