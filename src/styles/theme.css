@@ -574,8 +574,8 @@ h2 {
 }
 
 .tag-toggle.active {
-  background: var(--primary-teal);
-  border-color: var(--primary-teal);
+  background: var(--primary-purple);
+  border-color: var(--border-dark);
   color: white;
 }
 
