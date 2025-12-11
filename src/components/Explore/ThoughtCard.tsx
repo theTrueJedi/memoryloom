@@ -68,6 +68,11 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const [clickCount, setClickCount] = useState(0);
   const lastClickTime = useRef<number>(0);
 
+  // Copy feedback state
+  const [showCopied, setShowCopied] = useState(false);
+  const [showCopyMenu, setShowCopyMenu] = useState(false);
+  const copyMenuRef = useRef<HTMLDivElement>(null);
+
   const formatDate = (timestamp: any): string => {
     const date = timestamp.toDate();
     const now = new Date();
@@ -221,6 +226,62 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     }
   };
 
+  // Copy handler - copies plain text content
+  const handleCopyThought = async (includeMetadata: boolean) => {
+    // Convert HTML to plain text, preserving line breaks
+    let htmlContent = thought.content;
+    // Quill uses <p><br></p> for blank lines - treat as paragraph break
+    htmlContent = htmlContent.replace(/<p><br\s*\/?><\/p>/gi, '');
+    // Each </p><p> is a paragraph break - double newline
+    htmlContent = htmlContent.replace(/<\/p>\s*<p>/gi, '\n\n');
+    // Single <br> within a paragraph is a line break
+    htmlContent = htmlContent.replace(/<br\s*\/?>/gi, '\n');
+    // Strip opening/closing p tags
+    htmlContent = htmlContent.replace(/<\/?p>/gi, '');
+    // Extract text content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
+
+    let textToCopy = plainText;
+
+    if (includeMetadata) {
+      const tags = thought.tags.map(t => `#${t}`).join(' ');
+      const primaryMood = thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1);
+      const secondaryMood = thought.sentiment.secondaryLabel
+        ? thought.sentiment.secondaryLabel.charAt(0).toUpperCase() + thought.sentiment.secondaryLabel.slice(1)
+        : null;
+      const moods = secondaryMood ? `${primaryMood} | ${secondaryMood}` : primaryMood;
+
+      textToCopy += '\n---\n';
+      if (tags) textToCopy += `Tags: ${tags}\n`;
+      textToCopy += `Moods: ${moods}`;
+    }
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setShowCopied(true);
+      setShowCopyMenu(false);
+      setTimeout(() => setShowCopied(false), 1500);
+    } catch (error) {
+      console.error('Error copying thought:', error);
+    }
+  };
+
+  // Close copy menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (copyMenuRef.current && !copyMenuRef.current.contains(event.target as Node)) {
+        setShowCopyMenu(false);
+      }
+    };
+
+    if (showCopyMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showCopyMenu]);
+
   // Mood change handlers
   const handleSaveMood = async (primary: EmotionLabel, secondary?: EmotionLabel) => {
     const updatedSentiment = {
@@ -335,26 +396,55 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
                 Change Moods
               </button>
             </div>
-            <button
-              className="delete-button"
-              onClick={handleDeleteThought}
-              title="Delete thought"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="thought-action-buttons-right">
+              <div className="copy-button-wrapper" ref={copyMenuRef}>
+                <button
+                  className="copy-button"
+                  onClick={() => setShowCopyMenu(!showCopyMenu)}
+                  title="Copy thought"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                {showCopyMenu && (
+                  <div className="copy-menu">
+                    <button onClick={() => handleCopyThought(false)}>Copy Thought only</button>
+                    <button onClick={() => handleCopyThought(true)}>Copy Thought, Tags & Moods</button>
+                  </div>
+                )}
+                {showCopied && <span className="copied-tooltip">Copied!</span>}
+              </div>
+              <button
+                className="delete-button"
+                onClick={handleDeleteThought}
+                title="Delete thought"
               >
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
           </>
         ) : isEditingTags ? (
           <div
