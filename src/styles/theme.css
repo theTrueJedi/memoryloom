@@ -2210,6 +2210,49 @@ h2 {
   margin-bottom: var(--spacing-sm);
 }
 
+/* ========== Tag Autocomplete Dropdown ========== */
+.rich-text-editor-wrapper {
+  position: relative;
+}
+
+.tag-autocomplete-dropdown {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.tag-autocomplete-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--primary-purple);
+  margin: 2px;
+}
+
+.tag-autocomplete-option:hover,
+.tag-autocomplete-option.selected {
+  background: var(--primary-lavender-light);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tag-autocomplete-option {
+  color: var(--primary-lavender);
+}
+
+[data-theme="dark"] .tag-autocomplete-option:hover,
+[data-theme="dark"] .tag-autocomplete-option.selected {
+  background: var(--primary-lavender);
+  color: #2D1B3D;
+}
+
 /* Style rendered HTML content in thought cards */
 .thought-content strong {
   font-weight: 600;

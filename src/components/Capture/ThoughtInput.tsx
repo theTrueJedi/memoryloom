@@ -8,6 +8,7 @@ interface ThoughtInputProps {
   onSubmit: () => void;
   disabled?: boolean;
   onTagsDetected: (tags: string[]) => void;
+  availableTags?: string[]; // Tags available for autocomplete
 }
 
 const ThoughtInput: React.FC<ThoughtInputProps> = ({
@@ -16,6 +17,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
   onSubmit,
   disabled = false,
   onTagsDetected,
+  availableTags = [],
 }) => {
   useEffect(() => {
     // Extract and notify parent of tags whenever content changes
@@ -44,6 +46,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
         disabled={disabled}
         minHeight="100px"
         onKeyDown={handleKeyDown}
+        tags={availableTags}
       />
       <div className="thought-input-footer">
         <span className="hint-text">

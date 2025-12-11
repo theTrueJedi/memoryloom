@@ -138,6 +138,7 @@ const CaptureTab: React.FC = () => {
         onSubmit={handleSubmit}
         disabled={isSubmitting}
         onTagsDetected={handleTagsDetected}
+        availableTags={tags.map(t => t.name)}
       />
 
       <TagToggleList
