@@ -35,14 +35,23 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     onDateRangeChange({ start, end });
   };
 
-  const handleSingleDayPreset = (daysAgo: number, preset: PresetType) => {
-    const date = new Date();
-    date.setDate(date.getDate() - daysAgo);
-    const start = new Date(date);
+  const handleTodayPreset = () => {
+    // From midnight today to current time
+    const start = new Date();
     start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
-    setActivePreset(preset);
+    const end = new Date();
+    setActivePreset('today');
+    onDateRangeChange({ start, end });
+  };
+
+  const handleYesterdayPreset = () => {
+    // 28-hour window: from midnight yesterday to 4am today
+    const start = new Date();
+    start.setDate(start.getDate() - 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(4, 0, 0, 0);
+    setActivePreset('yesterday');
     onDateRangeChange({ start, end });
   };
 
@@ -65,13 +74,13 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       <div className="date-range-presets">
         <button
           className={`preset-button ${activePreset === 'today' ? 'active' : ''}`}
-          onClick={() => handleSingleDayPreset(0, 'today')}
+          onClick={handleTodayPreset}
         >
           Today
         </button>
         <button
           className={`preset-button ${activePreset === 'yesterday' ? 'active' : ''}`}
-          onClick={() => handleSingleDayPreset(1, 'yesterday')}
+          onClick={handleYesterdayPreset}
         >
           Yesterday
         </button>

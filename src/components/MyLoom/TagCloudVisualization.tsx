@@ -77,14 +77,6 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
   const minCount = Math.min(...tagCounts.map((t) => t.count), 1);
   const totalTags = tagCounts.reduce((sum, t) => sum + t.count, 0);
 
-  if (tagCounts.length === 0) {
-    return (
-      <div className="tag-cloud-visualization empty">
-        <p className="empty-message">No tags in this date range</p>
-      </div>
-    );
-  }
-
   const getFontSize = (count: number, containerWidth: number): number => {
     const isSmallScreen = containerWidth < 500;
     const minSize = isSmallScreen ? 10 : 14;
@@ -348,6 +340,14 @@ const TagCloudVisualization: React.FC<TagCloudVisualizationProps> = ({ thoughts 
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, []);
+
+  if (tagCounts.length === 0) {
+    return (
+      <div className="tag-cloud-visualization empty">
+        <p className="empty-message">No tags in this date range</p>
+      </div>
+    );
+  }
 
   return (
     <div className="tag-cloud-visualization">

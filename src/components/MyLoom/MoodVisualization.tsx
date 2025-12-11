@@ -132,14 +132,6 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
   const minCount = Math.min(...moodCounts.map((m) => m.count), 1);
   const totalCount = thoughts.length;
 
-  if (thoughts.length === 0) {
-    return (
-      <div className="mood-visualization empty">
-        <p className="empty-message">No thoughts in this date range</p>
-      </div>
-    );
-  }
-
   const getFontSize = (count: number, containerWidth: number): number => {
     const isSmallScreen = containerWidth < 500;
     const minSize = isSmallScreen ? 10 : 14;
@@ -400,6 +392,14 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, []);
+
+  if (thoughts.length === 0) {
+    return (
+      <div className="mood-visualization empty">
+        <p className="empty-message">No thoughts in this date range</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mood-visualization">
