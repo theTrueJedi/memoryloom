@@ -9,6 +9,10 @@ interface ThoughtInputProps {
   disabled?: boolean;
   onTagsDetected: (tags: string[]) => void;
   availableTags?: string[]; // Tags available for autocomplete
+  draftStatus?: {
+    hasDraft: boolean;
+    lastSaved: Date | null;
+  };
 }
 
 const ThoughtInput: React.FC<ThoughtInputProps> = ({
@@ -18,6 +22,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
   disabled = false,
   onTagsDetected,
   availableTags = [],
+  draftStatus,
 }) => {
   useEffect(() => {
     // Extract and notify parent of tags whenever content changes
@@ -49,9 +54,16 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
         tags={availableTags}
       />
       <div className="thought-input-footer">
-        <span className="hint-text">
-          Tip: Press Cmd+Enter to save
-        </span>
+        <div className="hint-section">
+          {draftStatus?.hasDraft && draftStatus.lastSaved && (
+            <span className="draft-status">
+              Draft saved {draftStatus.lastSaved.toLocaleTimeString()}
+            </span>
+          )}
+          <span className="hint-text">
+            Tip: Press Cmd+Enter to save
+          </span>
+        </div>
         <button
           className="button-primary submit-button"
           onClick={onSubmit}

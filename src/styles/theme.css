@@ -498,6 +498,22 @@ h2 {
   border-top: 1px solid var(--border-light);
 }
 
+.hint-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.draft-status {
+  color: var(--primary-teal-dark);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+[data-theme="dark"] .draft-status {
+  color: var(--primary-teal);
+}
+
 .hint-text {
   color: var(--text-secondary);
   font-size: var(--font-size-xs);
@@ -629,6 +645,17 @@ h2 {
   background: #F8D7DA;
   color: #721C24;
   border: 1px solid #F5C6CB;
+}
+
+/* Draft Indicator */
+.draft-indicator {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  padding: var(--spacing-xs);
+  background: rgba(91, 193, 179, 0.1);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--primary-teal);
 }
 
 /* ========== Explore Tab ========== */

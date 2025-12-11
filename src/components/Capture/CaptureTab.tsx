@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useThoughts } from '../../hooks/useThoughts';
 import { useTags } from '../../hooks/useTags';
+import { useDraft } from '../../hooks/useDraft';
 import ThoughtInput from './ThoughtInput';
 import TagToggleList from './TagToggleList';
 import { analyzeSentiment } from '../../services/gemini';
@@ -14,15 +15,42 @@ const CaptureTab: React.FC = () => {
   const { addThought, thoughts } = useThoughts(user?.uid);
   const { tags } = useTags(user?.uid);
 
+  // Auto-save drafts with 300ms debounce (proven timing from modernsalon)
+  const {
+    draftContent,
+    draftTags,
+    setDraftContent,
+    setDraftTags,
+    clearDraft,
+    isLoading: isDraftLoading,
+    hasDraft,
+    lastSaved,
+  } = useDraft(user?.uid, 'capture-thought');
+
   const [thoughtText, setThoughtText] = useState('');
   const [detectedTags, setDetectedTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleTagsDetected = useCallback((tags: string[]) => {
-    setDetectedTags(tags);
-  }, []);
+  // Initialize from draft on load
+  useEffect(() => {
+    if (!isDraftLoading && draftContent) {
+      setThoughtText(draftContent);
+      setDetectedTags(draftTags);
+    }
+  }, [isDraftLoading, draftContent, draftTags]);
+
+  // Sync local state to draft (debounced by the hook)
+  const handleTextChange = useCallback((text: string) => {
+    setThoughtText(text);
+    setDraftContent(text);
+  }, [setDraftContent]);
+
+  const handleTagsDetected = useCallback((newTags: string[]) => {
+    setDetectedTags(newTags);
+    setDraftTags(newTags);
+  }, [setDraftTags]);
 
   const handleSubmit = async () => {
     if (!thoughtText.trim() || !user) return;
@@ -48,9 +76,10 @@ const CaptureTab: React.FC = () => {
             .catch(err => console.error('Error generating tag suggestions:', err));
         }
 
-        // Clear form and show success message
+        // Clear form, draft, and show success message
         setThoughtText('');
         setDetectedTags([]);
+        await clearDraft();
         setSuccessMessage('Thought saved successfully!');
 
         // Clear success message after 3 seconds
@@ -134,18 +163,19 @@ const CaptureTab: React.FC = () => {
 
       <ThoughtInput
         value={thoughtText}
-        onChange={setThoughtText}
+        onChange={handleTextChange}
         onSubmit={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isSubmitting || isDraftLoading}
         onTagsDetected={handleTagsDetected}
         availableTags={tags.map(t => t.name)}
+        draftStatus={{ hasDraft, lastSaved }}
       />
 
       <TagToggleList
         tags={tags}
         activeTags={detectedTags}
         thoughtText={thoughtText}
-        onThoughtTextChange={setThoughtText}
+        onThoughtTextChange={handleTextChange}
       />
     </div>
   );

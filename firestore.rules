@@ -35,6 +35,16 @@ service cloud.firestore {
       match /config/{configId} {
         allow read, write: if isOwner(userId);
       }
+
+      // Drafts subcollection
+      match /drafts/{draftId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Sentiment suggestions subcollection
+      match /sentimentSuggestions/{suggestionId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }
