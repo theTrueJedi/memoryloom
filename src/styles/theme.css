@@ -90,6 +90,55 @@
   --tag-chip-border: #6f5a8f;
 }
 
+/* ========== Popup Menu (reusable) ========== */
+.popup-menu {
+  position: absolute;
+  background: linear-gradient(135deg, rgba(111, 45, 177, 0.05) 0%, rgba(91, 193, 179, 0.05) 100%);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .popup-menu {
+  background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
+  background-color: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+.popup-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.popup-menu-item:hover {
+  background: rgba(111, 45, 177, 0.1);
+}
+
+[data-theme="dark"] .popup-menu-item:hover {
+  background: rgba(155, 127, 217, 0.2);
+}
+
+.popup-menu-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-light);
+}
+
+[data-theme="dark"] .popup-menu-item:not(:last-child) {
+  border-bottom-color: var(--border-medium);
+}
+
 /* ========== Global Styles ========== */
 * {
   margin: 0;
@@ -950,10 +999,36 @@ h2 {
 .thought-content ol {
   margin: 0.5em 0;
   padding-left: 1.5em;
+  list-style: none;
 }
 
 .thought-content li {
   margin: 0.25em 0;
+}
+
+/* Quill v2 uses data-list attributes for list types */
+.thought-content li[data-list="bullet"]::before {
+  content: "\2022";
+  display: inline-block;
+  width: 1.2em;
+  margin-left: -1.2em;
+}
+
+.thought-content li[data-list="ordered"] {
+  counter-increment: list-0;
+}
+
+.thought-content li[data-list="ordered"]::before {
+  content: counter(list-0) ". ";
+  display: inline-block;
+  width: 1.2em;
+  margin-left: -1.5em;
+  margin-right: 0.3em;
+  text-align: right;
+}
+
+.thought-content ol {
+  counter-reset: list-0;
 }
 
 /* Quill indentation - minimal padding for economy */
@@ -1296,39 +1371,10 @@ h2 {
   align-items: center;
 }
 
+/* Copy menu uses shared popup-menu styles - position only */
 .copy-menu {
-  position: absolute;
   bottom: calc(100% + 6px);
   right: 0;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.copy-menu button {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  text-align: left;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background var(--transition-base);
-}
-
-.copy-menu button:hover {
-  background: var(--bg-secondary);
-}
-
-.copy-menu button:not(:last-child) {
-  border-bottom: 1px solid var(--border-light);
 }
 
 .copied-tooltip {
@@ -2413,24 +2459,10 @@ h2 {
   outline: none;
 }
 
-/* Style lists and formatting in editor */
+/* Style lists in editor - let Quill handle list markers via data-list attributes */
 .rich-text-editor-wrapper .ql-editor ul,
 .rich-text-editor-wrapper .ql-editor ol {
-  padding-left: 0.25em !important;
-  list-style-position: inside;
-}
-
-.rich-text-editor-wrapper .ql-editor ul {
-  list-style-type: disc !important;
-}
-
-.rich-text-editor-wrapper .ql-editor ol {
-  list-style-type: decimal !important;
-}
-
-.rich-text-editor-wrapper .ql-editor li {
-  display: list-item !important;
-  list-style: inherit !important;
+  padding-left: 1.5em;
 }
 
 .rich-text-editor-wrapper .ql-editor strong {

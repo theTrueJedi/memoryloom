@@ -226,24 +226,117 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     }
   };
 
-  // Copy handler - copies plain text content
+  // Convert Quill's list format to standard HTML
+  // Quill uses <ol> with data-list="bullet"|"ordered" attributes
+  // Other apps expect proper <ul>/<ol> nesting
+  const convertQuillListsToStandardHtml = (html: string): string => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    // Find all ol elements that contain list items
+    const olElements = tempDiv.querySelectorAll('ol');
+
+    olElements.forEach(ol => {
+      const items = ol.querySelectorAll('li');
+      if (items.length === 0) return;
+
+      // Group consecutive items by their list type and indent level
+      const groups: { type: string; indent: number; items: Element[] }[] = [];
+      let currentGroup: { type: string; indent: number; items: Element[] } | null = null;
+
+      items.forEach(li => {
+        const listType = li.getAttribute('data-list') || 'bullet';
+        // Get indent level from class
+        let indent = 0;
+        for (let i = 1; i <= 8; i++) {
+          if (li.classList.contains(`ql-indent-${i}`)) {
+            indent = i;
+            break;
+          }
+        }
+
+        // Remove Quill's UI span elements
+        const qlUi = li.querySelector('.ql-ui');
+        if (qlUi) qlUi.remove();
+
+        if (!currentGroup || currentGroup.type !== listType || currentGroup.indent !== indent) {
+          currentGroup = { type: listType, indent, items: [li] };
+          groups.push(currentGroup);
+        } else {
+          currentGroup.items.push(li);
+        }
+      });
+
+      // Build new list structure
+      const fragment = document.createDocumentFragment();
+      let currentIndent = 0;
+      const listStack: Element[] = [];
+
+      groups.forEach(group => {
+        // Create the appropriate list type
+        const listTag = group.type === 'ordered' ? 'ol' : 'ul';
+
+        // Handle indent changes
+        while (currentIndent > group.indent && listStack.length > 0) {
+          listStack.pop();
+          currentIndent--;
+        }
+
+        // Create new list for this group
+        const newList = document.createElement(listTag);
+
+        group.items.forEach(item => {
+          const newLi = document.createElement('li');
+          newLi.innerHTML = item.innerHTML;
+          newList.appendChild(newLi);
+        });
+
+        if (listStack.length > 0 && group.indent > 0) {
+          // Nest inside the last item of the parent list
+          const parentList = listStack[listStack.length - 1];
+          const lastLi = parentList.lastElementChild;
+          if (lastLi) {
+            lastLi.appendChild(newList);
+          } else {
+            parentList.appendChild(newList);
+          }
+        } else {
+          fragment.appendChild(newList);
+        }
+
+        listStack.push(newList);
+        currentIndent = group.indent;
+      });
+
+      // Replace the original ol with the new structure
+      ol.replaceWith(fragment);
+    });
+
+    return tempDiv.innerHTML;
+  };
+
+  // Copy handler - copies both HTML and plain text formats
   const handleCopyThought = async (includeMetadata: boolean) => {
-    // Convert HTML to plain text, preserving line breaks
-    let htmlContent = thought.content;
+    // Build HTML content - convert Quill format to standard HTML
+    let htmlContent = convertQuillListsToStandardHtml(normalizeContent(thought.content));
+
+    // Build plain text version for fallback
+    let plainContent = thought.content;
     // Quill uses <p><br></p> for blank lines - treat as paragraph break
-    htmlContent = htmlContent.replace(/<p><br\s*\/?><\/p>/gi, '');
+    plainContent = plainContent.replace(/<p><br\s*\/?><\/p>/gi, '');
     // Each </p><p> is a paragraph break - double newline
-    htmlContent = htmlContent.replace(/<\/p>\s*<p>/gi, '\n\n');
+    plainContent = plainContent.replace(/<\/p>\s*<p>/gi, '\n\n');
     // Single <br> within a paragraph is a line break
-    htmlContent = htmlContent.replace(/<br\s*\/?>/gi, '\n');
+    plainContent = plainContent.replace(/<br\s*\/?>/gi, '\n');
     // Strip opening/closing p tags
-    htmlContent = htmlContent.replace(/<\/?p>/gi, '');
+    plainContent = plainContent.replace(/<\/?p>/gi, '');
     // Extract text content
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
+    tempDiv.innerHTML = plainContent;
     const plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
 
-    let textToCopy = plainText;
+    let finalPlainText = plainText;
+    let finalHtml = htmlContent;
 
     if (includeMetadata) {
       const tags = thought.tags.map(t => `#${t}`).join(' ');
@@ -253,18 +346,36 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
         : null;
       const moods = secondaryMood ? `${primaryMood} | ${secondaryMood}` : primaryMood;
 
-      textToCopy += '\n---\n';
-      if (tags) textToCopy += `Tags: ${tags}\n`;
-      textToCopy += `Moods: ${moods}`;
+      finalPlainText += '\n---\n';
+      if (tags) finalPlainText += `Tags: ${tags}\n`;
+      finalPlainText += `Moods: ${moods}`;
+
+      finalHtml += '<hr>';
+      if (tags) finalHtml += `<p>Tags: ${tags}</p>`;
+      finalHtml += `<p>Moods: ${moods}</p>`;
     }
 
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      // Use ClipboardItem API to write both HTML and plain text formats
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([finalHtml], { type: 'text/html' }),
+        'text/plain': new Blob([finalPlainText], { type: 'text/plain' }),
+      });
+      await navigator.clipboard.write([clipboardItem]);
       setShowCopied(true);
       setShowCopyMenu(false);
       setTimeout(() => setShowCopied(false), 1500);
     } catch (error) {
-      console.error('Error copying thought:', error);
+      // Fallback to plain text if ClipboardItem not supported
+      console.error('Error copying with rich text, falling back to plain text:', error);
+      try {
+        await navigator.clipboard.writeText(finalPlainText);
+        setShowCopied(true);
+        setShowCopyMenu(false);
+        setTimeout(() => setShowCopied(false), 1500);
+      } catch (fallbackError) {
+        console.error('Error copying thought:', fallbackError);
+      }
     }
   };
 
@@ -418,9 +529,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
                   </svg>
                 </button>
                 {showCopyMenu && (
-                  <div className="copy-menu">
-                    <button onClick={() => handleCopyThought(false)}>Copy Thought only</button>
-                    <button onClick={() => handleCopyThought(true)}>Copy Thought, Tags & Moods</button>
+                  <div className="popup-menu copy-menu">
+                    <button className="popup-menu-item" onClick={() => handleCopyThought(false)}>Copy Thought only</button>
+                    <button className="popup-menu-item" onClick={() => handleCopyThought(true)}>Copy Thought, Tags & Moods</button>
                   </div>
                 )}
                 {showCopied && <span className="copied-tooltip">Copied!</span>}
