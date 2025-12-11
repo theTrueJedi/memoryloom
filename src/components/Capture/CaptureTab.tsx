@@ -5,10 +5,10 @@ import { useTags } from '../../hooks/useTags';
 import { useDraft } from '../../hooks/useDraft';
 import ThoughtInput from './ThoughtInput';
 import TagToggleList from './TagToggleList';
-import { analyzeSentiment } from '../../services/gemini';
+import { processThought } from '../../services/gemini';
 import { createTagSuggestion } from '../../services/firestore';
-import { suggestTags } from '../../services/gemini';
 import { stripTags } from '../../services/tagExtraction';
+import { Sentiment } from '../../types';
 
 const CaptureTab: React.FC = () => {
   const { user } = useAuth();
@@ -63,20 +63,20 @@ const CaptureTab: React.FC = () => {
       // Strip hashtags from the content before saving
       const contentWithoutTags = stripTags(thoughtText);
 
-      // Analyze sentiment on the original text (with tags for context)
-      const sentiment = await analyzeSentiment(thoughtText);
+      // Create 'processing' sentiment - will be updated asynchronously
+      const processingSentiment: Sentiment = {
+        score: 0,
+        magnitude: 0,
+        label: 'processing',
+      };
 
-      // Create thought with cleaned content (no hashtags)
-      const thoughtId = await addThought(contentWithoutTags, detectedTags, sentiment);
+      // Save thought immediately with 'processing' sentiment
+      const thoughtId = await addThought(contentWithoutTags, detectedTags, processingSentiment);
 
       if (thoughtId) {
-        // Generate tag suggestions asynchronously (don't await)
-        if (user.uid) {
-          generateTagSuggestions(user.uid, thoughtId, thoughtText, tags.map(t => t.name))
-            .catch(err => console.error('Error generating tag suggestions:', err));
-        }
-
-        // Clear form, draft, and show success message
+        // Clear form, draft, and show success message immediately
+        const savedThoughtText = thoughtText; // Capture for async processing
+        const savedDetectedTags = [...detectedTags];
         setThoughtText('');
         setDetectedTags([]);
         await clearDraft();
@@ -84,6 +84,13 @@ const CaptureTab: React.FC = () => {
 
         // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(null), 3000);
+
+        // Process sentiment and tags asynchronously (don't await)
+        // The Cloud Function will update Firestore directly with the sentiment
+        if (user.uid) {
+          processThoughtAsync(user.uid, thoughtId, savedThoughtText, tags.map(t => t.name), savedDetectedTags)
+            .catch(err => console.error('Error processing thought:', err));
+        }
       } else {
         setErrorMessage('Failed to save thought. Please try again.');
       }
@@ -95,11 +102,12 @@ const CaptureTab: React.FC = () => {
     }
   };
 
-  const generateTagSuggestions = async (
+  const processThoughtAsync = async (
     userId: string,
     thoughtId: string,
     content: string,
-    existingTagNames: string[]
+    existingTagNames: string[],
+    alreadyAppliedTags: string[]
   ) => {
     try {
       // Build historical context from recent thoughts
@@ -111,33 +119,44 @@ const CaptureTab: React.FC = () => {
         }))
       };
 
-      const suggestions = await suggestTags(content, existingTagNames, context);
+      // Call the combined Cloud Function - it updates sentiment in Firestore
+      // and returns tag suggestions
+      const result = await processThought(
+        thoughtId,
+        userId,
+        content,
+        existingTagNames,
+        context
+      );
+
+      // Handle tag suggestions from the response
+      const { tagSuggestions } = result;
 
       // Create suggestion for existing tags
-      for (const tag of suggestions.existingTags) {
-        if (!detectedTags.includes(tag)) {
+      for (const tag of tagSuggestions.existingTags) {
+        if (!alreadyAppliedTags.includes(tag)) {
           await createTagSuggestion(
             userId,
             thoughtId,
             tag,
             false,
-            `AI suggested existing tag: ${suggestions.reasoning}`
+            `AI suggested existing tag: ${tagSuggestions.reasoning}`
           );
         }
       }
 
       // Create suggestion for new tag
-      if (suggestions.newTag && !detectedTags.includes(suggestions.newTag)) {
+      if (tagSuggestions.newTag && !alreadyAppliedTags.includes(tagSuggestions.newTag)) {
         await createTagSuggestion(
           userId,
           thoughtId,
-          suggestions.newTag,
+          tagSuggestions.newTag,
           true,
-          `AI suggested new tag: ${suggestions.reasoning}`
+          `AI suggested new tag: ${tagSuggestions.reasoning}`
         );
       }
     } catch (error) {
-      console.error('Error in generateTagSuggestions:', error);
+      console.error('Error in processThoughtAsync:', error);
     }
   };
 

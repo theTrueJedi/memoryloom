@@ -1,5 +1,10 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { VertexAI } from "@google-cloud/vertexai";
+import * as admin from "firebase-admin";
+
+// Initialize Firebase Admin
+admin.initializeApp();
+const firestore = admin.firestore();
 
 // Initialize Vertex AI - uses default service account credentials
 const vertexAI = new VertexAI({
@@ -26,24 +31,21 @@ interface TagSuggestionContext {
   }>;
 }
 
+interface TagSuggestionResult {
+  existingTags: string[];
+  newTag: string | null;
+  reasoning: string;
+}
+
+// ============================================================
+// CORE LOGIC FUNCTIONS (reusable internally)
+// ============================================================
+
 /**
- * Analyze sentiment of a thought using Vertex AI Gemini
+ * Core sentiment analysis logic - can be called internally or via Cloud Function
  */
-export const analyzeSentiment = onCall<{ content: string }>(
-  { cors: true },
-  async (request) => {
-    // Verify user is authenticated
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "User must be authenticated");
-    }
-
-    const { content } = request.data;
-    if (!content || typeof content !== "string") {
-      throw new HttpsError("invalid-argument", "Content is required");
-    }
-
-    try {
-      const prompt = `Analyze the emotional content of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks).
+async function analyzeSentimentCore(content: string): Promise<Sentiment> {
+  const prompt = `Analyze the emotional content of this journal entry and respond with ONLY valid JSON (no markdown, no code blocks).
 The entry may be written in any language (English, Chinese, Spanish, etc.) - analyze the emotions regardless of language.
 
 {
@@ -98,24 +100,44 @@ Do NOT default to "neutral" just because the writing style is matter-of-fact. Co
 
 Entry: "${content.replace(/"/g, '\\"')}"`;
 
-      const result = await model.generateContent(prompt);
-      const response = result.response;
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-      // Remove markdown code blocks if present
-      const jsonText = text
-        .replace(/```json\n?/g, "")
-        .replace(/```\n?/g, "")
-        .trim();
+  // Remove markdown code blocks if present
+  const jsonText = text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
 
-      const sentiment = JSON.parse(jsonText);
+  const sentiment = JSON.parse(jsonText);
 
-      return {
-        score: Number(sentiment.score),
-        magnitude: Number(sentiment.magnitude),
-        label: sentiment.label,
-        secondaryLabel: sentiment.secondaryLabel || undefined,
-      };
+  return {
+    score: Number(sentiment.score),
+    magnitude: Number(sentiment.magnitude),
+    label: sentiment.label,
+    secondaryLabel: sentiment.secondaryLabel || undefined,
+  };
+}
+
+/**
+ * Analyze sentiment of a thought using Vertex AI Gemini (Cloud Function wrapper)
+ */
+export const analyzeSentiment = onCall<{ content: string }>(
+  { cors: true },
+  async (request) => {
+    // Verify user is authenticated
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "User must be authenticated");
+    }
+
+    const { content } = request.data;
+    if (!content || typeof content !== "string") {
+      throw new HttpsError("invalid-argument", "Content is required");
+    }
+
+    try {
+      return await analyzeSentimentCore(content);
     } catch (error) {
       console.error("Error analyzing sentiment:", error);
       throw new HttpsError("internal", "Failed to analyze sentiment");
@@ -124,93 +146,82 @@ Entry: "${content.replace(/"/g, '\\"')}"`;
 );
 
 /**
- * Suggest tags for a thought using Vertex AI Gemini
+ * Core tag suggestion logic - can be called internally or via Cloud Function
  */
-export const suggestTags = onCall<{
-  content: string;
-  existingTags: string[];
-  context?: TagSuggestionContext;
-}>({ cors: true }, async (request) => {
-  // Verify user is authenticated
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
+async function suggestTagsCore(
+  content: string,
+  existingTags: string[],
+  context?: TagSuggestionContext
+): Promise<TagSuggestionResult> {
+  const existingTagsList =
+    existingTags && existingTags.length > 0 ? existingTags.join(", ") : "none";
 
-  const { content, existingTags, context } = request.data;
-  if (!content || typeof content !== "string") {
-    throw new HttpsError("invalid-argument", "Content is required");
-  }
+  // Build context sections for the prompt
+  let contextSection = "";
 
-  try {
-    const existingTagsList =
-      existingTags && existingTags.length > 0 ? existingTags.join(", ") : "none";
+  if (context && context.thoughts && context.thoughts.length > 0) {
+    // Build tag co-occurrence patterns
+    const tagPairs: { [key: string]: Set<string> } = {};
+    const tagFrequency: { [key: string]: number } = {};
 
-    // Build context sections for the prompt
-    let contextSection = "";
-
-    if (context && context.thoughts && context.thoughts.length > 0) {
-      // Build tag co-occurrence patterns
-      const tagPairs: { [key: string]: Set<string> } = {};
-      const tagFrequency: { [key: string]: number } = {};
-
-      context.thoughts.forEach((thought) => {
-        // Track tag frequency
-        thought.tags.forEach((tag) => {
-          tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
-        });
-
-        // Track tag co-occurrence (which tags appear together)
-        for (let i = 0; i < thought.tags.length; i++) {
-          for (let j = i + 1; j < thought.tags.length; j++) {
-            const tag1 = thought.tags[i];
-            const tag2 = thought.tags[j];
-
-            if (!tagPairs[tag1]) tagPairs[tag1] = new Set();
-            if (!tagPairs[tag2]) tagPairs[tag2] = new Set();
-
-            tagPairs[tag1].add(tag2);
-            tagPairs[tag2].add(tag1);
-          }
-        }
+    context.thoughts.forEach((thought) => {
+      // Track tag frequency
+      thought.tags.forEach((tag) => {
+        tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
       });
 
-      // Build context string with most relevant information
-      const topTags = Object.entries(tagFrequency)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10)
-        .map(([tag, count]) => `${tag} (${count} uses)`)
-        .join(", ");
+      // Track tag co-occurrence (which tags appear together)
+      for (let i = 0; i < thought.tags.length; i++) {
+        for (let j = i + 1; j < thought.tags.length; j++) {
+          const tag1 = thought.tags[i];
+          const tag2 = thought.tags[j];
 
-      const cooccurrenceExamples = Object.entries(tagPairs)
-        .slice(0, 5)
-        .map(
-          ([tag, related]) =>
-            `${tag} often appears with: ${Array.from(related).slice(0, 3).join(", ")}`
-        )
-        .join("\n  ");
+          if (!tagPairs[tag1]) tagPairs[tag1] = new Set();
+          if (!tagPairs[tag2]) tagPairs[tag2] = new Set();
 
-      // Find similar thoughts (simple keyword matching)
-      const contentWords = content
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((w) => w.length > 3);
-      const similarThoughts = context.thoughts
-        .map((thought) => {
-          const thoughtWords = thought.content.toLowerCase().split(/\s+/);
-          const matchCount = contentWords.filter((word) =>
-            thoughtWords.includes(word)
-          ).length;
-          return { thought, matchCount };
-        })
-        .filter(({ matchCount }) => matchCount > 0)
-        .sort((a, b) => b.matchCount - a.matchCount)
-        .slice(0, 3)
-        .map(
-          ({ thought }) =>
-            `"${thought.content.substring(0, 80)}..." → tags: ${thought.tags.join(", ")}`
-        );
+          tagPairs[tag1].add(tag2);
+          tagPairs[tag2].add(tag1);
+        }
+      }
+    });
 
-      contextSection = `
+    // Build context string with most relevant information
+    const topTags = Object.entries(tagFrequency)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([tag, count]) => `${tag} (${count} uses)`)
+      .join(", ");
+
+    const cooccurrenceExamples = Object.entries(tagPairs)
+      .slice(0, 5)
+      .map(
+        ([tag, related]) =>
+          `${tag} often appears with: ${Array.from(related).slice(0, 3).join(", ")}`
+      )
+      .join("\n  ");
+
+    // Find similar thoughts (simple keyword matching)
+    const contentWords = content
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length > 3);
+    const similarThoughts = context.thoughts
+      .map((thought) => {
+        const thoughtWords = thought.content.toLowerCase().split(/\s+/);
+        const matchCount = contentWords.filter((word) =>
+          thoughtWords.includes(word)
+        ).length;
+        return { thought, matchCount };
+      })
+      .filter(({ matchCount }) => matchCount > 0)
+      .sort((a, b) => b.matchCount - a.matchCount)
+      .slice(0, 3)
+      .map(
+        ({ thought }) =>
+          `"${thought.content.substring(0, 80)}..." → tags: ${thought.tags.join(", ")}`
+      );
+
+    contextSection = `
 
 Historical Context:
 - Most used tags: ${topTags}
@@ -227,9 +238,9 @@ Use this context to:
 1. Prioritize tags that appear in similar thoughts
 2. Suggest related tags that often appear together
 3. Consider emotional patterns when relevant`;
-    }
+  }
 
-    const prompt = `Given this journal entry and the user's existing tags, suggest:
+  const prompt = `Given this journal entry and the user's existing tags, suggest:
 1. Which existing tags are relevant (if any)
 2. If a new tag should be created (and what it should be)
 
@@ -247,25 +258,120 @@ Respond with ONLY valid JSON (no markdown, no code blocks):
   "reasoning": "brief explanation"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Remove markdown code blocks if present
-    const jsonText = text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
+  // Remove markdown code blocks if present
+  const jsonText = text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
 
-    const suggestions = JSON.parse(jsonText);
+  const suggestions = JSON.parse(jsonText);
 
-    return {
-      existingTags: suggestions.existingTags || [],
-      newTag: suggestions.newTag || null,
-      reasoning: suggestions.reasoning || "",
-    };
+  return {
+    existingTags: suggestions.existingTags || [],
+    newTag: suggestions.newTag || null,
+    reasoning: suggestions.reasoning || "",
+  };
+}
+
+/**
+ * Suggest tags for a thought using Vertex AI Gemini (Cloud Function wrapper)
+ */
+export const suggestTags = onCall<{
+  content: string;
+  existingTags: string[];
+  context?: TagSuggestionContext;
+}>({ cors: true }, async (request) => {
+  // Verify user is authenticated
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "User must be authenticated");
+  }
+
+  const { content, existingTags, context } = request.data;
+  if (!content || typeof content !== "string") {
+    throw new HttpsError("invalid-argument", "Content is required");
+  }
+
+  try {
+    return await suggestTagsCore(content, existingTags, context);
   } catch (error) {
     console.error("Error suggesting tags:", error);
     throw new HttpsError("internal", "Failed to suggest tags");
+  }
+});
+
+// ============================================================
+// COMBINED PROCESSING FUNCTION (for new thoughts)
+// ============================================================
+
+/**
+ * Process a new thought: analyze sentiment and suggest tags in parallel,
+ * then update the thought in Firestore.
+ *
+ * This function is called asynchronously after a thought is saved with
+ * 'processing' sentiment. It updates the thought with real results.
+ */
+export const processThought = onCall<{
+  thoughtId: string;
+  userId: string;
+  content: string;
+  existingTags: string[];
+  context?: TagSuggestionContext;
+}>({ cors: true }, async (request) => {
+  // Verify user is authenticated
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "User must be authenticated");
+  }
+
+  const { thoughtId, userId, content, existingTags, context } = request.data;
+
+  // Verify the authenticated user matches the userId
+  if (request.auth.uid !== userId) {
+    throw new HttpsError("permission-denied", "User ID mismatch");
+  }
+
+  if (!thoughtId || !content || typeof content !== "string") {
+    throw new HttpsError("invalid-argument", "thoughtId and content are required");
+  }
+
+  try {
+    // Run sentiment and tag analysis in parallel
+    const [sentiment, tagSuggestions] = await Promise.all([
+      analyzeSentimentCore(content),
+      suggestTagsCore(content, existingTags, context),
+    ]);
+
+    // Update the thought in Firestore with the sentiment
+    const thoughtRef = firestore
+      .collection("users")
+      .doc(userId)
+      .collection("thoughts")
+      .doc(thoughtId);
+
+    // Build sentiment object without undefined values (Firestore rejects undefined)
+    const sentimentData: Record<string, unknown> = {
+      score: sentiment.score,
+      magnitude: sentiment.magnitude,
+      label: sentiment.label,
+    };
+    if (sentiment.secondaryLabel) {
+      sentimentData.secondaryLabel = sentiment.secondaryLabel;
+    }
+
+    await thoughtRef.update({
+      sentiment: sentimentData,
+    });
+
+    // Return results (tag suggestions will be handled by client to create TagSuggestion docs)
+    return {
+      sentiment,
+      tagSuggestions,
+    };
+  } catch (error) {
+    console.error("Error processing thought:", error);
+    throw new HttpsError("internal", "Failed to process thought");
   }
 });

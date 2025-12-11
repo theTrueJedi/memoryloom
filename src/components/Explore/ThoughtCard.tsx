@@ -261,7 +261,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
             <div
               className="sentiment-indicator primary"
               style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
-              title={`Primary: ${thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1)} (${thought.sentiment.score.toFixed(2)})`}
+              title={thought.sentiment.label === 'processing'
+                ? 'Processing Sentiment...'
+                : `Primary: ${thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1)} (${thought.sentiment.score.toFixed(2)})`}
             >
               {getSentimentEmoji(thought.sentiment.label)}
             </div>

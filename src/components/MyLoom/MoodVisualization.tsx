@@ -58,6 +58,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       confusion: '😕',
       neutral: '😌',
       mixed: '😐',
+      processing: '🕐',
     };
     return emojiMap[label];
   };
@@ -87,6 +88,7 @@ const MoodVisualization: React.FC<MoodVisualizationProps> = ({ thoughts }) => {
       confusion: '#FF9800',
       neutral: '#949494',
       mixed: '#673AB7',
+      processing: '#d0d0d0',
     };
     return colorMap[label];
   };

@@ -57,6 +57,10 @@ export const getSentimentColor = (label: string): string => {
     case 'mixed':
       return '#673AB7';
 
+    // Meta states
+    case 'processing':
+      return '#d0d0d0';
+
     default:
       return '#949494';
   }
@@ -116,6 +120,10 @@ export const getSentimentEmoji = (label: string): string => {
     case 'mixed':
       return '😐';
 
+    // Meta states
+    case 'processing':
+      return '🕐';
+
     default:
       return '😌';
   }
@@ -146,6 +154,7 @@ export const getAllEmotionLabels = (): EmotionLabel[] => {
     'confusion',
     'neutral',
     'mixed',
+    'processing',
   ];
 };
 

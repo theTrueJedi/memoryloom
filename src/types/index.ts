@@ -23,7 +23,8 @@ export type EmotionLabel =
   | 'surprise'      // Amazed, shocked, astonished
   | 'curiosity'     // Interested, inquisitive
   | 'neutral'       // Balanced, unremarkable
-  | 'mixed';        // Multiple competing emotions
+  | 'mixed'         // Multiple competing emotions
+  | 'processing';   // Meta: sentiment analysis in progress
 
 export interface Sentiment {
   score: number;      // -1 to 1 (overall valence)

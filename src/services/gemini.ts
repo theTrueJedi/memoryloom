@@ -24,6 +24,24 @@ const suggestTagsFn = httpsCallable<
   }
 >(functions, 'suggestTags');
 
+const processThoughtFn = httpsCallable<
+  {
+    thoughtId: string;
+    userId: string;
+    content: string;
+    existingTags: string[];
+    context?: TagSuggestionContext;
+  },
+  {
+    sentiment: Sentiment;
+    tagSuggestions: {
+      existingTags: string[];
+      newTag: string | null;
+      reasoning: string;
+    };
+  }
+>(functions, 'processThought');
+
 export interface TagSuggestionContext {
   thoughts: Array<{
     content: string;
@@ -71,6 +89,53 @@ export const suggestTags = async (
       existingTags: [],
       newTag: null,
       reasoning: 'Error generating suggestions',
+    };
+  }
+};
+
+/**
+ * Process a new thought: analyze sentiment and suggest tags in parallel.
+ * The Cloud Function updates the thought's sentiment directly in Firestore.
+ * Returns tag suggestions for the client to handle.
+ */
+export const processThought = async (
+  thoughtId: string,
+  userId: string,
+  content: string,
+  existingTags: string[],
+  context?: TagSuggestionContext
+): Promise<{
+  sentiment: Sentiment;
+  tagSuggestions: {
+    existingTags: string[];
+    newTag: string | null;
+    reasoning: string;
+  };
+}> => {
+  try {
+    const result = await processThoughtFn({
+      thoughtId,
+      userId,
+      content,
+      existingTags,
+      context,
+    });
+    return result.data;
+  } catch (error) {
+    console.error('Error processing thought:', error);
+    // Return fallback values - sentiment will remain as 'processing'
+    // which signals to the user that something went wrong
+    return {
+      sentiment: {
+        score: 0,
+        magnitude: 0.5,
+        label: 'neutral',
+      },
+      tagSuggestions: {
+        existingTags: [],
+        newTag: null,
+        reasoning: 'Error generating suggestions',
+      },
     };
   }
 };
