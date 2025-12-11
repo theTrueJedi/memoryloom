@@ -16,14 +16,15 @@ const ACTIVE_TAB_KEY = 'memoryloom-active-tab';
 const App: React.FC = () => {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>(() => {
-    const savedTab = localStorage.getItem(ACTIVE_TAB_KEY);
+    // Use sessionStorage so tab persists on refresh but resets on new visit
+    const savedTab = sessionStorage.getItem(ACTIVE_TAB_KEY);
     return (savedTab as TabType) || 'capture';
   });
   const [showAdminTab, setShowAdminTab] = useState(false);
   const [headerTapCount, setHeaderTapCount] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem(ACTIVE_TAB_KEY, activeTab);
+    sessionStorage.setItem(ACTIVE_TAB_KEY, activeTab);
   }, [activeTab]);
 
   // If admin tab is hidden and user is on it, switch to capture
