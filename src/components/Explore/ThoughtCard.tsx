@@ -73,6 +73,10 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   const [showCopyMenu, setShowCopyMenu] = useState(false);
   const copyMenuRef = useRef<HTMLDivElement>(null);
 
+  // Sentiment tooltip state
+  const [showSentimentTooltip, setShowSentimentTooltip] = useState(false);
+  const sentimentRef = useRef<HTMLDivElement>(null);
+
   const formatDate = (timestamp: any): string => {
     const date = timestamp.toDate();
     const now = new Date();
@@ -393,6 +397,20 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     }
   }, [showCopyMenu]);
 
+  // Close sentiment tooltip when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sentimentRef.current && !sentimentRef.current.contains(event.target as Node)) {
+        setShowSentimentTooltip(false);
+      }
+    };
+
+    if (showSentimentTooltip) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showSentimentTooltip]);
+
   // Mood change handlers
   const handleSaveMood = async (primary: EmotionLabel, secondary?: EmotionLabel) => {
     const updatedSentiment = {
@@ -429,13 +447,16 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
         </div>
         <div className="thought-card-meta">
           <span className="thought-date">{formatDate(thought.timestamp)}</span>
-          <div className="sentiment-indicators">
+          <div
+            className="sentiment-indicators"
+            ref={sentimentRef}
+            onClick={() => setShowSentimentTooltip(!showSentimentTooltip)}
+            onMouseEnter={() => setShowSentimentTooltip(true)}
+            onMouseLeave={() => setShowSentimentTooltip(false)}
+          >
             <div
               className="sentiment-indicator primary"
               style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
-              title={thought.sentiment.label === 'processing'
-                ? 'Processing Sentiment...'
-                : `Primary: ${thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1)} (${thought.sentiment.score.toFixed(2)})`}
             >
               {getSentimentEmoji(thought.sentiment.label)}
             </div>
@@ -443,9 +464,55 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
               <div
                 className="sentiment-indicator secondary"
                 style={{ backgroundColor: getSentimentColor(thought.sentiment.secondaryLabel) }}
-                title={`Secondary: ${thought.sentiment.secondaryLabel.charAt(0).toUpperCase() + thought.sentiment.secondaryLabel.slice(1)}`}
               >
                 {getSentimentEmoji(thought.sentiment.secondaryLabel)}
+              </div>
+            )}
+            {showSentimentTooltip && thought.sentiment.label !== 'processing' && (
+              <div className="sentiment-tooltip">
+                <div className="sentiment-tooltip-row primary">
+                  <div className="sentiment-tooltip-icon-wrapper">
+                    <div
+                      className="sentiment-tooltip-icon"
+                      style={{ backgroundColor: getSentimentColor(thought.sentiment.label) }}
+                    >
+                      {getSentimentEmoji(thought.sentiment.label)}
+                    </div>
+                  </div>
+                  <span className="sentiment-tooltip-label">
+                    {thought.sentiment.label.charAt(0).toUpperCase() + thought.sentiment.label.slice(1)}
+                  </span>
+                </div>
+                {thought.sentiment.secondaryLabel && (
+                  <div className="sentiment-tooltip-row secondary">
+                    <div className="sentiment-tooltip-icon-wrapper">
+                      <div
+                        className="sentiment-tooltip-icon"
+                        style={{ backgroundColor: getSentimentColor(thought.sentiment.secondaryLabel) }}
+                      >
+                        {getSentimentEmoji(thought.sentiment.secondaryLabel)}
+                      </div>
+                    </div>
+                    <span className="sentiment-tooltip-label">
+                      {thought.sentiment.secondaryLabel.charAt(0).toUpperCase() + thought.sentiment.secondaryLabel.slice(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+            {showSentimentTooltip && thought.sentiment.label === 'processing' && (
+              <div className="sentiment-tooltip">
+                <div className="sentiment-tooltip-row primary">
+                  <div className="sentiment-tooltip-icon-wrapper">
+                    <div
+                      className="sentiment-tooltip-icon"
+                      style={{ backgroundColor: getSentimentColor('processing') }}
+                    >
+                      {getSentimentEmoji('processing')}
+                    </div>
+                  </div>
+                  <span className="sentiment-tooltip-label">Processing...</span>
+                </div>
               </div>
             )}
           </div>

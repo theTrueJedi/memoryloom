@@ -966,6 +966,84 @@ h2 {
   z-index: 2;
 }
 
+.sentiment-indicators {
+  cursor: pointer;
+}
+
+.sentiment-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: linear-gradient(135deg, rgba(111, 45, 177, 0.05) 0%, rgba(91, 193, 179, 0.05) 100%);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  padding: 10px 14px;
+  min-width: 140px;
+}
+
+[data-theme="dark"] .sentiment-tooltip {
+  background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
+  background-color: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+.sentiment-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sentiment-tooltip-row.primary {
+  margin-bottom: 8px;
+}
+
+.sentiment-tooltip-row.primary:last-child {
+  margin-bottom: 0;
+}
+
+.sentiment-tooltip-row.secondary {
+  margin-top: 0;
+}
+
+.sentiment-tooltip-icon {
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-shadow: 0.5px 0.87px 2px rgba(0, 0, 0, 0.35), 1px 1.73px 4px rgba(0, 0, 0, 0.25);
+}
+
+.sentiment-tooltip-icon-wrapper {
+  width: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sentiment-tooltip-row.primary .sentiment-tooltip-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+}
+
+.sentiment-tooltip-row.secondary .sentiment-tooltip-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+}
+
+.sentiment-tooltip-label {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
 .thought-content {
   color: var(--text-primary);
   line-height: 1.5;
