@@ -1,6 +1,8 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.bubble.css';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface RichTextEditorProps {
   value: string;
@@ -31,6 +33,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const quillRef = useRef<ReactQuill>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  // Use bubble theme on mobile (floating toolbar near selection)
+  // Use snow theme on desktop (fixed toolbar at top)
+  const theme = isMobile ? 'bubble' : 'snow';
 
   const [autocomplete, setAutocomplete] = useState<AutocompleteState>({
     isOpen: false,
@@ -107,8 +114,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [minHeight]);
 
-  // Modules config - stable reference
-  const modules = {
+  // Modules config - memoized to prevent unnecessary re-renders
+  const modules = useMemo(() => ({
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -116,12 +123,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       ['link'],
       ['clean']
     ],
-  };
+  }), []);
 
-  const formats = [
+  const formats = useMemo(() => [
     'bold', 'italic', 'underline', 'strike',
     'list', 'indent', 'link'
-  ];
+  ], []);
 
   // Get cursor position for dropdown placement
   const getCursorPosition = useCallback(() => {
@@ -400,7 +407,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     <div className="rich-text-editor-wrapper" ref={containerRef}>
       <ReactQuill
         ref={quillRef}
-        theme="snow"
+        theme={theme}
         value={value}
         onChange={onChange}
         modules={modules}

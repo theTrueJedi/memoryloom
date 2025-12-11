@@ -2159,6 +2159,83 @@ h2 {
   font-size: var(--font-size-sm);
 }
 
+/* Bubble theme container - full rounded corners since no toolbar above */
+.rich-text-editor-wrapper .ql-container.ql-bubble {
+  border-radius: var(--radius-sm);
+}
+
+/* Bubble theme tooltip (floating toolbar) */
+.rich-text-editor-wrapper .ql-bubble .ql-tooltip {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  padding: 8px 8px !important;
+  margin-top: 20px !important;
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-tooltip .ql-toolbar {
+  padding: 0 !important;
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-formats {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  margin: 0 6px 0 0 !important;
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-formats:last-child {
+  margin-right: 0 !important;
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-tooltip::before {
+  border-bottom-color: var(--border-medium);
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-tooltip::after {
+  border-bottom-color: var(--bg-secondary);
+}
+
+/* Bubble toolbar button styling */
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-stroke {
+  stroke: var(--text-primary);
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-fill {
+  fill: var(--text-primary);
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--primary-teal);
+}
+
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar button:hover .ql-fill,
+.rich-text-editor-wrapper .ql-bubble .ql-toolbar button.ql-active .ql-fill {
+  fill: var(--primary-teal);
+}
+
+/* Dark mode bubble theme */
+[data-theme="dark"] .rich-text-editor-wrapper .ql-bubble .ql-tooltip {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .rich-text-editor-wrapper .ql-bubble .ql-tooltip::after {
+  border-bottom-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-stroke {
+  stroke: var(--text-primary);
+}
+
+[data-theme="dark"] .rich-text-editor-wrapper .ql-bubble .ql-toolbar .ql-fill {
+  fill: var(--text-primary);
+}
+
 .rich-text-editor-wrapper .ql-editor {
   color: var(--text-primary);
   line-height: 1.6;
