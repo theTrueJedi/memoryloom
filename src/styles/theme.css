@@ -1537,9 +1537,9 @@ h2 {
 /* Spin Thought Button */
 .spin-thought-button {
   padding: 5px 10px;
-  background: rgba(91, 193, 179, 0.08);
-  color: var(--primary-teal);
-  border: 1px solid var(--primary-teal);
+  background: rgba(139, 92, 246, 0.08);
+  color: var(--primary-purple);
+  border: 1px solid var(--primary-purple);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
@@ -1556,8 +1556,8 @@ h2 {
 }
 
 .spin-thought-button:hover:not(:disabled) {
-  background: var(--primary-teal);
-  border-color: var(--primary-teal);
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
 }
 
 .spin-thought-button:hover:not(:disabled) svg > path {
@@ -1571,14 +1571,14 @@ h2 {
 }
 
 [data-theme="dark"] .spin-thought-button {
-  background: rgba(125, 212, 199, 0.1);
-  color: #7dd4c7;
-  border-color: #7dd4c7;
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+  border-color: #a78bfa;
 }
 
 [data-theme="dark"] .spin-thought-button:hover:not(:disabled) {
-  background: #7dd4c7;
-  border-color: #7dd4c7;
+  background: #a78bfa;
+  border-color: #a78bfa;
 }
 
 [data-theme="dark"] .spin-thought-button:hover:not(:disabled) svg > path {
@@ -3625,13 +3625,22 @@ h2 {
 
 .yarn-regenerate-button {
   background: transparent;
-  color: var(--primary-purple);
-  border: 2px solid var(--primary-purple);
+  color: var(--primary-teal);
+  border: 2px solid var(--primary-teal);
 }
 
 .yarn-regenerate-button:hover {
-  background: var(--primary-lavender);
+  background: rgba(91, 193, 179, 0.15);
   transform: translateY(-1px);
+}
+
+[data-theme="dark"] .yarn-regenerate-button {
+  color: #7dd4c7;
+  border-color: #7dd4c7;
+}
+
+[data-theme="dark"] .yarn-regenerate-button:hover {
+  background: rgba(125, 212, 199, 0.15);
 }
 
 /* Mobile responsive for yarn modal */
