@@ -1402,7 +1402,6 @@ h2 {
   background: #d64545;
   border-color: #d64545;
   color: white;
-  transform: translateY(-1px);
 }
 
 .delete-button:disabled {
@@ -1452,7 +1451,6 @@ h2 {
   background: #6b7280;
   border-color: #6b7280;
   color: white;
-  transform: translateY(-1px);
 }
 
 .copy-button:disabled {
@@ -1515,6 +1513,154 @@ h2 {
   15% { opacity: 1; transform: translateX(-50%) translateY(0); }
   85% { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+/* Spin Thought Button */
+.spin-thought-button {
+  padding: 5px 10px;
+  background: var(--bg-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    linear-gradient(var(--bg-primary), var(--bg-primary)),
+    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.spin-thought-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.spin-thought-button:hover:not(:disabled) {
+  background-image:
+    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal)),
+    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
+}
+
+.spin-thought-button:hover:not(:disabled) svg > path {
+  fill: var(--bg-primary);
+}
+
+.spin-thought-button:hover:not(:disabled) svg g path {
+  stroke: var(--bg-primary);
+  fill: none;
+}
+
+/* Spin Thought Modal */
+.spin-thought-modal {
+  max-width: 700px;
+}
+
+.spin-thought-instructions {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.spin-thought-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
+}
+
+.spin-thought-toggle-btn {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.spin-thought-toggle-btn:hover {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+  border-color: var(--primary-teal);
+  color: white;
+}
+
+.spin-thought-chips {
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.spin-thought-error {
+  color: #ef4444;
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.spin-thought-results {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.spin-thought-table-wrapper {
+  border-radius: var(--radius-md);
+  padding: 1px;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
+}
+
+.spin-thought-table {
+  width: 100%;
+  border-spacing: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.spin-thought-table td {
+  border-bottom: 0.5px solid var(--border-medium);
+}
+
+.spin-thought-table tr:last-child td {
+  border-bottom: none;
+}
+
+.spin-thought-cell {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  vertical-align: top;
+}
+
+.spin-thought-cell strong {
+  font-family: 'Montserrat', sans-serif;
+  color: #8b5cf6;
+  font-size: 0.9rem;
+}
+
+.spin-thought-content {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-top: var(--spacing-xs);
+}
+
+.spin-thought-content p {
+  margin: 0 0 0.5em 0;
+}
+
+.spin-thought-content p:last-child {
+  margin-bottom: 0;
+}
+
+[data-theme="dark"] .spin-thought-cell strong {
+  color: #a78bfa;
 }
 
 .tag-editor {

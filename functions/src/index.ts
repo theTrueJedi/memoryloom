@@ -696,3 +696,95 @@ ${styleText}
     throw new HttpsError("internal", "Failed to spin yarn");
   }
 });
+
+/**
+ * Retell a single thought in multiple styles
+ */
+export const spinThought = onCall(
+  {
+    timeoutSeconds: 120,
+    memory: "512MiB",
+    region: "us-central1",
+  },
+  async (request) => {
+    // Verify auth
+    if (!request.auth) {
+      throw new HttpsError(
+        "unauthenticated",
+        "User must be authenticated to spin a thought"
+      );
+    }
+
+    const { thoughtContent, styles } = request.data as {
+      thoughtContent: string;
+      styles: string[];
+    };
+
+    if (!thoughtContent || !styles || styles.length === 0) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Thought content and at least one style are required"
+      );
+    }
+
+    // Style descriptions for prompts
+    const styleDescriptions: Record<string, string> = {
+      greekMyth:
+        "Write in the style of Greek mythology - epic language, references to fate and destiny, heroic framing of ordinary experiences.",
+      medieval:
+        "Write as a medieval chronicle - formal, archaic language, as if recorded by a scribe in an illuminated manuscript.",
+      adventure:
+        "Write with adventure pulp energy - vivid action words, tension, dramatic pacing, as if narrating an expedition.",
+      pulp: "Write in pulp fiction style - punchy sentences, noir undertones, hardboiled narration with atmospheric prose.",
+      western:
+        "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
+      lovecraftian:
+        "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
+    };
+
+    try {
+      const results: Record<string, string> = {};
+
+      // Process each style
+      for (const style of styles) {
+        const styleDescription = styleDescriptions[style];
+        if (!styleDescription) {
+          results[style] = "Unknown style";
+          continue;
+        }
+
+        const prompt = `You are retelling a personal thought or journal entry in a specific literary style.
+
+## Original Thought
+${thoughtContent}
+
+## Task
+Retell this thought in the following style:
+${styleDescription}
+
+## Guidelines
+- Preserve the core meaning and emotional essence of the original
+- Keep the retelling concise - roughly the same length as the original
+- Be evocative but faithful to the original content
+- Do not add new facts or events not present in the original
+- Write as a single paragraph or two at most
+- Do not use quotation marks around the output
+- Write directly in the style without meta-commentary`;
+
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const content =
+          response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        results[style] = content.trim();
+      }
+
+      return { results };
+    } catch (error) {
+      console.error("Error spinning thought:", error);
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      throw new HttpsError("internal", "Failed to spin thought");
+    }
+  }
+);

@@ -3,7 +3,7 @@ import { YarnSettings } from '../../types';
 import { getYarnForTag } from '../../services/firestore';
 import BarSelect from '../common/BarSelect';
 
-const STYLE_OPTIONS = [
+export const STYLE_OPTIONS = [
   { value: 'yourVoice', label: 'Your Voice' },
   { value: 'greekMyth', label: 'Greek Myth' },
   { value: 'medieval', label: 'Medieval' },

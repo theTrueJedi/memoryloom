@@ -5,9 +5,10 @@ import ThoughtCard from './ThoughtCard';
 interface ThoughtListProps {
   thoughts: Thought[];
   loading: boolean;
+  onTagClick?: (tagName: string) => void;
 }
 
-const ThoughtList: React.FC<ThoughtListProps> = ({ thoughts, loading }) => {
+const ThoughtList: React.FC<ThoughtListProps> = ({ thoughts, loading, onTagClick }) => {
   if (loading) {
     return (
       <div className="thought-list-loading">
@@ -32,7 +33,7 @@ const ThoughtList: React.FC<ThoughtListProps> = ({ thoughts, loading }) => {
       </h3>
       <div className="thoughts-grid">
         {thoughts.map((thought) => (
-          <ThoughtCard key={thought.id} thought={thought} />
+          <ThoughtCard key={thought.id} thought={thought} onTagClick={onTagClick} />
         ))}
       </div>
     </div>

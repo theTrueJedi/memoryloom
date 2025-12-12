@@ -37,6 +37,11 @@ const ExploreTab: React.FC = () => {
     }
   };
 
+  // Navigate to single tag filter (from ThoughtCard tag clicks)
+  const handleTagNavigate = (tagName: string) => {
+    setSelectedTags([tagName]);
+  };
+
   // Filter thoughts based on search and tags
   const filteredThoughts = useMemo(() => {
     let filtered = thoughts;
@@ -115,7 +120,7 @@ const ExploreTab: React.FC = () => {
         userId={user?.uid}
       />
 
-      <ThoughtList thoughts={filteredThoughts} loading={loading} />
+      <ThoughtList thoughts={filteredThoughts} loading={loading} onTagClick={handleTagNavigate} />
 
       {showYarnModal && selectedTags.length === 1 && (
         <YarnModal

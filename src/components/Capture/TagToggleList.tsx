@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Tag } from '../../types';
 import { insertTag, removeTag } from '../../services/tagExtraction';
 
@@ -9,6 +9,8 @@ interface TagToggleListProps {
   onThoughtTextChange: (text: string) => void;
 }
 
+const COLLAPSED_MAX_HEIGHT = 102; // ~3 rows: 3 * 30px tag height + 2 * 6px gaps
+
 const TagToggleList: React.FC<TagToggleListProps> = ({
   tags,
   activeTags,
@@ -16,6 +18,15 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
   onThoughtTextChange,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const [needsExpand, setNeedsExpand] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setNeedsExpand(containerRef.current.scrollHeight > COLLAPSED_MAX_HEIGHT);
+    }
+  }, [tags]);
+
   const handleTagToggle = (tagName: string) => {
     const isActive = activeTags.includes(tagName);
 
@@ -43,7 +54,7 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
   return (
     <div className="tag-toggle-list">
       <h3 className="tag-toggle-title">Add Past Tags</h3>
-      <div className={`tag-toggle-grid ${expanded ? '' : 'collapsed'}`}>
+      <div ref={containerRef} className={`tag-toggle-grid ${expanded ? '' : 'collapsed'}`}>
         {tags.map((tag) => {
           const isActive = activeTags.includes(tag.name);
           return (
@@ -57,12 +68,14 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
           );
         })}
       </div>
-      <button
-        className="expand-tags-button"
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? 'Collapse' : 'Expand...'}
-      </button>
+      {needsExpand && (
+        <button
+          className="expand-tags-button"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? 'Collapse' : 'Expand...'}
+        </button>
+      )}
     </div>
   );
 };

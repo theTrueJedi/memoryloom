@@ -12,6 +12,7 @@ import {
   getSentimentColor,
   getSentimentEmoji,
 } from '../../utils/sentimentUtils';
+import SpinThoughtModal from './SpinThoughtModal';
 
 // Normalize HTML content to use consistent paragraph structure
 const normalizeContent = (html: string): string => {
@@ -45,9 +46,10 @@ const normalizeContent = (html: string): string => {
 
 interface ThoughtCardProps {
   thought: Thought;
+  onTagClick?: (tagName: string) => void;
 }
 
-const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
+const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
   const { user } = useAuth();
   const { editThought, removeThought } = useThoughts(user?.uid);
   const { tags: allTags, addTag } = useTags(user?.uid);
@@ -76,6 +78,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
   // Sentiment tooltip state
   const [showSentimentTooltip, setShowSentimentTooltip] = useState(false);
   const sentimentRef = useRef<HTMLDivElement>(null);
+
+  // Spin thought modal state
+  const [showSpinModal, setShowSpinModal] = useState(false);
 
   const formatDate = (timestamp: any): string => {
     const date = timestamp.toDate();
@@ -512,8 +517,8 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
                 <span
                   key={tag}
                   className="thought-tag"
-                  onClick={() => setIsEditingTags(true)}
-                  title="Click to edit tags"
+                  onClick={() => onTagClick?.(tag)}
+                  title="Click to filter by this tag"
                 >
                   #{tag}
                 </span>
@@ -652,6 +657,37 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
               </button>
             </div>
             <div className="thought-action-buttons-right">
+              <button
+                className="spin-thought-button"
+                onClick={() => setShowSpinModal(true)}
+                title="Spin this thought"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <defs>
+                    <linearGradient id="spin-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="var(--primary-purple)" />
+                      <stop offset="50%" stopColor="var(--primary-blue)" />
+                      <stop offset="100%" stopColor="var(--primary-teal)" />
+                    </linearGradient>
+                  </defs>
+                  {/* Speech bubble outline */}
+                  <g transform="translate(-2,-2)" stroke="url(#spin-icon-gradient)" fill="none">
+                    <path d="M 21,11.5 A 8.38,8.38 0 0 1 20.1,15.3 8.5,8.5 0 0 1 12.5,20 8.38,8.38 0 0 1 8.7,19.1 L 3,21 4.9,15.3 A 8.38,8.38 0 0 1 4,11.5 8.5,8.5 0 0 1 8.7,3.9 8.38,8.38 0 0 1 12.5,3 H 13 a 8.48,8.48 0 0 1 8,8 z" />
+                  </g>
+                  {/* Arrows inside */}
+                  <path
+                    fill="url(#spin-icon-gradient)"
+                    d="m 7.841,14.668 c 0.04,-0.021 0.103,-0.067 0.142,-0.101 0.038,-0.035 0.089,-0.107 0.114,-0.16 0.024,-0.053 0.044,-0.145 0.044,-0.205 0,-0.06 -0.02,-0.152 -0.045,-0.205 -0.027,-0.057 -0.19,-0.24 -0.397,-0.445 -0.194,-0.192 -0.352,-0.357 -0.352,-0.367 0,-0.01 1.466,-0.021 3.258,-0.024 l 3.258,-0.007 0.169,-0.057 c 0.093,-0.031 0.24,-0.094 0.328,-0.14 0.088,-0.046 0.232,-0.143 0.32,-0.216 0.089,-0.073 0.21,-0.2 0.271,-0.282 0.06,-0.082 0.147,-0.223 0.193,-0.314 0.046,-0.091 0.106,-0.248 0.133,-0.349 0.044,-0.161 0.051,-0.275 0.061,-0.921 0.008,-0.508 0.003,-0.778 -0.016,-0.867 -0.015,-0.071 -0.051,-0.164 -0.08,-0.206 -0.029,-0.042 -0.095,-0.104 -0.147,-0.138 -0.052,-0.034 -0.143,-0.069 -0.202,-0.077 -0.061,-0.009 -0.147,-0.004 -0.198,0.011 -0.05,0.015 -0.127,0.052 -0.172,0.082 -0.045,0.03 -0.109,0.104 -0.142,0.163 -0.06,0.107 -0.06,0.109 -0.072,0.914 l -0.012,0.807 -0.083,0.153 c -0.045,0.084 -0.128,0.189 -0.183,0.234 -0.055,0.045 -0.153,0.106 -0.218,0.136 l -0.119,0.055 -3.174,0.006 c -1.745,0.004 -3.174,-0.002 -3.174,-0.012 0,-0.01 0.158,-0.176 0.352,-0.368 0.207,-0.205 0.37,-0.389 0.397,-0.445 0.025,-0.053 0.045,-0.143 0.046,-0.2 0,-0.057 -0.017,-0.143 -0.037,-0.193 -0.021,-0.049 -0.067,-0.12 -0.102,-0.158 -0.036,-0.038 -0.105,-0.089 -0.154,-0.114 -0.054,-0.027 -0.139,-0.046 -0.212,-0.046 -0.067,0 -0.162,0.017 -0.212,0.037 -0.06,0.025 -0.36,0.306 -0.916,0.861 -0.464,0.463 -0.849,0.867 -0.878,0.921 -0.034,0.065 -0.051,0.14 -0.051,0.229 0,0.089 0.017,0.164 0.051,0.229 0.029,0.054 0.414,0.458 0.878,0.92 0.556,0.555 0.856,0.836 0.916,0.861 0.049,0.02 0.147,0.037 0.217,0.036 0.07,-0.001 0.16,-0.018 0.2,-0.039 z M 6.287,9.529 c 0.059,-0.028 0.128,-0.069 0.153,-0.091 0.025,-0.023 0.068,-0.084 0.097,-0.137 0.049,-0.092 0.052,-0.137 0.064,-0.903 l 0.012,-0.807 0.083,-0.153 c 0.045,-0.084 0.128,-0.189 0.182,-0.234 0.055,-0.045 0.153,-0.106 0.219,-0.137 l 0.118,-0.054 3.174,-0.007 c 1.746,-0.003 3.174,0.002 3.174,0.012 0,0.011 -0.158,0.176 -0.352,0.368 -0.207,0.205 -0.37,0.389 -0.397,0.445 -0.025,0.053 -0.045,0.143 -0.046,0.2 0,0.057 0.017,0.143 0.037,0.193 0.021,0.049 0.067,0.12 0.102,0.158 0.036,0.038 0.105,0.089 0.155,0.114 0.053,0.028 0.138,0.046 0.211,0.046 0.067,0 0.163,-0.017 0.212,-0.037 0.06,-0.025 0.36,-0.306 0.916,-0.861 0.464,-0.463 0.849,-0.867 0.878,-0.921 0.034,-0.065 0.051,-0.14 0.051,-0.229 0,-0.089 -0.017,-0.164 -0.051,-0.229 -0.029,-0.054 -0.414,-0.458 -0.878,-0.92 -0.556,-0.555 -0.856,-0.837 -0.916,-0.862 -0.05,-0.02 -0.145,-0.037 -0.212,-0.037 -0.073,0 -0.159,0.019 -0.214,0.047 -0.05,0.026 -0.125,0.085 -0.166,0.132 -0.041,0.047 -0.086,0.126 -0.1,0.176 -0.014,0.05 -0.025,0.118 -0.025,0.151 0,0.033 0.012,0.104 0.026,0.157 0.021,0.077 0.103,0.173 0.397,0.471 0.204,0.206 0.371,0.382 0.371,0.391 0,0.009 -1.466,0.02 -3.258,0.023 l -3.258,0.007 -0.169,0.057 c -0.093,0.031 -0.24,0.094 -0.328,0.14 -0.088,0.046 -0.223,0.134 -0.301,0.197 -0.077,0.063 -0.193,0.178 -0.257,0.258 -0.064,0.079 -0.164,0.238 -0.222,0.353 -0.058,0.115 -0.125,0.294 -0.149,0.397 -0.038,0.162 -0.044,0.297 -0.044,0.971 0,0.573 0.008,0.806 0.031,0.869 0.017,0.048 0.065,0.122 0.107,0.165 0.042,0.043 0.108,0.094 0.147,0.114 0.039,0.02 0.126,0.041 0.194,0.047 0.092,0.008 0.151,-0.002 0.232,-0.039 z"
+                  />
+                </svg>
+              </button>
               <div className="copy-button-wrapper" ref={copyMenuRef}>
                 <button
                   className="copy-button"
@@ -772,6 +808,13 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
         onClose={() => setIsTimestampEditorOpen(false)}
         onSave={handleSaveTimestamp}
       />
+
+      {showSpinModal && (
+        <SpinThoughtModal
+          thought={thought}
+          onClose={() => setShowSpinModal(false)}
+        />
+      )}
     </div>
   );
 };
