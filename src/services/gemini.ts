@@ -1,6 +1,6 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import app from './firebase';
-import { Sentiment } from '../types';
+import { Sentiment, YarnSettings } from '../types';
 
 // Initialize Firebase Functions
 const functions = getFunctions(app);
@@ -146,6 +146,7 @@ const spinYarnFn = httpsCallable<
     userId: string;
     tagName: string;
     forceRegenerate?: boolean;
+    settings?: YarnSettings;
   },
   {
     content: string;
@@ -159,10 +160,11 @@ const spinYarnFn = httpsCallable<
 export const spinYarn = async (
   userId: string,
   tagName: string,
-  forceRegenerate = false
+  forceRegenerate = false,
+  settings?: YarnSettings
 ): Promise<{ content: string; cached: boolean }> => {
   try {
-    const result = await spinYarnFn({ userId, tagName, forceRegenerate });
+    const result = await spinYarnFn({ userId, tagName, forceRegenerate, settings });
     return result.data;
   } catch (error) {
     console.error('Error spinning yarn:', error);

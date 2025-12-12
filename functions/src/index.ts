@@ -412,17 +412,26 @@ function formatDate(timestamp: FirebaseFirestore.Timestamp): string {
 /**
  * Spin a Yarn: Generate a narrative about experiences with a specific tag
  */
+interface YarnSettings {
+  perspective: "first" | "second" | "third";
+  delivery: "curt" | "normal" | "unabridged";
+  coverage: "recent" | "month" | "allTime";
+  style: string;
+  customPrompt?: string;
+}
+
 export const spinYarn = onCall<{
   userId: string;
   tagName: string;
   forceRegenerate?: boolean;
+  settings?: YarnSettings;
 }>({ cors: true, timeoutSeconds: 120 }, async (request) => {
   // Verify user is authenticated
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
   }
 
-  const { userId, tagName, forceRegenerate } = request.data;
+  const { userId, tagName, forceRegenerate, settings } = request.data;
 
   // Verify the authenticated user matches the userId
   if (request.auth.uid !== userId) {
@@ -433,9 +442,18 @@ export const spinYarn = onCall<{
     throw new HttpsError("invalid-argument", "tagName is required");
   }
 
+  // Check if custom settings are provided (non-default)
+  const hasCustomSettings =
+    settings &&
+    (settings.perspective !== "second" ||
+      settings.delivery !== "normal" ||
+      settings.coverage !== "allTime" ||
+      settings.style !== "yourVoice" ||
+      (settings.customPrompt && settings.customPrompt.trim() !== ""));
+
   try {
-    // Check for cached yarn (unless forcing regeneration)
-    if (!forceRegenerate) {
+    // Check for cached yarn (unless forcing regeneration or using custom settings)
+    if (!forceRegenerate && !hasCustomSettings) {
       const yarnRef = firestore
         .collection("users")
         .doc(userId)
@@ -445,6 +463,12 @@ export const spinYarn = onCall<{
 
       if (yarnSnap.exists) {
         const yarnData = yarnSnap.data();
+
+        // If cached yarn doesn't have settings saved, update it with current settings
+        if (!yarnData?.settings && settings) {
+          await yarnRef.update({ settings });
+        }
+
         return {
           content: yarnData?.content || "",
           cached: true,
@@ -458,9 +482,33 @@ export const spinYarn = onCall<{
       .doc(userId)
       .collection("thoughts");
 
-    const taggedThoughtsQuery = thoughtsRef
-      .where("tags", "array-contains", tagName)
-      .orderBy("timestamp", "asc");
+    // Build query with coverage filtering
+    let taggedThoughtsQuery = thoughtsRef.where(
+      "tags",
+      "array-contains",
+      tagName
+    );
+
+    // Apply coverage filter
+    if (settings?.coverage === "recent") {
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      taggedThoughtsQuery = taggedThoughtsQuery.where(
+        "timestamp",
+        ">=",
+        admin.firestore.Timestamp.fromDate(fourteenDaysAgo)
+      );
+    } else if (settings?.coverage === "month") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      taggedThoughtsQuery = taggedThoughtsQuery.where(
+        "timestamp",
+        ">=",
+        admin.firestore.Timestamp.fromDate(thirtyDaysAgo)
+      );
+    }
+
+    taggedThoughtsQuery = taggedThoughtsQuery.orderBy("timestamp", "asc");
 
     const taggedThoughtsSnap = await taggedThoughtsQuery.get();
 
@@ -516,6 +564,67 @@ export const spinYarn = onCall<{
       })
       .join("\n\n---\n\n");
 
+    // Build dynamic prompt based on settings
+    const perspectiveMap: Record<string, string> = {
+      first: 'first person ("I", "my", "me")',
+      second: 'second person ("you", "your")',
+      third: 'third person ("they", "their", "them")',
+    };
+    const perspectiveText =
+      perspectiveMap[settings?.perspective || "second"] ||
+      perspectiveMap.second;
+
+    const deliveryMap: Record<string, string> = {
+      curt: "Write a brief, factual overview. State dates with bulleted, short, accurate summaries beneath them. Very to-the-point - almost just an outline. No flourishes.",
+      normal:
+        "Write a 1-3 paragraph narrative, condensing and summarizing as needed to capture the essence.",
+      unabridged:
+        "Write a detailed narrative of 2+ paragraphs, covering everything thoroughly and including specific anecdotes and details from the entries.",
+    };
+    const deliveryText =
+      deliveryMap[settings?.delivery || "normal"] || deliveryMap.normal;
+
+    // Coverage context for recent/month
+    let coverageContext = "";
+    if (settings?.coverage === "recent" || settings?.coverage === "month") {
+      coverageContext =
+        '\nIMPORTANT: Start with a VERY brief recap of prior context ("where we left off" or "before this period..."), then focus primarily on the entries shown.';
+    }
+
+    // Style guidance
+    const styleMap: Record<string, string> = {
+      yourVoice:
+        "Match the author's natural writing style, tone, and vocabulary from the samples above.",
+      greekMyth:
+        "Write in the style of Greek mythology - epic language, references to fate and destiny, heroic framing of ordinary experiences.",
+      medieval:
+        "Write as a medieval chronicle - formal, archaic language, as if recorded by a scribe in an illuminated manuscript.",
+      adventure:
+        "Write with adventure pulp energy - vivid action words, tension, dramatic pacing, as if narrating an expedition.",
+      pulp: "Write in pulp fiction style - punchy sentences, noir undertones, hardboiled narration with atmospheric prose.",
+      western:
+        "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
+      lovecraftian:
+        "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
+    };
+    let styleText =
+      styleMap[settings?.style || "yourVoice"] || styleMap.yourVoice;
+
+    // If custom style (not in map), use the style value as custom instructions
+    if (
+      settings?.style &&
+      !styleMap[settings.style] &&
+      settings.style !== "yourVoice"
+    ) {
+      styleText = `Follow this style guidance: ${settings.style}`;
+    }
+
+    // Custom prompt additions
+    const customPromptText =
+      settings?.customPrompt && settings.customPrompt.trim()
+        ? `\n\nAdditional Instructions from the author:\n${settings.customPrompt.trim()}`
+        : "";
+
     const prompt = `You are capturing someone's personal journey in their own voice.
 
 ## Writing Style Reference
@@ -533,20 +642,23 @@ ${taggedThoughtsText}
 ---
 
 ## Task
-Write a 2-4 paragraph narrative about their experience with "${tagName}" in second person ("you").
+${deliveryText}
 
-Guidelines:
-- Match the author's writing style, tone, and vocabulary from the samples above
+Write in ${perspectiveText}.${coverageContext}
+
+## Style
+${styleText}
+
+## Guidelines
 - Weave dates, months, and seasons naturally into the prose (e.g., "that December", "by late summer", "the March entry")
 - Give it a journal-like quality - grounded in specific moments in time
 - Follow chronological progression - show how things evolved over time
 - Let the recorded moods/sentiments inform the emotional arc of the narrative
-- Maintain a measured, reflective tone - avoid being overly enthusiastic or chatty
 - Be evocative but factual - do not embellish or invent details not present in the entries
 - If there's only one entry, write a brief vignette rather than a full narrative arc
 - Avoid clichéd phrases like "your journey", "looking back", "little did you know"
-- Do not use exclamation points or overly casual language
-- Write with literary restraint - understated is better than effusive`;
+- Do not use exclamation points unless the chosen style calls for it
+- Write with literary restraint - understated is better than effusive${customPromptText}`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;
@@ -568,6 +680,7 @@ Guidelines:
       userId,
       tagName,
       content: yarnContent,
+      settings: settings || null,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

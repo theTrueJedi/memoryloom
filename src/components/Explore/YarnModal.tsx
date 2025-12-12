@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface YarnModalProps {
   tagName: string;
@@ -51,9 +52,7 @@ const YarnModal: React.FC<YarnModalProps> = ({
             </div>
           ) : (
             <div className="yarn-text">
-              {content.split('\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              <ReactMarkdown>{content}</ReactMarkdown>
             </div>
           )}
         </div>

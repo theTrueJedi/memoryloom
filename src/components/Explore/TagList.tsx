@@ -5,12 +5,11 @@ interface TagListProps {
   tags: Tag[];
   selectedTags: string[];
   onTagToggle: (tag: string | null) => void;
-  onSpinYarn?: () => void;
 }
 
 const COLLAPSED_MAX_HEIGHT = 102; // ~3 rows: 3 * 30px tag height + 2 * 6px gaps
 
-const TagList: React.FC<TagListProps> = ({ tags, selectedTags, onTagToggle, onSpinYarn }) => {
+const TagList: React.FC<TagListProps> = ({ tags, selectedTags, onTagToggle }) => {
   const [expanded, setExpanded] = useState(false);
   const [needsExpand, setNeedsExpand] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,20 +52,6 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTags, onTagToggle, onSp
         >
           {expanded ? 'Collapse' : 'Expand...'}
         </button>
-      )}
-      {onSpinYarn && (
-        <div className="spin-yarn-row">
-          <span className={`spin-yarn-hint ${selectedTags.length === 1 ? 'hidden' : ''}`}>
-            Select a single Tag to...
-          </span>
-          <button
-            className={`spin-yarn-button ${selectedTags.length !== 1 ? 'disabled' : ''}`}
-            onClick={onSpinYarn}
-            disabled={selectedTags.length !== 1}
-          >
-            Spin a Yarn for #{selectedTags.length === 1 ? selectedTags[0] : '____'}
-          </button>
-        </div>
       )}
     </div>
   );

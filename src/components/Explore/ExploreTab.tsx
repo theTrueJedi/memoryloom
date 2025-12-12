@@ -3,8 +3,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useThoughts } from '../../hooks/useThoughts';
 import { useTags } from '../../hooks/useTags';
 import { spinYarn } from '../../services/gemini';
+import { YarnSettings } from '../../types';
 import SearchBar from './SearchBar';
 import TagList from './TagList';
+import SpinYarnSection from './SpinYarnSection';
 import ThoughtList from './ThoughtList';
 import YarnModal from './YarnModal';
 
@@ -58,17 +60,26 @@ const ExploreTab: React.FC = () => {
     return filtered;
   }, [thoughts, selectedTags, searchQuery]);
 
-  const handleSpinYarn = async (forceRegenerate = false) => {
+  // Store current settings for regenerate functionality
+  const [currentSettings, setCurrentSettings] = useState<YarnSettings | undefined>();
+
+  const handleSpinYarn = async (forceRegenerate = false, settings?: YarnSettings) => {
     // Only allow Spin a Yarn when exactly one tag is selected
     if (!user?.uid || selectedTags.length !== 1) return;
     const selectedTag = selectedTags[0];
+
+    // Store settings for regenerate
+    if (settings) {
+      setCurrentSettings(settings);
+    }
 
     setShowYarnModal(true);
     setYarnLoading(true);
     setYarnContent('');
 
     try {
-      const result = await spinYarn(user.uid, selectedTag, forceRegenerate);
+      const settingsToUse = settings || currentSettings;
+      const result = await spinYarn(user.uid, selectedTag, forceRegenerate, settingsToUse);
       setYarnContent(result.content);
     } catch (error) {
       console.error('Error spinning yarn:', error);
@@ -96,7 +107,12 @@ const ExploreTab: React.FC = () => {
         tags={tags}
         selectedTags={selectedTags}
         onTagToggle={handleTagToggle}
-        onSpinYarn={() => handleSpinYarn(false)}
+      />
+
+      <SpinYarnSection
+        selectedTags={selectedTags}
+        onSpinYarn={(settings) => handleSpinYarn(false, settings)}
+        userId={user?.uid}
       />
 
       <ThoughtList thoughts={filteredThoughts} loading={loading} />

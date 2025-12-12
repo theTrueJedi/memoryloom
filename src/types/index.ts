@@ -81,3 +81,11 @@ export interface Yarn {
   content: string;
   createdAt: Timestamp;
 }
+
+export interface YarnSettings {
+  perspective: 'first' | 'second' | 'third';
+  delivery: 'curt' | 'normal' | 'unabridged';
+  coverage: 'recent' | 'month' | 'allTime';
+  style: string;
+  customPrompt: string;
+}

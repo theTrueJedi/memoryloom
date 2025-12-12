@@ -15,7 +15,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Thought, Tag, TagSuggestion, SentimentSuggestion, Sentiment } from '../types';
+import { Thought, Tag, TagSuggestion, SentimentSuggestion, Sentiment, YarnSettings } from '../types';
 
 // ========== Thought Operations ==========
 
@@ -449,4 +449,28 @@ export const bulkUpdateSentimentSuggestions = async (
   }
 
   await batch.commit();
+};
+
+// ========== Yarn Operations ==========
+
+/**
+ * Check if a cached yarn exists for a given tag and return its settings
+ */
+export const getYarnForTag = async (
+  userId: string,
+  tagName: string
+): Promise<{ exists: boolean; createdAt?: Date; settings?: YarnSettings }> => {
+  const yarnRef = doc(db, `users/${userId}/yarns`, tagName);
+  const yarnSnap = await getDoc(yarnRef);
+
+  if (yarnSnap.exists()) {
+    const data = yarnSnap.data();
+    return {
+      exists: true,
+      createdAt: data.createdAt?.toDate(),
+      settings: data.settings || undefined,
+    };
+  }
+
+  return { exists: false };
 };
