@@ -3267,6 +3267,7 @@ h2 {
 
 .setting-row > label {
   display: block;
+  font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   margin-bottom: 4px;
@@ -3286,6 +3287,7 @@ h2 {
   border: none;
   border-right: 1px solid var(--border-medium);
   color: var(--text-secondary);
+  font-family: var(--font-primary);
   font-size: var(--font-size-xs);
   font-weight: 600;
   cursor: pointer;
@@ -3323,6 +3325,7 @@ h2 {
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
+  font-family: var(--font-primary);
   font-size: var(--font-size-xs);
   font-weight: 600;
   white-space: nowrap;
@@ -3361,7 +3364,8 @@ h2 {
 }
 
 .custom-prompt-input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  opacity: 0.6;
 }
 
 /* Yarn cache hint */

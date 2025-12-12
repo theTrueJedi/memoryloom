@@ -45,6 +45,11 @@ service cloud.firestore {
       match /sentimentSuggestions/{suggestionId} {
         allow read, write: if isOwner(userId);
       }
+
+      // Yarns subcollection (cached yarn stories)
+      match /yarns/{yarnId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

@@ -751,14 +751,11 @@ export const spinThought = onCall(
     };
 
     try {
-      const results: Record<string, string> = {};
-
-      // Process each style
-      for (const style of styles) {
+      // Process all styles in parallel for faster response
+      const stylePromises = styles.map(async (style) => {
         const styleDescription = styleDescriptions[style];
         if (!styleDescription) {
-          results[style] = "Unknown style";
-          continue;
+          return { style, content: "Unknown style" };
         }
 
         const prompt = `You are retelling a personal thought or journal entry in a specific literary style.
@@ -783,7 +780,13 @@ ${styleDescription}
         const response = result.response;
         const content =
           response.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        results[style] = content.trim();
+        return { style, content: content.trim() };
+      });
+
+      const styleResults = await Promise.all(stylePromises);
+      const results: Record<string, string> = {};
+      for (const { style, content } of styleResults) {
+        results[style] = content;
       }
 
       return { results };

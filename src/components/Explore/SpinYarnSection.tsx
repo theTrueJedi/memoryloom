@@ -13,7 +13,7 @@ export const STYLE_OPTIONS = [
   { value: 'lovecraftian', label: 'Lovecraftian' },
   { value: 'standup', label: 'Standup' },
   { value: 'documentary', label: 'Documentary' },
-  { value: 'custom', label: 'Write your own' },
+  { value: 'custom', label: 'Write your own...' },
 ] as const;
 
 const PERSPECTIVE_OPTIONS = [
@@ -191,7 +191,7 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
 
       <div className="spin-yarn-settings">
         <p className="spin-yarn-instructions">
-          Select one or more Tags above, and how you'd like your story told...
+          Select a #Tag above, and how you'd like your story to be told below.
         </p>
 
         <h4 className="settings-subheader">Storytelling Patterns</h4>
@@ -224,7 +224,7 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
         </div>
 
         <div className="setting-row">
-          <label>Style</label>
+          <label>Narrative Style</label>
           <div className="style-chips">
             {STYLE_OPTIONS.map((option) => (
               <button
@@ -246,7 +246,9 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
             className="custom-prompt-input"
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Add any additional instructions for your story..."
+            placeholder={style === 'custom'
+              ? "Define the Narrative Style you'd like, and any additional instructions for your story..."
+              : "Add any additional instructions for your story..."}
             rows={1}
           />
         </div>

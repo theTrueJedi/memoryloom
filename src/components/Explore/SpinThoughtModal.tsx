@@ -59,7 +59,9 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
 
     try {
       const functions = getFunctions();
-      const spinThought = httpsCallable(functions, 'spinThought');
+      const spinThought = httpsCallable(functions, 'spinThought', {
+        timeout: 120000, // Match server timeout of 120 seconds
+      });
 
       const plainTextContent = getPlainTextContent(thought.content);
 
