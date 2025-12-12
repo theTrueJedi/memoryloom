@@ -751,8 +751,10 @@ export const spinThought = onCall(
     };
 
     try {
-      // Process all styles in parallel for faster response
-      const stylePromises = styles.map(async (style) => {
+      const results: Record<string, string> = {};
+
+      // Helper to process a single style
+      const processStyle = async (style: string): Promise<{ style: string; content: string }> => {
         const styleDescription = styleDescriptions[style];
         if (!styleDescription) {
           return { style, content: "Unknown style" };
@@ -781,12 +783,16 @@ ${styleDescription}
         const content =
           response.candidates?.[0]?.content?.parts?.[0]?.text || "";
         return { style, content: content.trim() };
-      });
+      };
 
-      const styleResults = await Promise.all(stylePromises);
-      const results: Record<string, string> = {};
-      for (const { style, content } of styleResults) {
-        results[style] = content;
+      // Process styles in batches of 2 to avoid rate limiting
+      const BATCH_SIZE = 2;
+      for (let i = 0; i < styles.length; i += BATCH_SIZE) {
+        const batch = styles.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.all(batch.map(processStyle));
+        for (const { style, content } of batchResults) {
+          results[style] = content;
+        }
       }
 
       return { results };
