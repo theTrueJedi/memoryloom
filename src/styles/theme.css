@@ -1364,12 +1364,12 @@ h2 {
 }
 
 .edit-tags-button {
-  padding: 5px 14px;
+  padding: 4px 10px;
   background: rgba(26, 122, 111, 0.08);
   color: var(--primary-teal-dark);
   border: 1px solid var(--primary-teal-dark);
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
