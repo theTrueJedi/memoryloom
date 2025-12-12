@@ -130,6 +130,7 @@ export const getSentimentEmoji = (label: string): string => {
 };
 
 export const getAllEmotionLabels = (): EmotionLabel[] => {
+  // Note: 'processing' is intentionally excluded - it's a system-only state
   return [
     'joy',
     'amusement',
@@ -154,7 +155,6 @@ export const getAllEmotionLabels = (): EmotionLabel[] => {
     'confusion',
     'neutral',
     'mixed',
-    'processing',
   ];
 };
 

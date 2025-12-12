@@ -48,7 +48,7 @@ const YarnModal: React.FC<YarnModalProps> = ({
           {loading ? (
             <div className="yarn-loading">
               <div className="yarn-spinner"></div>
-              <p>Spinning your yarn...</p>
+              <p>Spinning your Yarn...</p>
             </div>
           ) : (
             <div className="yarn-text">

@@ -22,7 +22,7 @@ const PERSPECTIVE_OPTIONS = [
 
 const DELIVERY_OPTIONS = [
   { value: 'curt' as const, label: 'Curt' },
-  { value: 'normal' as const, label: 'Normal' },
+  { value: 'normal' as const, label: 'Summary' },
   { value: 'unabridged' as const, label: 'Unabridged' },
 ];
 
@@ -82,26 +82,35 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
         return;
       }
 
-      const result = await getYarnForTag(userId, selectedTags[0]);
-      setCachedYarnExists(result.exists);
-      setCachedYarnDate(result.createdAt);
+      try {
+        console.log('[SpinYarn] Checking for existing yarn:', { userId, tagName: selectedTags[0] });
+        const result = await getYarnForTag(userId, selectedTags[0]);
+        console.log('[SpinYarn] Result:', result);
+        setCachedYarnExists(result.exists);
+        setCachedYarnDate(result.createdAt);
 
-      // Restore saved settings if they exist, otherwise use defaults
-      if (result.settings) {
-        setSavedSettings(result.settings);
-        setPerspective(result.settings.perspective || 'second');
-        setDelivery(result.settings.delivery || 'normal');
-        setCoverage(result.settings.coverage || 'allTime');
-        setStyle(result.settings.style || 'yourVoice');
-        setCustomPrompt(result.settings.customPrompt || '');
-      } else {
-        // No saved settings - use defaults
+        // Restore saved settings if they exist, otherwise use defaults
+        if (result.settings) {
+          setSavedSettings(result.settings);
+          setPerspective(result.settings.perspective || 'second');
+          setDelivery(result.settings.delivery || 'normal');
+          setCoverage(result.settings.coverage || 'allTime');
+          setStyle(result.settings.style || 'yourVoice');
+          setCustomPrompt(result.settings.customPrompt || '');
+        } else {
+          // No saved settings - use defaults
+          setSavedSettings(null);
+          setPerspective('second');
+          setDelivery('normal');
+          setCoverage('allTime');
+          setStyle('yourVoice');
+          setCustomPrompt('');
+        }
+      } catch (error) {
+        console.error('[SpinYarn] Error checking for existing yarn:', error);
+        setCachedYarnExists(false);
+        setCachedYarnDate(undefined);
         setSavedSettings(null);
-        setPerspective('second');
-        setDelivery('normal');
-        setCoverage('allTime');
-        setStyle('yourVoice');
-        setCustomPrompt('');
       }
     };
 
@@ -204,7 +213,7 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
         </div>
 
         <div className="setting-row">
-          <label>Coverage</label>
+          <label>Time Horizon</label>
           <BarSelect
             options={COVERAGE_OPTIONS}
             value={coverage}

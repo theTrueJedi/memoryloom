@@ -575,11 +575,11 @@ export const spinYarn = onCall<{
       perspectiveMap.second;
 
     const deliveryMap: Record<string, string> = {
-      curt: "Write a brief, factual overview. State dates with bulleted, short, accurate summaries beneath them. Very to-the-point - almost just an outline. No flourishes.",
+      curt: "Brief and factual. Use a bulleted timeline format - each bullet has the date and a 1-2 sentence summary. No narrative prose or transitions between entries. Keep it scannable.",
       normal:
-        "Write a 1-3 paragraph narrative, condensing and summarizing as needed to capture the essence.",
+        "Write a concise 1-2 paragraph summary. Hit the key highlights only - distill the essence without lingering on details. Aim for brevity while maintaining narrative flow.",
       unabridged:
-        "Write a detailed narrative of 2+ paragraphs, covering everything thoroughly and including specific anecdotes and details from the entries.",
+        "Write a 1-3 paragraph narrative, condensing and summarizing as needed to capture the essence.",
     };
     const deliveryText =
       deliveryMap[settings?.delivery || "normal"] || deliveryMap.normal;
@@ -588,7 +588,7 @@ export const spinYarn = onCall<{
     let coverageContext = "";
     if (settings?.coverage === "recent" || settings?.coverage === "month") {
       coverageContext =
-        '\nIMPORTANT: Start with a VERY brief recap of prior context ("where we left off" or "before this period..."), then focus primarily on the entries shown.';
+        '\nIMPORTANT: Start with a VERY brief recap of prior context for THIS TAG ONLY ("where we left off" or "before this period..."), then focus primarily on the entries shown. Do not reference other tags or unrelated topics.';
     }
 
     // Style guidance

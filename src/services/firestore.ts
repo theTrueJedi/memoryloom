@@ -460,11 +460,15 @@ export const getYarnForTag = async (
   userId: string,
   tagName: string
 ): Promise<{ exists: boolean; createdAt?: Date; settings?: YarnSettings }> => {
+  const path = `users/${userId}/yarns/${tagName}`;
+  console.log('[getYarnForTag] Fetching:', path);
   const yarnRef = doc(db, `users/${userId}/yarns`, tagName);
   const yarnSnap = await getDoc(yarnRef);
 
+  console.log('[getYarnForTag] Exists:', yarnSnap.exists());
   if (yarnSnap.exists()) {
     const data = yarnSnap.data();
+    console.log('[getYarnForTag] Data:', data);
     return {
       exists: true,
       createdAt: data.createdAt?.toDate(),
