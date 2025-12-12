@@ -3,14 +3,14 @@ import { Tag } from '../../types';
 
 interface TagListProps {
   tags: Tag[];
-  selectedTag: string | null;
-  onTagSelect: (tag: string | null) => void;
+  selectedTags: string[];
+  onTagToggle: (tag: string | null) => void;
   onSpinYarn?: () => void;
 }
 
 const COLLAPSED_MAX_HEIGHT = 102; // ~3 rows: 3 * 30px tag height + 2 * 6px gaps
 
-const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect, onSpinYarn }) => {
+const TagList: React.FC<TagListProps> = ({ tags, selectedTags, onTagToggle, onSpinYarn }) => {
   const [expanded, setExpanded] = useState(false);
   const [needsExpand, setNeedsExpand] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,16 +30,16 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect, onSpi
       <h3 className="section-title">Trace by Tag</h3>
       <div ref={containerRef} className={`tag-list ${expanded ? '' : 'collapsed'}`}>
         <button
-          className={`tag-filter ${selectedTag === null ? 'active' : ''}`}
-          onClick={() => onTagSelect(null)}
+          className={`tag-filter ${selectedTags.length === 0 ? 'active' : ''}`}
+          onClick={() => onTagToggle(null)}
         >
           All Thoughts
         </button>
         {tags.map((tag) => (
           <button
             key={tag.id}
-            className={`tag-filter ${selectedTag === tag.name ? 'active' : ''}`}
-            onClick={() => onTagSelect(tag.name)}
+            className={`tag-filter ${selectedTags.includes(tag.name) ? 'active' : ''}`}
+            onClick={() => onTagToggle(tag.name)}
           >
             <span className="tag-name">#{tag.name}</span>
             <span className="tag-badge">{tag.usageCount}</span>
@@ -56,15 +56,15 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect, onSpi
       )}
       {onSpinYarn && (
         <div className="spin-yarn-row">
-          <span className={`spin-yarn-hint ${selectedTag ? 'hidden' : ''}`}>
-            Select a Tag to...
+          <span className={`spin-yarn-hint ${selectedTags.length === 1 ? 'hidden' : ''}`}>
+            Select a single Tag to...
           </span>
           <button
-            className={`spin-yarn-button ${!selectedTag ? 'disabled' : ''}`}
+            className={`spin-yarn-button ${selectedTags.length !== 1 ? 'disabled' : ''}`}
             onClick={onSpinYarn}
-            disabled={!selectedTag}
+            disabled={selectedTags.length !== 1}
           >
-            Spin a Yarn for #{selectedTag || '____'}
+            Spin a Yarn for #{selectedTags.length === 1 ? selectedTags[0] : '____'}
           </button>
         </div>
       )}

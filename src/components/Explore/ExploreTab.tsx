@@ -14,21 +14,35 @@ const ExploreTab: React.FC = () => {
   const { tags } = useTags(user?.uid);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Yarn state
   const [showYarnModal, setShowYarnModal] = useState(false);
   const [yarnContent, setYarnContent] = useState('');
   const [yarnLoading, setYarnLoading] = useState(false);
 
-  // Filter thoughts based on search and tag
+  // Toggle tag selection (add if not selected, remove if already selected)
+  const handleTagToggle = (tagName: string | null) => {
+    if (tagName === null) {
+      // "All Thoughts" clicked - clear all selections
+      setSelectedTags([]);
+    } else if (selectedTags.includes(tagName)) {
+      // Already selected - remove it
+      setSelectedTags(selectedTags.filter(t => t !== tagName));
+    } else {
+      // Not selected - add it
+      setSelectedTags([...selectedTags, tagName]);
+    }
+  };
+
+  // Filter thoughts based on search and tags
   const filteredThoughts = useMemo(() => {
     let filtered = thoughts;
 
-    // Filter by tag
-    if (selectedTag) {
+    // Filter by tags (union - show thoughts with ANY selected tag)
+    if (selectedTags.length > 0) {
       filtered = filtered.filter((thought) =>
-        thought.tags.includes(selectedTag)
+        thought.tags.some(tag => selectedTags.includes(tag))
       );
     }
 
@@ -42,10 +56,12 @@ const ExploreTab: React.FC = () => {
     }
 
     return filtered;
-  }, [thoughts, selectedTag, searchQuery]);
+  }, [thoughts, selectedTags, searchQuery]);
 
   const handleSpinYarn = async (forceRegenerate = false) => {
-    if (!user?.uid || !selectedTag) return;
+    // Only allow Spin a Yarn when exactly one tag is selected
+    if (!user?.uid || selectedTags.length !== 1) return;
+    const selectedTag = selectedTags[0];
 
     setShowYarnModal(true);
     setYarnLoading(true);
@@ -78,16 +94,16 @@ const ExploreTab: React.FC = () => {
 
       <TagList
         tags={tags}
-        selectedTag={selectedTag}
-        onTagSelect={setSelectedTag}
+        selectedTags={selectedTags}
+        onTagToggle={handleTagToggle}
         onSpinYarn={() => handleSpinYarn(false)}
       />
 
       <ThoughtList thoughts={filteredThoughts} loading={loading} />
 
-      {showYarnModal && selectedTag && (
+      {showYarnModal && selectedTags.length === 1 && (
         <YarnModal
-          tagName={selectedTag}
+          tagName={selectedTags[0]}
           content={yarnContent}
           loading={yarnLoading}
           onClose={handleCloseYarn}
