@@ -11,6 +11,8 @@ export const STYLE_OPTIONS = [
   { value: 'pulp', label: 'Pulp' },
   { value: 'western', label: 'Western' },
   { value: 'lovecraftian', label: 'Lovecraftian' },
+  { value: 'standup', label: 'Standup' },
+  { value: 'documentary', label: 'Documentary' },
   { value: 'custom', label: 'Write your own' },
 ] as const;
 
@@ -204,7 +206,7 @@ const SpinYarnSection: React.FC<SpinYarnSectionProps> = ({
         </div>
 
         <div className="setting-row">
-          <label>Delivery</label>
+          <label>Story Length</label>
           <BarSelect
             options={DELIVERY_OPTIONS}
             value={delivery}

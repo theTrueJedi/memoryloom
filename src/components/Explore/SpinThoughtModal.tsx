@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { STYLE_OPTIONS } from './SpinYarnSection';
 import { Thought } from '../../types';
 import { getFunctions, httpsCallable } from 'firebase/functions';
@@ -192,7 +193,7 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
           {loading && (
             <div className="yarn-loading">
               <div className="yarn-spinner"></div>
-              <p>Retelling your thought...</p>
+              <p>Retelling...</p>
             </div>
           )}
 
@@ -219,7 +220,7 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
                       <td className="spin-thought-cell">
                         <strong>Style: {result.label}</strong>
                         <div className="spin-thought-content">
-                          {result.content}
+                          <ReactMarkdown>{result.content}</ReactMarkdown>
                         </div>
                       </td>
                     </tr>

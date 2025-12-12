@@ -606,6 +606,10 @@ export const spinYarn = onCall<{
         "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
       lovecraftian:
         "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
+      standup:
+        "Write as a stand-up comedy bit - observational humor, self-deprecating wit, building tension through callbacks, and always land a punchline at the end.",
+      documentary:
+        "Write in the style of a nature documentary narrator like David Attenborough - measured, reverent tone, observing human behavior with gentle wonder as if documenting a fascinating species in its natural habitat.",
     };
     let styleText =
       styleMap[settings?.style || "yourVoice"] || styleMap.yourVoice;
@@ -740,6 +744,10 @@ export const spinThought = onCall(
         "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
       lovecraftian:
         "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
+      standup:
+        "Write as a stand-up comedy bit - observational humor, self-deprecating wit, building tension through callbacks, and always land a punchline at the end.",
+      documentary:
+        "Write in the style of a nature documentary narrator like David Attenborough - measured, reverent tone, observing human behavior with gentle wonder as if documenting a fascinating species in its natural habitat.",
     };
 
     try {
