@@ -73,3 +73,11 @@ export interface SentimentSuggestion {
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: Timestamp;
 }
+
+export interface Yarn {
+  id: string;
+  userId: string;
+  tagName: string;
+  content: string;
+  createdAt: Timestamp;
+}

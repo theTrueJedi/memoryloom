@@ -375,3 +375,208 @@ export const processThought = onCall<{
     throw new HttpsError("internal", "Failed to process thought");
   }
 });
+
+// ============================================================
+// SPIN A YARN - Generate narrative from tagged thoughts
+// ============================================================
+
+interface ThoughtData {
+  content: string;
+  tags: string[];
+  sentiment: Sentiment;
+  timestamp: FirebaseFirestore.Timestamp;
+}
+
+/**
+ * Strip HTML tags from content for cleaner prompt text
+ */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Format a timestamp for display in the narrative prompt
+ */
+function formatDate(timestamp: FirebaseFirestore.Timestamp): string {
+  const date = timestamp.toDate();
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/**
+ * Spin a Yarn: Generate a narrative about experiences with a specific tag
+ */
+export const spinYarn = onCall<{
+  userId: string;
+  tagName: string;
+  forceRegenerate?: boolean;
+}>({ cors: true, timeoutSeconds: 120 }, async (request) => {
+  // Verify user is authenticated
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "User must be authenticated");
+  }
+
+  const { userId, tagName, forceRegenerate } = request.data;
+
+  // Verify the authenticated user matches the userId
+  if (request.auth.uid !== userId) {
+    throw new HttpsError("permission-denied", "User ID mismatch");
+  }
+
+  if (!tagName || typeof tagName !== "string") {
+    throw new HttpsError("invalid-argument", "tagName is required");
+  }
+
+  try {
+    // Check for cached yarn (unless forcing regeneration)
+    if (!forceRegenerate) {
+      const yarnRef = firestore
+        .collection("users")
+        .doc(userId)
+        .collection("yarns")
+        .doc(tagName);
+      const yarnSnap = await yarnRef.get();
+
+      if (yarnSnap.exists) {
+        const yarnData = yarnSnap.data();
+        return {
+          content: yarnData?.content || "",
+          cached: true,
+        };
+      }
+    }
+
+    // Query all thoughts with this tag, ordered by timestamp (chronological)
+    const thoughtsRef = firestore
+      .collection("users")
+      .doc(userId)
+      .collection("thoughts");
+
+    const taggedThoughtsQuery = thoughtsRef
+      .where("tags", "array-contains", tagName)
+      .orderBy("timestamp", "asc");
+
+    const taggedThoughtsSnap = await taggedThoughtsQuery.get();
+
+    if (taggedThoughtsSnap.empty) {
+      throw new HttpsError("not-found", "No thoughts found with this tag");
+    }
+
+    const taggedThoughts: ThoughtData[] = taggedThoughtsSnap.docs.map(
+      (doc) => doc.data() as ThoughtData
+    );
+
+    // Collect sentiment labels from tagged thoughts for voice sampling
+    const sentimentLabels = new Set(
+      taggedThoughts.map((t) => t.sentiment?.label).filter(Boolean)
+    );
+
+    // Query additional thoughts for voice reference (different tags, similar sentiments)
+    // Get up to 5 sample thoughts prioritizing similar sentiments
+    const allThoughtsQuery = thoughtsRef
+      .orderBy("timestamp", "desc")
+      .limit(50);
+
+    const allThoughtsSnap = await allThoughtsQuery.get();
+    const allThoughts: ThoughtData[] = allThoughtsSnap.docs.map(
+      (doc) => doc.data() as ThoughtData
+    );
+
+    // Filter to thoughts NOT with this tag, prioritize similar sentiments
+    const voiceSamples = allThoughts
+      .filter((t) => !t.tags.includes(tagName))
+      .sort((a, b) => {
+        // Prioritize similar sentiments
+        const aMatch = sentimentLabels.has(a.sentiment?.label) ? 1 : 0;
+        const bMatch = sentimentLabels.has(b.sentiment?.label) ? 1 : 0;
+        return bMatch - aMatch;
+      })
+      .slice(0, 5);
+
+    // Build the prompt
+    const voiceSamplesText =
+      voiceSamples.length > 0
+        ? voiceSamples
+            .map((t) => `"${stripHtml(t.content).substring(0, 200)}..."`)
+            .join("\n\n")
+        : "No additional samples available.";
+
+    const taggedThoughtsText = taggedThoughts
+      .map((t) => {
+        const date = formatDate(t.timestamp);
+        const mood = t.sentiment?.label || "unknown";
+        const content = stripHtml(t.content);
+        return `**${date}** [Mood: ${mood}]\n${content}`;
+      })
+      .join("\n\n---\n\n");
+
+    const prompt = `You are capturing someone's personal journey in their own voice.
+
+## Writing Style Reference
+Here are samples of how this person writes (use these to match their tone, vocabulary, and style):
+
+${voiceSamplesText}
+
+## Their Journey with "${tagName}"
+These entries are listed chronologically:
+
+---
+
+${taggedThoughtsText}
+
+---
+
+## Task
+Write a 2-4 paragraph narrative about their experience with "${tagName}" in second person ("you").
+
+Guidelines:
+- Match the author's writing style, tone, and vocabulary from the samples above
+- Follow chronological progression - show how things evolved over time
+- Let the recorded moods/sentiments inform the emotional arc of the narrative
+- Be clever and witty in your prose, but NOT cheesy or deliberately "inspirational"
+- Be evocative but factual - do not embellish or invent details not present in the entries
+- If there's only one entry, write a brief vignette rather than a full narrative arc
+- Do not use phrases like "your journey" or "looking back" - be more creative
+- Write naturally as if telling a story to a friend`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const yarnContent =
+      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    if (!yarnContent) {
+      throw new HttpsError("internal", "Failed to generate yarn content");
+    }
+
+    // Save to cache
+    const yarnRef = firestore
+      .collection("users")
+      .doc(userId)
+      .collection("yarns")
+      .doc(tagName);
+
+    await yarnRef.set({
+      userId,
+      tagName,
+      content: yarnContent,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      content: yarnContent,
+      cached: false,
+    };
+  } catch (error) {
+    console.error("Error spinning yarn:", error);
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    throw new HttpsError("internal", "Failed to spin yarn");
+  }
+});

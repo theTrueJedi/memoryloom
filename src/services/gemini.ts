@@ -139,3 +139,33 @@ export const processThought = async (
     };
   }
 };
+
+// Cloud Function reference for spinning yarns
+const spinYarnFn = httpsCallable<
+  {
+    userId: string;
+    tagName: string;
+    forceRegenerate?: boolean;
+  },
+  {
+    content: string;
+    cached: boolean;
+  }
+>(functions, 'spinYarn');
+
+/**
+ * Spin a Yarn: Generate a narrative about experiences with a specific tag
+ */
+export const spinYarn = async (
+  userId: string,
+  tagName: string,
+  forceRegenerate = false
+): Promise<{ content: string; cached: boolean }> => {
+  try {
+    const result = await spinYarnFn({ userId, tagName, forceRegenerate });
+    return result.data;
+  } catch (error) {
+    console.error('Error spinning yarn:', error);
+    throw error;
+  }
+};
