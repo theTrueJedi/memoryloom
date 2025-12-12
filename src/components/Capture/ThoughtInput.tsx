@@ -64,7 +64,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
             </span>
           )}
           <span className="hint-text">
-            {isMobile ? 'Tip: Highlight text for a Formatting Toolbar' : 'Tip: Press Cmd+Enter to save'}
+            {isMobile ? 'Select text for Format Toolbar' : 'Tip: Press Cmd+Enter to save'}
           </span>
         </div>
         <button

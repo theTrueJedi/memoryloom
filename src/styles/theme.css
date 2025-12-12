@@ -303,6 +303,7 @@ h2 {
   align-items: center;
   gap: var(--spacing-xs);
   flex: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .header-logo-wrapper {
