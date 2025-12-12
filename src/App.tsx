@@ -34,6 +34,11 @@ const App: React.FC = () => {
     }
   }, [showAdminTab, activeTab]);
 
+  // Scroll to top when tapping title bar
+  const handleTitleBarClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Handle secret admin tab activation
   const handleHeaderClick = () => {
     const newCount = headerTapCount + 1;
@@ -66,10 +71,12 @@ const App: React.FC = () => {
     <div className="app">
       <div className="app-sticky-header">
         <header className="app-header">
-          <div className="header-logo-wrapper">
-            <img src="/memoryloom_icon.svg" alt="MemoryLoom Icon" className="header-logo" />
+          <div className="header-title-area" onClick={handleTitleBarClick} style={{ cursor: 'pointer' }}>
+            <div className="header-logo-wrapper">
+              <img src="/memoryloom_icon.svg" alt="MemoryLoom Icon" className="header-logo" />
+            </div>
+            <h1 className="page-title">MemoryLoom</h1>
           </div>
-          <h1 className="page-title">MemoryLoom</h1>
           <div className="auth-container-wrapper">
             <GoogleSignIn />
           </div>

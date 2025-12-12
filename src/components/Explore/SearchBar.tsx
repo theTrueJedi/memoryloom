@@ -3,9 +3,10 @@ import React from 'react';
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder = "Search your thoughts..." }) => {
   return (
     <div className="search-bar">
       <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -15,7 +16,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
       <input
         type="text"
         className="search-input"
-        placeholder="Search your thoughts..."
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

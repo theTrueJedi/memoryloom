@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../hooks/useTags';
 import { useThoughts } from '../../hooks/useThoughts';
 import { renameTag, deleteTag } from '../../services/firestore';
+import SearchBar from '../Explore/SearchBar';
 
 const TagManagerTab: React.FC = () => {
   const { user } = useAuth();
@@ -11,6 +12,7 @@ const TagManagerTab: React.FC = () => {
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [newTagName, setNewTagName] = useState('');
   const [deletingTagId, setDeletingTagId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleStartEdit = (tagId: string, currentName: string) => {
     setEditingTagId(tagId);
@@ -125,6 +127,11 @@ const TagManagerTab: React.FC = () => {
     );
   }
 
+  // Filter tags based on search query
+  const filteredTags = tags.filter(tag =>
+    tag.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="tag-manager-tab">
       <div className="tag-manager-header">
@@ -132,8 +139,14 @@ const TagManagerTab: React.FC = () => {
         <p className="subtitle">Manage your tags - rename or delete them</p>
       </div>
 
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search tags..."
+      />
+
       <div className="tag-manager-list">
-        {[...tags].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).map((tag) => {
+        {[...filteredTags].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).map((tag) => {
           // Count thoughts with this tag (case-insensitive)
           const thoughtCount = thoughts.filter(t =>
             t.tags.some(thoughtTag => thoughtTag.toLowerCase() === tag.name.toLowerCase())

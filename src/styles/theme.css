@@ -298,6 +298,13 @@ h2 {
   box-shadow: var(--shadow-sm);
 }
 
+.header-title-area {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
 .header-logo-wrapper {
   height: 60px;
   width: 45px;

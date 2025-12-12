@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { extractTags } from '../../services/tagExtraction';
 import RichTextEditor from './RichTextEditor';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface ThoughtInputProps {
   value: string;
@@ -24,6 +25,8 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
   availableTags = [],
   draftStatus,
 }) => {
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     // Extract and notify parent of tags whenever content changes
     // Strip HTML tags before extracting hashtags
@@ -47,7 +50,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
       <RichTextEditor
         value={value}
         onChange={onChange}
-        placeholder={"What's on your mind? Use #tags to categorize...\nAdd *bold* or _italics_, or start bullets with \"- \""}
+        placeholder={"What's on your mind? Use #tags to categorize...\nUse *bold* or _italics_, or start bullets with \"- \""}
         disabled={disabled}
         minHeight="100px"
         onKeyDown={handleKeyDown}
@@ -61,7 +64,7 @@ const ThoughtInput: React.FC<ThoughtInputProps> = ({
             </span>
           )}
           <span className="hint-text">
-            Tip: Press Cmd+Enter to save
+            {isMobile ? 'Tip: Highlight text for a Formatting Toolbar' : 'Tip: Press Cmd+Enter to save'}
           </span>
         </div>
         <button
