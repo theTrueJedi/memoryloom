@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tag } from '../../types';
 import { insertTag, removeTag } from '../../services/tagExtraction';
 
@@ -15,6 +15,7 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
   thoughtText,
   onThoughtTextChange,
 }) => {
+  const [expanded, setExpanded] = useState(false);
   const handleTagToggle = (tagName: string) => {
     const isActive = activeTags.includes(tagName);
 
@@ -42,7 +43,7 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
   return (
     <div className="tag-toggle-list">
       <h3 className="tag-toggle-title">Add Past Tags</h3>
-      <div className="tag-toggle-grid">
+      <div className={`tag-toggle-grid ${expanded ? '' : 'collapsed'}`}>
         {tags.map((tag) => {
           const isActive = activeTags.includes(tag.name);
           return (
@@ -56,6 +57,12 @@ const TagToggleList: React.FC<TagToggleListProps> = ({
           );
         })}
       </div>
+      <button
+        className="expand-tags-button"
+        onClick={() => setExpanded(!expanded)}
+      >
+        {expanded ? 'Collapse' : 'Expand...'}
+      </button>
     </div>
   );
 };

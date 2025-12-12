@@ -634,7 +634,7 @@ h2 {
 .tag-toggle-list {
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
 }
@@ -650,6 +650,31 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.tag-toggle-grid.collapsed,
+.tag-list.collapsed {
+  max-height: 102px; /* ~3 rows: 3 * 30px tag height + 2 * 6px gaps */
+  overflow: hidden;
+}
+
+.expand-tags-button {
+  display: block;
+  margin: 6px auto 0;
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.expand-tags-button:hover {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+  border-color: var(--primary-teal);
+  color: white;
 }
 
 .tag-toggle {
@@ -821,7 +846,7 @@ h2 {
 .tag-list-section {
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
 }

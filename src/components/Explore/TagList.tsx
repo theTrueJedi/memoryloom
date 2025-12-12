@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tag } from '../../types';
 
 interface TagListProps {
@@ -8,6 +8,8 @@ interface TagListProps {
 }
 
 const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => {
+  const [expanded, setExpanded] = useState(false);
+
   if (tags.length === 0) {
     return null;
   }
@@ -15,7 +17,7 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => 
   return (
     <div className="tag-list-section">
       <h3 className="section-title">Trace by Tag</h3>
-      <div className="tag-list">
+      <div className={`tag-list ${expanded ? '' : 'collapsed'}`}>
         <button
           className={`tag-filter ${selectedTag === null ? 'active' : ''}`}
           onClick={() => onTagSelect(null)}
@@ -33,6 +35,12 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => 
           </button>
         ))}
       </div>
+      <button
+        className="expand-tags-button"
+        onClick={() => setExpanded(!expanded)}
+      >
+        {expanded ? 'Collapse' : 'Expand...'}
+      </button>
     </div>
   );
 };
