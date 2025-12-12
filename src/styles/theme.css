@@ -95,7 +95,7 @@
   position: absolute;
   background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
   background-color: var(--bg-primary);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   z-index: 100;
@@ -104,9 +104,7 @@
 }
 
 [data-theme="dark"] .popup-menu {
-  background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
   background-color: var(--bg-secondary);
-  border-color: var(--border-medium);
 }
 
 .popup-menu-item {
@@ -132,11 +130,7 @@
 }
 
 .popup-menu-item:not(:last-child) {
-  border-bottom: 1px solid var(--border-light);
-}
-
-[data-theme="dark"] .popup-menu-item:not(:last-child) {
-  border-bottom-color: var(--border-medium);
+  border-bottom: 1px solid var(--border-medium);
 }
 
 /* ========== Global Styles ========== */
@@ -614,7 +608,6 @@ h2 {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   border-color: var(--primary-teal);
   color: white;
-  transform: translateY(-1px);
 }
 
 /* Chip highlight state (reusable across all chip types) */
@@ -900,7 +893,6 @@ h2 {
 
 .thought-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }
 
 .thought-card:hover::before {
@@ -976,7 +968,7 @@ h2 {
   right: 0;
   background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
   background-color: var(--bg-primary);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   z-index: 100;
@@ -985,9 +977,7 @@ h2 {
 }
 
 [data-theme="dark"] .sentiment-tooltip {
-  background: linear-gradient(135deg, rgba(111, 45, 177, 0.20) 0%, rgba(91, 193, 179, 0.20) 100%);
   background-color: var(--bg-secondary);
-  border-color: var(--border-medium);
 }
 
 .sentiment-tooltip-row {
