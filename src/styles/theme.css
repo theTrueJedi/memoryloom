@@ -3015,29 +3015,60 @@ h2 {
 }
 
 /* ========== Spin a Yarn ========== */
+.spin-yarn-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.spin-yarn-hint {
+  position: absolute;
+  right: calc(50% + 90px);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: nowrap;
+  transition: opacity var(--transition-base);
+}
+
+.spin-yarn-hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .spin-yarn-button {
-  display: block;
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 8px 16px;
   background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-blue) 50%, var(--primary-teal) 100%);
   color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
+  white-space: nowrap;
 }
 
-.spin-yarn-button:hover {
-  transform: translateY(-2px);
+.spin-yarn-button:hover:not(:disabled) {
+  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
   filter: brightness(1.1);
 }
 
-.spin-yarn-button:active {
+.spin-yarn-button:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.spin-yarn-button.disabled,
+.spin-yarn-button:disabled {
+  background: var(--border-light);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-medium);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Yarn Modal */

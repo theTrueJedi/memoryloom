@@ -537,13 +537,16 @@ Write a 2-4 paragraph narrative about their experience with "${tagName}" in seco
 
 Guidelines:
 - Match the author's writing style, tone, and vocabulary from the samples above
+- Weave dates, months, and seasons naturally into the prose (e.g., "that December", "by late summer", "the March entry")
+- Give it a journal-like quality - grounded in specific moments in time
 - Follow chronological progression - show how things evolved over time
 - Let the recorded moods/sentiments inform the emotional arc of the narrative
-- Be clever and witty in your prose, but NOT cheesy or deliberately "inspirational"
+- Maintain a measured, reflective tone - avoid being overly enthusiastic or chatty
 - Be evocative but factual - do not embellish or invent details not present in the entries
 - If there's only one entry, write a brief vignette rather than a full narrative arc
-- Do not use phrases like "your journey" or "looking back" - be more creative
-- Write naturally as if telling a story to a friend`;
+- Avoid clichéd phrases like "your journey", "looking back", "little did you know"
+- Do not use exclamation points or overly casual language
+- Write with literary restraint - understated is better than effusive`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;

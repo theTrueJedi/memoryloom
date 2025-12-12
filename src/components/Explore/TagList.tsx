@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Tag } from '../../types';
 
 interface TagListProps {
   tags: Tag[];
   selectedTag: string | null;
   onTagSelect: (tag: string | null) => void;
+  onSpinYarn?: () => void;
 }
 
-const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => {
+const COLLAPSED_MAX_HEIGHT = 102; // ~3 rows: 3 * 30px tag height + 2 * 6px gaps
+
+const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect, onSpinYarn }) => {
   const [expanded, setExpanded] = useState(false);
+  const [needsExpand, setNeedsExpand] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setNeedsExpand(containerRef.current.scrollHeight > COLLAPSED_MAX_HEIGHT);
+    }
+  }, [tags]);
 
   if (tags.length === 0) {
     return null;
@@ -17,7 +28,7 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => 
   return (
     <div className="tag-list-section">
       <h3 className="section-title">Trace by Tag</h3>
-      <div className={`tag-list ${expanded ? '' : 'collapsed'}`}>
+      <div ref={containerRef} className={`tag-list ${expanded ? '' : 'collapsed'}`}>
         <button
           className={`tag-filter ${selectedTag === null ? 'active' : ''}`}
           onClick={() => onTagSelect(null)}
@@ -35,12 +46,28 @@ const TagList: React.FC<TagListProps> = ({ tags, selectedTag, onTagSelect }) => 
           </button>
         ))}
       </div>
-      <button
-        className="expand-tags-button"
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? 'Collapse' : 'Expand...'}
-      </button>
+      {needsExpand && (
+        <button
+          className="expand-tags-button"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? 'Collapse' : 'Expand...'}
+        </button>
+      )}
+      {onSpinYarn && (
+        <div className="spin-yarn-row">
+          <span className={`spin-yarn-hint ${selectedTag ? 'hidden' : ''}`}>
+            Select a Tag to...
+          </span>
+          <button
+            className={`spin-yarn-button ${!selectedTag ? 'disabled' : ''}`}
+            onClick={onSpinYarn}
+            disabled={!selectedTag}
+          >
+            Spin a Yarn for #{selectedTag || '____'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

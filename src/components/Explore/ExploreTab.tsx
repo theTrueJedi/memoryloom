@@ -80,16 +80,8 @@ const ExploreTab: React.FC = () => {
         tags={tags}
         selectedTag={selectedTag}
         onTagSelect={setSelectedTag}
+        onSpinYarn={() => handleSpinYarn(false)}
       />
-
-      {selectedTag && (
-        <button
-          className="spin-yarn-button"
-          onClick={() => handleSpinYarn(false)}
-        >
-          Spin a Yarn for #{selectedTag}
-        </button>
-      )}
 
       <ThoughtList thoughts={filteredThoughts} loading={loading} />
 
