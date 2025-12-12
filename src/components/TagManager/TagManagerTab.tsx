@@ -136,7 +136,7 @@ const TagManagerTab: React.FC = () => {
     <div className="tag-manager-tab">
       <div className="tag-manager-header">
         <h2 className="gradient-text">Tag Manager</h2>
-        <p className="subtitle">Manage your tags - rename or delete them</p>
+        <p className="subtitle">Rename or delete your existing tags</p>
       </div>
 
       <SearchBar

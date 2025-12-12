@@ -90,6 +90,19 @@
   --tag-chip-border: #6f5a8f;
 }
 
+/* ========== Base Button Font ========== */
+button {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Exclude tag-related buttons from Montserrat */
+.tag-toggle,
+.tag-filter,
+.tag-editor-item,
+.thought-tag {
+  font-family: var(--font-primary);
+}
+
 /* ========== Popup Menu (reusable) ========== */
 .popup-menu {
   position: absolute;
@@ -390,6 +403,7 @@ h2 {
   color: white;
   border: none;
   border-radius: var(--radius-md);
+  font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
@@ -450,6 +464,7 @@ h2 {
   background: transparent;
   color: var(--text-secondary);
   border: none;
+  border-bottom: 2px solid transparent;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -459,14 +474,18 @@ h2 {
 }
 
 .tab-button:hover {
-  background: var(--primary-lavender);
-  color: var(--text-primary);
+  background: rgba(111, 45, 177, 0.9);
+  color: white;
 }
 
 .tab-button.active {
   background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
   color: white;
   border-bottom: 2px solid var(--primary-teal);
+}
+
+[data-theme="dark"] .tab-button:hover:not(.active) {
+  background: rgba(111, 45, 177, 0.9);
 }
 
 /* ========== Main Content Area ========== */
@@ -1430,8 +1449,8 @@ h2 {
 .copy-button {
   padding: 5px 10px;
   background: rgba(128, 128, 128, 0.08);
-  color: #6b7280;
-  border: 1px solid #9ca3af;
+  color: #4b5563;
+  border: 1px solid #6b7280;
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
@@ -1460,8 +1479,8 @@ h2 {
 
 [data-theme="dark"] .copy-button {
   background: rgba(156, 163, 175, 0.1);
-  color: #9ca3af;
-  border-color: #6b7280;
+  color: #b4bcc8;
+  border-color: #9ca3af;
 }
 
 [data-theme="dark"] .copy-button:hover:not(:disabled) {
@@ -1518,8 +1537,9 @@ h2 {
 /* Spin Thought Button */
 .spin-thought-button {
   padding: 5px 10px;
-  background: var(--bg-primary);
-  border: 1px solid transparent;
+  background: rgba(139, 92, 246, 0.08);
+  color: var(--primary-purple);
+  border: 1px solid var(--primary-purple);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
@@ -1528,11 +1548,6 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image:
-    linear-gradient(var(--bg-primary), var(--bg-primary)),
-    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
 }
 
 .spin-thought-button svg {
@@ -1541,17 +1556,38 @@ h2 {
 }
 
 .spin-thought-button:hover:not(:disabled) {
-  background-image:
-    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal)),
-    linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
 }
 
 .spin-thought-button:hover:not(:disabled) svg > path {
-  fill: var(--bg-primary);
+  fill: white;
+  stroke: white;
 }
 
 .spin-thought-button:hover:not(:disabled) svg g path {
-  stroke: var(--bg-primary);
+  stroke: white;
+  fill: none;
+}
+
+[data-theme="dark"] .spin-thought-button {
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+  border-color: #a78bfa;
+}
+
+[data-theme="dark"] .spin-thought-button:hover:not(:disabled) {
+  background: #a78bfa;
+  border-color: #a78bfa;
+}
+
+[data-theme="dark"] .spin-thought-button:hover:not(:disabled) svg > path {
+  fill: #1a1625;
+  stroke: #1a1625;
+}
+
+[data-theme="dark"] .spin-thought-button:hover:not(:disabled) svg g path {
+  stroke: #1a1625;
   fill: none;
 }
 

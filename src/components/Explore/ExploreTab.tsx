@@ -103,7 +103,7 @@ const ExploreTab: React.FC = () => {
     <div className="explore-tab">
       <div className="explore-header">
         <h2 className="gradient-text">Explore Your Tapestry</h2>
-        <p className="subtitle">Revisit your past thoughts and insights</p>
+        <p className="subtitle">Revisit and retell your past thoughts and insights</p>
       </div>
 
       <SearchBar value={searchQuery} onChange={setSearchQuery} />
