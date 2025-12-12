@@ -607,7 +607,7 @@ export const spinYarn = onCall<{
       lovecraftian:
         "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
       standup:
-        "Write as a stand-up comedy bit - observational humor, self-deprecating wit, building tension through callbacks, and always land a punchline at the end.",
+        "Write as a stand-up comedy bit. Structure it like a real joke: setup that builds tension and leads the audience to assume one thing, then flip it with an unexpected punchline that gets the laugh. Use misdirection - point toward a norm then subvert it. Be specific and vivid, not generic. Channel the energy of comedians like John Mulaney (storytelling with escalating absurdity), Nate Bargatze (deadpan observations), or Ali Wong (bold and unapologetic). NO jokes in the setup - save ALL the funny for the punchline. The ending MUST land with a laugh.",
       documentary:
         "Write in the style of a nature documentary narrator like David Attenborough - measured, reverent tone, observing human behavior with gentle wonder as if documenting a fascinating species in its natural habitat.",
     };
@@ -745,7 +745,7 @@ export const spinThought = onCall(
       lovecraftian:
         "Write with cosmic horror undertones - hints of unknowable dread, purple prose, existential unease lurking beneath mundane events.",
       standup:
-        "Write as a stand-up comedy bit - observational humor, self-deprecating wit, building tension through callbacks, and always land a punchline at the end.",
+        "Write as a stand-up comedy bit. Structure it like a real joke: setup that builds tension and leads the audience to assume one thing, then flip it with an unexpected punchline that gets the laugh. Use misdirection - point toward a norm then subvert it. Be specific and vivid, not generic. Channel the energy of comedians like John Mulaney (storytelling with escalating absurdity), Nate Bargatze (deadpan observations), or Ali Wong (bold and unapologetic). NO jokes in the setup - save ALL the funny for the punchline. The ending MUST land with a laugh.",
       documentary:
         "Write in the style of a nature documentary narrator like David Attenborough - measured, reverent tone, observing human behavior with gentle wonder as if documenting a fascinating species in its natural habitat.",
     };

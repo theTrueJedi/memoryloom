@@ -1537,9 +1537,9 @@ h2 {
 /* Spin Thought Button */
 .spin-thought-button {
   padding: 5px 10px;
-  background: rgba(139, 92, 246, 0.08);
-  color: var(--primary-purple);
-  border: 1px solid var(--primary-purple);
+  background: rgba(91, 193, 179, 0.08);
+  color: var(--primary-teal);
+  border: 1px solid var(--primary-teal);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
@@ -1556,8 +1556,8 @@ h2 {
 }
 
 .spin-thought-button:hover:not(:disabled) {
-  background: var(--primary-purple);
-  border-color: var(--primary-purple);
+  background: var(--primary-teal);
+  border-color: var(--primary-teal);
 }
 
 .spin-thought-button:hover:not(:disabled) svg > path {
@@ -1571,14 +1571,14 @@ h2 {
 }
 
 [data-theme="dark"] .spin-thought-button {
-  background: rgba(167, 139, 250, 0.1);
-  color: #a78bfa;
-  border-color: #a78bfa;
+  background: rgba(125, 212, 199, 0.1);
+  color: #7dd4c7;
+  border-color: #7dd4c7;
 }
 
 [data-theme="dark"] .spin-thought-button:hover:not(:disabled) {
-  background: #a78bfa;
-  border-color: #a78bfa;
+  background: #7dd4c7;
+  border-color: #7dd4c7;
 }
 
 [data-theme="dark"] .spin-thought-button:hover:not(:disabled) svg > path {
@@ -1594,6 +1594,10 @@ h2 {
 /* Spin Thought Modal */
 .spin-thought-modal {
   max-width: 700px;
+}
+
+.spin-thought-modal .yarn-modal-header {
+  padding: var(--spacing-xs) var(--spacing-lg);
 }
 
 .spin-thought-instructions {
@@ -1649,7 +1653,7 @@ h2 {
 .spin-thought-table-wrapper {
   border-radius: var(--radius-md);
   padding: 1px;
-  background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
+  background: linear-gradient(95deg, var(--primary-purple), var(--primary-blue), var(--primary-teal));
 }
 
 .spin-thought-table {
