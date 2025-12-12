@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface DateRange {
   start: Date;
@@ -6,6 +6,8 @@ export interface DateRange {
 }
 
 type PresetType = 'today' | 'yesterday' | '7days' | '30days' | '90days' | '365days' | null;
+
+const STORAGE_KEY = 'memoryloom-myloom-preset';
 
 interface DateRangeSelectorProps {
   dateRange: DateRange;
@@ -16,7 +18,62 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   dateRange,
   onDateRangeChange,
 }) => {
-  const [activePreset, setActivePreset] = useState<PresetType>('7days');
+  // Load saved preset from localStorage, default to '7days'
+  const getSavedPreset = (): PresetType => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && ['today', 'yesterday', '7days', '30days', '90days', '365days'].includes(saved)) {
+      return saved as PresetType;
+    }
+    return '7days';
+  };
+
+  const [activePreset, setActivePreset] = useState<PresetType>(getSavedPreset);
+
+  // Save preset to localStorage whenever it changes
+  useEffect(() => {
+    if (activePreset) {
+      localStorage.setItem(STORAGE_KEY, activePreset);
+    }
+  }, [activePreset]);
+
+  // Apply saved preset on initial mount
+  useEffect(() => {
+    const savedPreset = getSavedPreset();
+    if (savedPreset && savedPreset !== '7days') {
+      // Apply the saved preset's date range
+      const end = new Date();
+      const start = new Date();
+
+      switch (savedPreset) {
+        case 'today':
+          start.setHours(0, 0, 0, 0);
+          break;
+        case 'yesterday':
+          start.setDate(start.getDate() - 1);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(4, 0, 0, 0);
+          break;
+        case '30days':
+          end.setHours(23, 59, 59, 999);
+          start.setDate(start.getDate() - 30);
+          start.setHours(0, 0, 0, 0);
+          break;
+        case '90days':
+          end.setHours(23, 59, 59, 999);
+          start.setDate(start.getDate() - 90);
+          start.setHours(0, 0, 0, 0);
+          break;
+        case '365days':
+          end.setHours(23, 59, 59, 999);
+          start.setDate(start.getDate() - 365);
+          start.setHours(0, 0, 0, 0);
+          break;
+      }
+
+      onDateRangeChange({ start, end });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const formatDateForInput = (date: Date): string => {
     const year = date.getFullYear();
