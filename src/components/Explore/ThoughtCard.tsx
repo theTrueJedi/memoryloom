@@ -319,25 +319,101 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought }) => {
     return tempDiv.innerHTML;
   };
 
-  // Copy handler - copies both HTML and plain text formats
+  // Convert HTML to plain text with proper formatting for lists and paragraphs
+  const convertHtmlToPlainText = (html: string): string => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    const lines: string[] = [];
+
+    const processNode = (node: Node, indent: number = 0) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent || '';
+        if (text.trim()) {
+          return text;
+        }
+        return '';
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+      const el = node as Element;
+      const tagName = el.tagName.toLowerCase();
+
+      // Skip Quill UI elements
+      if (el.classList.contains('ql-ui')) return '';
+
+      // Handle list items
+      if (tagName === 'li') {
+        // Get indent level from Quill classes
+        let itemIndent = indent;
+        for (let i = 1; i <= 8; i++) {
+          if (el.classList.contains(`ql-indent-${i}`)) {
+            itemIndent = i;
+            break;
+          }
+        }
+
+        const prefix = '  '.repeat(itemIndent) + '- ';
+        const childContent: string[] = [];
+        el.childNodes.forEach(child => {
+          const result = processNode(child, itemIndent);
+          if (result) childContent.push(result);
+        });
+        lines.push(prefix + childContent.join(''));
+        return '';
+      }
+
+      // Handle lists (ol/ul)
+      if (tagName === 'ol' || tagName === 'ul') {
+        el.childNodes.forEach(child => processNode(child, indent));
+        return '';
+      }
+
+      // Handle paragraphs
+      if (tagName === 'p') {
+        // Check for empty paragraph (blank line)
+        if (el.innerHTML === '<br>' || el.innerHTML === '' || !el.textContent?.trim()) {
+          lines.push('');
+          return '';
+        }
+
+        const childContent: string[] = [];
+        el.childNodes.forEach(child => {
+          const result = processNode(child, indent);
+          if (result) childContent.push(result);
+        });
+        if (childContent.length > 0) {
+          lines.push(childContent.join(''));
+        }
+        return '';
+      }
+
+      // Handle line breaks
+      if (tagName === 'br') {
+        return '\n';
+      }
+
+      // For other elements, process children and return concatenated text
+      const childContent: string[] = [];
+      el.childNodes.forEach(child => {
+        const result = processNode(child, indent);
+        if (result) childContent.push(result);
+      });
+      return childContent.join('');
+    };
+
+    tempDiv.childNodes.forEach(node => processNode(node, 0));
+
+    return lines.join('\n').trim();
+  };
+
   const handleCopyThought = async (includeMetadata: boolean) => {
     // Build HTML content - convert Quill format to standard HTML
     let htmlContent = convertQuillListsToStandardHtml(normalizeContent(thought.content));
 
-    // Build plain text version for fallback
-    let plainContent = thought.content;
-    // Quill uses <p><br></p> for blank lines - treat as paragraph break
-    plainContent = plainContent.replace(/<p><br\s*\/?><\/p>/gi, '');
-    // Each </p><p> is a paragraph break - double newline
-    plainContent = plainContent.replace(/<\/p>\s*<p>/gi, '\n\n');
-    // Single <br> within a paragraph is a line break
-    plainContent = plainContent.replace(/<br\s*\/?>/gi, '\n');
-    // Strip opening/closing p tags
-    plainContent = plainContent.replace(/<\/?p>/gi, '');
-    // Extract text content
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = plainContent;
-    const plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
+    // Build plain text version with proper formatting
+    const plainText = convertHtmlToPlainText(thought.content);
 
     let finalPlainText = plainText;
     let finalHtml = htmlContent;
