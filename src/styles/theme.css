@@ -140,6 +140,11 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Always reserve space for scrollbar to prevent layout shift between tabs */
+  overflow-y: scroll;
+}
+
 body {
   font-family: var(--font-primary);
   background: var(--bg-primary);
@@ -473,7 +478,7 @@ h2 {
   margin: 0 auto;
 }
 
-/* ========== Capture Tab ========== */
+/* ========== Collect Tab ========== */
 .capture-tab {
   display: flex;
   flex-direction: column;
@@ -638,7 +643,7 @@ h2 {
   border-color: var(--chip-highlight-border);
 }
 
-/* Tag Toggle List (Capture Tab specific) */
+/* Tag Toggle List (Collect Tab specific) */
 .tag-toggle-list {
   background: var(--bg-secondary);
   border-radius: var(--radius-md);

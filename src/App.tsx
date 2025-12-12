@@ -9,7 +9,7 @@ import TagManagerTab from './components/TagManager/TagManagerTab';
 import AdminTab from './components/Admin/AdminTab';
 import './styles/theme.css';
 
-type TabType = 'capture' | 'explore' | 'myloom' | 'tags' | 'admin';
+type TabType = 'collect' | 'explore' | 'myloom' | 'tags' | 'admin';
 
 const ACTIVE_TAB_KEY = 'memoryloom-active-tab';
 
@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     // Use sessionStorage so tab persists on refresh but resets on new visit
     const savedTab = sessionStorage.getItem(ACTIVE_TAB_KEY);
-    return (savedTab as TabType) || 'capture';
+    return (savedTab as TabType) || 'collect';
   });
   const [showAdminTab, setShowAdminTab] = useState(false);
   const [headerTapCount, setHeaderTapCount] = useState(0);
@@ -27,10 +27,10 @@ const App: React.FC = () => {
     sessionStorage.setItem(ACTIVE_TAB_KEY, activeTab);
   }, [activeTab]);
 
-  // If admin tab is hidden and user is on it, switch to capture
+  // If admin tab is hidden and user is on it, switch to collect
   useEffect(() => {
     if (!showAdminTab && activeTab === 'admin') {
-      setActiveTab('capture');
+      setActiveTab('collect');
     }
   }, [showAdminTab, activeTab]);
 
@@ -91,7 +91,7 @@ const App: React.FC = () => {
       </div>
 
       <main className="app-main">
-        {activeTab === 'capture' && <CaptureTab />}
+        {activeTab === 'collect' && <CaptureTab />}
         {activeTab === 'explore' && <ExploreTab />}
         {activeTab === 'myloom' && <MyLoomTab />}
         {activeTab === 'tags' && <TagManagerTab />}
