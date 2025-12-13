@@ -28,6 +28,7 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<RetellResult[]>([]);
   const [copied, setCopied] = useState(false);
+  const [copiedCell, setCopiedCell] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleStyleToggle = (styleValue: string) => {
@@ -125,6 +126,37 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
     }
   };
 
+  const handleCopyCell = async (cellId: string, content: string, isHtml: boolean = false) => {
+    try {
+      let plainText: string;
+      let html: string;
+
+      if (isHtml) {
+        // For original thought content (HTML)
+        plainText = getPlainTextContent(content);
+        html = content;
+      } else {
+        // For markdown content from results
+        plainText = content;
+        html = content;
+      }
+
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plainText], { type: 'text/plain' }),
+      });
+      await navigator.clipboard.write([clipboardItem]);
+      setCopiedCell(cellId);
+      setTimeout(() => setCopiedCell(null), 1500);
+    } catch (err) {
+      // Fallback to plain text
+      const plainText = isHtml ? getPlainTextContent(content) : content;
+      await navigator.clipboard.writeText(plainText);
+      setCopiedCell(cellId);
+      setTimeout(() => setCopiedCell(null), 1500);
+    }
+  };
+
   // Normalize HTML content for display
   const normalizeContent = (html: string): string => {
     if (html.includes('<p>')) {
@@ -208,7 +240,25 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
                 <tbody>
                   <tr>
                     <td className="spin-thought-cell">
-                      <strong>Style: Original</strong>
+                      <div className="spin-thought-header">
+                        <strong>Style: Original</strong>
+                        <button
+                          className="cell-copy-button"
+                          onClick={() => handleCopyCell('original', thought.content, true)}
+                          title="Copy this style"
+                        >
+                          {copiedCell === 'original' ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                       <div
                         className="spin-thought-content"
                         dangerouslySetInnerHTML={{
@@ -220,7 +270,25 @@ const SpinThoughtModal: React.FC<SpinThoughtModalProps> = ({
                   {results.map((result) => (
                     <tr key={result.style}>
                       <td className="spin-thought-cell">
-                        <strong>Style: {result.label}</strong>
+                        <div className="spin-thought-header">
+                          <strong>Style: {result.label}</strong>
+                          <button
+                            className="cell-copy-button"
+                            onClick={() => handleCopyCell(result.style, result.content, false)}
+                            title="Copy this style"
+                          >
+                            {copiedCell === result.style ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                              </svg>
+                            )}
+                          </button>
+                        </div>
                         <div className="spin-thought-content">
                           <ReactMarkdown>{result.content}</ReactMarkdown>
                         </div>

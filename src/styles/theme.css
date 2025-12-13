@@ -1703,6 +1703,53 @@ h2 {
   color: #a78bfa;
 }
 
+.spin-thought-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cell-copy-button {
+  padding: 4px 7px;
+  background: rgba(128, 128, 128, 0.08);
+  color: #4b5563;
+  border: 1px solid #6b7280;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.spin-thought-cell:hover .cell-copy-button {
+  opacity: 1;
+}
+
+.cell-copy-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cell-copy-button:hover {
+  background: #6b7280;
+  border-color: #6b7280;
+  color: white;
+}
+
+[data-theme="dark"] .cell-copy-button {
+  background: rgba(156, 163, 175, 0.1);
+  color: #b4bcc8;
+  border-color: #9ca3af;
+}
+
+[data-theme="dark"] .cell-copy-button:hover {
+  background: #9ca3af;
+  border-color: #9ca3af;
+  color: #1a1625;
+}
+
 .tag-editor {
   padding: var(--spacing-sm);
   background: var(--bg-primary);

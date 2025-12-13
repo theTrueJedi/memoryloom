@@ -600,7 +600,7 @@ export const spinYarn = onCall<{
       medieval:
         "Write as a medieval chronicle - formal, archaic language, as if recorded by a scribe in an illuminated manuscript.",
       adventure:
-        "Write with adventure pulp energy - vivid action words, tension, dramatic pacing, as if narrating an expedition.",
+        "Write like a classic adventure film - Indiana Jones, The Goonies, Romancing the Stone. Treasure maps and booby traps, quips in the face of danger, that sense of wonder when discovering something ancient and impossible. Breathless pacing, lucky escapes, and the thrill of the chase.",
       pulp: "Write in pulp fiction style - punchy sentences, noir undertones, hardboiled narration with atmospheric prose.",
       western:
         "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
@@ -738,7 +738,7 @@ export const spinThought = onCall(
       medieval:
         "Write as a medieval chronicle - formal, archaic language, as if recorded by a scribe in an illuminated manuscript.",
       adventure:
-        "Write with adventure pulp energy - vivid action words, tension, dramatic pacing, as if narrating an expedition.",
+        "Write like a classic adventure film - Indiana Jones, The Goonies, Romancing the Stone. Treasure maps and booby traps, quips in the face of danger, that sense of wonder when discovering something ancient and impossible. Breathless pacing, lucky escapes, and the thrill of the chase.",
       pulp: "Write in pulp fiction style - punchy sentences, noir undertones, hardboiled narration with atmospheric prose.",
       western:
         "Write in Western frontier style - sparse, dusty prose, stoic tone, imagery of wide open spaces and rugged determination.",
