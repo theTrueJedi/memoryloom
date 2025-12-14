@@ -579,7 +579,7 @@ export const spinYarn = onCall<{
       normal:
         "Write a concise 1-2 paragraph summary. Hit the key highlights only - distill the essence without lingering on details. Aim for brevity while maintaining narrative flow.",
       unabridged:
-        "Write a 1-3 paragraph narrative, condensing and summarizing as needed to capture the essence.",
+        "Write a 1-3 paragraph narrative, recapping the majority of the original thoughts, including some direct or near-direct anecdotes and details. You can perform some summarization or combining of similar thoughts to make the narrative flow better.",
     };
     const deliveryText =
       deliveryMap[settings?.delivery || "normal"] || deliveryMap.normal;
@@ -588,7 +588,7 @@ export const spinYarn = onCall<{
     let coverageContext = "";
     if (settings?.coverage === "recent" || settings?.coverage === "month") {
       coverageContext =
-        '\nIMPORTANT: Start with a VERY brief recap of prior context for THIS TAG ONLY ("where we left off" or "before this period..."), then focus primarily on the entries shown. Do not reference other tags or unrelated topics.';
+        '\nIMPORTANT: Start with a brief recap of prior context for THIS TAG ONLY ("where we left off" or "before this period..."), then focus primarily on the entries shown. Do not reference other tags or unrelated topics.';
     }
 
     // Style guidance
@@ -596,7 +596,7 @@ export const spinYarn = onCall<{
       yourVoice:
         "Match the author's natural writing style, tone, and vocabulary from the samples above.",
       greekMyth:
-        "Write in the style of Greek mythology - epic language, references to fate and destiny, heroic framing of ordinary experiences.",
+        "Write in the style of Greek mythology - epic language, references to fate and destiny, heroic framing of ordinary experiences, grand prose with a bit of embellishment.",
       medieval:
         "Write as a medieval chronicle - formal, archaic language, as if recorded by a scribe in an illuminated manuscript.",
       adventure:
