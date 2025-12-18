@@ -9,6 +9,7 @@ export type EmotionLabel =
   | 'love'          // Affectionate, caring, warm
   | 'peace'         // Calm, serene, content
   | 'hope'          // Optimistic, encouraged
+  | 'lucky'         // Fortunate, good karma, worked out well, serendipitous
   | 'creative'      // Inspired, imaginative, inventive; making/building/crafting
   | 'sadness'       // Unhappy, down, melancholic
   | 'anxiety'       // Worried, nervous, stressed

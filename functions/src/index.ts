@@ -70,6 +70,7 @@ Guidelines:
   - love: Affectionate, caring, warm, connected
   - peace: Calm, serene, content, tranquil
   - hope: Optimistic, encouraged, looking forward
+  - lucky: Fortunate, good karma, worked out well, serendipitous, things going your way unexpectedly
   - creative: Inspired, imaginative, inventive, artistic, innovative; also use when describing creative projects, making/building things, crafting, designing, DIY projects, or artistic endeavors
   - curiosity: Interested, inquisitive, engaged, wondering
   - surprise: Amazed, shocked, astonished (in a positive way)
