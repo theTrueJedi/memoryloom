@@ -633,10 +633,23 @@ h2 {
   line-height: 1.2;
 }
 
-.tag-toggle:hover,
-.thought-tag:hover,
-.tag-filter:hover,
-.preset-button:hover {
+/* Hover styles only for devices with mouse/pointer (not touch) */
+@media (hover: hover) {
+  .tag-toggle:hover,
+  .thought-tag:hover,
+  .tag-filter:hover,
+  .preset-button:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    border-color: var(--primary-teal);
+    color: white;
+  }
+}
+
+/* Active/pressed state for touch devices */
+.tag-toggle:active,
+.thought-tag:active,
+.tag-filter:active,
+.preset-button:active {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   border-color: var(--primary-teal);
   color: white;
@@ -653,13 +666,15 @@ h2 {
   color: var(--chip-highlight-text);
 }
 
-.chip-highlight:hover,
-.tag-toggle.active:hover,
-.tag-filter.active:hover,
-.tag-editor-item.active:hover,
-.preset-button.active:hover {
-  background: var(--chip-highlight-bg);
-  border-color: var(--chip-highlight-border);
+@media (hover: hover) {
+  .chip-highlight:hover,
+  .tag-toggle.active:hover,
+  .tag-filter.active:hover,
+  .tag-editor-item.active:hover,
+  .preset-button.active:hover {
+    background: var(--chip-highlight-bg);
+    border-color: var(--chip-highlight-border);
+  }
 }
 
 /* Tag Toggle List (Collect Tab specific) */
@@ -703,7 +718,15 @@ h2 {
   cursor: pointer;
 }
 
-.expand-tags-button:hover {
+@media (hover: hover) {
+  .expand-tags-button:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    border-color: var(--primary-teal);
+    color: white;
+  }
+}
+
+.expand-tags-button:active {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   border-color: var(--primary-teal);
   color: white;
@@ -1626,7 +1649,15 @@ h2 {
   transition: all var(--transition-base);
 }
 
-.spin-thought-toggle-btn:hover {
+@media (hover: hover) {
+  .spin-thought-toggle-btn:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    border-color: var(--primary-teal);
+    color: white;
+  }
+}
+
+.spin-thought-toggle-btn:active {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   border-color: var(--primary-teal);
   color: white;
@@ -1780,6 +1811,14 @@ h2 {
 
 [data-theme="dark"] .tag-editor-input-wrapper:focus-within {
   border-color: var(--primary-teal);
+}
+
+.tag-editor-input-wrapper .tag-autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
 }
 
 .tag-editor-hash {
@@ -3382,7 +3421,15 @@ h2 {
   white-space: nowrap;
 }
 
-.style-chip:hover:not(.active) {
+@media (hover: hover) {
+  .style-chip:hover:not(.active) {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    border-color: var(--primary-teal);
+    color: white;
+  }
+}
+
+.style-chip:active:not(.active) {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
   border-color: var(--primary-teal);
   color: white;

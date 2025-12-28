@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { Thought, EmotionLabel } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -59,6 +59,10 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>(thought.tags);
   const [editedContent, setEditedContent] = useState(thought.content);
   const [newTagInput, setNewTagInput] = useState('');
+  const [tagAutocomplete, setTagAutocomplete] = useState({
+    isOpen: false,
+    selectedIndex: 0,
+  });
 
   // Sync local state when thought.tags changes (e.g., from accepted suggestions)
   React.useEffect(() => {
@@ -81,6 +85,17 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
 
   // Spin thought modal state
   const [showSpinModal, setShowSpinModal] = useState(false);
+
+  // Filtered tags for autocomplete (exclude already selected, match by prefix)
+  const filteredAutocompleteTags = useMemo(() => {
+    if (!newTagInput.trim()) return [];
+    return allTags
+      .filter(tag =>
+        tag.name.toLowerCase().startsWith(newTagInput.toLowerCase()) &&
+        !selectedTags.includes(tag.name)
+      )
+      .slice(0, 5);
+  }, [newTagInput, allTags, selectedTags]);
 
   const formatDate = (timestamp: any): string => {
     const date = timestamp.toDate();
@@ -165,13 +180,43 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
     setIsEditingContent(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  // Select a tag from autocomplete suggestions
+  const selectAutocompleteTag = (tagName: string) => {
+    if (!selectedTags.includes(tagName)) {
+      setSelectedTags(prev => [...prev, tagName]);
+    }
+    setNewTagInput('');
+    setTagAutocomplete({ isOpen: false, selectedIndex: 0 });
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const hasAutocomplete = tagAutocomplete.isOpen && filteredAutocompleteTags.length > 0;
+
+    if (e.key === 'ArrowDown' && hasAutocomplete) {
+      e.preventDefault();
+      setTagAutocomplete(prev => ({
+        ...prev,
+        selectedIndex: Math.min(prev.selectedIndex + 1, filteredAutocompleteTags.length - 1),
+      }));
+    } else if (e.key === 'ArrowUp' && hasAutocomplete) {
+      e.preventDefault();
+      setTagAutocomplete(prev => ({
+        ...prev,
+        selectedIndex: Math.max(prev.selectedIndex - 1, 0),
+      }));
+    } else if ((e.key === 'Enter' || e.key === 'Tab') && hasAutocomplete) {
+      e.preventDefault();
+      selectAutocompleteTag(filteredAutocompleteTags[tagAutocomplete.selectedIndex].name);
+    } else if (e.key === 'Enter') {
       e.preventDefault();
       handleAddNewTag();
     } else if (e.key === 'Escape') {
       e.preventDefault();
-      setNewTagInput('');
+      if (hasAutocomplete) {
+        setTagAutocomplete({ isOpen: false, selectedIndex: 0 });
+      } else {
+        setNewTagInput('');
+      }
     }
   };
 
@@ -736,7 +781,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
           <div
             className="tag-editor"
             onKeyDown={(e) => {
-              if (e.key === 'Escape') {
+              if (e.key === 'Escape' && !tagAutocomplete.isOpen) {
                 e.preventDefault();
                 handleCancelEdit();
               }
@@ -750,9 +795,32 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({ thought, onTagClick }) => {
                   className="tag-editor-input"
                   placeholder="Add new tag..."
                   value={newTagInput}
-                  onChange={(e) => setNewTagInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onChange={(e) => {
+                    setNewTagInput(e.target.value);
+                    setTagAutocomplete({
+                      isOpen: e.target.value.trim().length > 0,
+                      selectedIndex: 0,
+                    });
+                  }}
+                  onKeyDown={handleTagInputKeyDown}
                 />
+                {tagAutocomplete.isOpen && filteredAutocompleteTags.length > 0 && (
+                  <div className="tag-autocomplete-dropdown">
+                    {filteredAutocompleteTags.map((tag, index) => (
+                      <div
+                        key={tag.name}
+                        className={`tag-autocomplete-option ${index === tagAutocomplete.selectedIndex ? 'selected' : ''}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          selectAutocompleteTag(tag.name);
+                        }}
+                        onMouseEnter={() => setTagAutocomplete(prev => ({ ...prev, selectedIndex: index }))}
+                      >
+                        #{tag.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
                 className="tag-editor-add-button"
