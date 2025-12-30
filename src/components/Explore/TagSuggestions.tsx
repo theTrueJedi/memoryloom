@@ -12,6 +12,7 @@ const TagSuggestions: React.FC = () => {
   const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [rejectingAll, setRejectingAll] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -58,6 +59,23 @@ const TagSuggestions: React.FC = () => {
     }
   };
 
+  const handleRejectAll = async () => {
+    if (!user || suggestions.length === 0) return;
+
+    setRejectingAll(true);
+    try {
+      await Promise.all(
+        suggestions.map((suggestion) =>
+          updateTagSuggestionStatus(user.uid, suggestion.id, 'rejected')
+        )
+      );
+    } catch (error) {
+      console.error('Error rejecting all suggestions:', error);
+    } finally {
+      setRejectingAll(false);
+    }
+  };
+
   if (loading) {
     return null;
   }
@@ -87,14 +105,14 @@ const TagSuggestions: React.FC = () => {
               <button
                 className="button-accept"
                 onClick={() => handleAccept(suggestion)}
-                disabled={processingId === suggestion.id}
+                disabled={processingId === suggestion.id || rejectingAll}
               >
                 Accept
               </button>
               <button
                 className="button-reject"
                 onClick={() => handleReject(suggestion)}
-                disabled={processingId === suggestion.id}
+                disabled={processingId === suggestion.id || rejectingAll}
               >
                 Reject
               </button>
@@ -102,6 +120,13 @@ const TagSuggestions: React.FC = () => {
           </div>
         ))}
       </div>
+      <button
+        className="button-reject-all"
+        onClick={handleRejectAll}
+        disabled={rejectingAll || processingId !== null}
+      >
+        {rejectingAll ? 'Rejecting...' : 'Reject All'}
+      </button>
     </div>
   );
 };
