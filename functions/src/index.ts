@@ -1,4 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import { FirestoreAdminClient } from "@google-cloud/firestore/build/src/v1";
 import { VertexAI } from "@google-cloud/vertexai";
 import * as admin from "firebase-admin";
 
@@ -804,5 +806,39 @@ ${styleDescription}
       }
       throw new HttpsError("internal", "Failed to spin thought");
     }
+  }
+);
+
+// ============================================================
+// DAILY FIRESTORE BACKUP
+// ============================================================
+
+/**
+ * Daily automated Firestore export to Cloud Storage.
+ * Runs at 3 AM Central daily. Export runs server-side; this function
+ * just kicks it off and returns.
+ */
+export const dailyFirestoreBackup = onSchedule(
+  {
+    schedule: "0 3 * * *",
+    timeZone: "America/Chicago",
+    region: "us-central1",
+    memory: "256MiB",
+    timeoutSeconds: 120,
+    retryCount: 3,
+  },
+  async () => {
+    const client = new FirestoreAdminClient();
+    const bucket = "gs://thoughtloom-918bd-firestore-backups";
+    const databaseName = client.databasePath("thoughtloom-918bd", "(default)");
+
+    console.log(`[Backup] Starting Firestore export to ${bucket}`);
+
+    const [response] = await client.exportDocuments({
+      name: databaseName,
+      outputUriPrefix: bucket,
+    });
+
+    console.log(`[Backup] Export started: ${response.name}`);
   }
 );
